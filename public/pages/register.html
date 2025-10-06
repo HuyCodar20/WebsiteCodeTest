@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Đăng ký - WebApp Trắc Nghiệm</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Navbar -->
+    <!-- Navbar -->
+    <nav class="navbar">
+      <div class="container">
+        <a href="index.html" class="logo">WebApp Trắc Nghiệm</a>
+        <span class="menu-toggle">&#9776;</span>
+        <ul class="menu">
+          <li><a href="index.html" >Trang chủ</a></li>
+          <li><a href="login.html">Đăng nhập</a></li>
+          <li><a href="register.html" class="active">Đăng ký</a></li>
+          <li><a href="topics.html">Chọn đề tài</a></li>
+          <li><a href="#">Xếp hạng</a></li>
+          <li><a href="#">Đăng câu hỏi</a></li>
+          <li><a href="#">Admin</a></li>
+        </ul>
+      </div>
+    </nav>
+
+  <!-- Nội dung -->
+  <div class="form-container">
+    <h2>Đăng ký</h2>
+    <form>
+      <div class="input-field">
+        <input type="text" placeholder="Tên đăng nhập" required>
+      </div>
+      <div class="input-field">
+        <input type="email" placeholder="Email" required>
+      </div>
+      <div class="input-field">
+        <input type="password" placeholder="Mật khẩu" required>
+      </div>
+      <div class="input-field">
+        <input type="password" placeholder="Xác nhận mật khẩu" required>
+      </div>
+      <button type="submit" class="btn btn-success">Đăng ký</button>
+      <p class="form-text">Đã có tài khoản? <a href="login.html">Đăng nhập ngay</a></p>
+    </form>
+  </div>
+   <!-- JS bật/tắt menu mobile -->
+   <script>
+    const toggle = document.querySelector('.menu-toggle');
+    const menu = document.querySelector('.menu');
+
+    toggle.addEventListener('click', () => {
+      menu.classList.toggle('show');
+    });
+  </script>
+</body>
+</html>
