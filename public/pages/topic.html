@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Danh Mục | DevArena</title>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="/stylesheets/header.css">
+  <link rel="stylesheet" href="/stylesheets/footer.css">
+  <link rel="stylesheet" href="/stylesheets/topic.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+
+<body>
+  <!-- Header -->
+  <div id="header-placeholder"></div>
+
+  <!-- Search Banner -->
+  <section class="search-banner">
+    <h1>Tìm kiếm các danh mục mà bạn quan tâm</h1>
+    <form class="search-form">
+      <input type="search" placeholder="Nhập tên danh mục, ví dụ: ReactJS...">
+      <button type="submit">
+        <i class="fas fa-search"></i>
+      </button>
+    </form>
+  </section>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Sidebar Filters -->
+    <aside class="filters">
+      <div class="filters-header">
+        <h2><i class="fas fa-filter"></i> Filters</h2>
+        <a href="#" class="clear-filters">Clear filters</a>
+      </div>
+
+      <!-- Level Filter -->
+      <div class="filter-group">
+        <h3>Level</h3>
+        <div class="filter-option">
+          <input type="checkbox" id="level-beginner">
+          <label for="level-beginner">Beginner</label>
+        </div>
+        <div class="filter-option">
+          <input type="checkbox" id="level-intermediate">
+          <label for="level-intermediate">Intermediate</label>
+        </div>
+        <div class="filter-option">
+          <input type="checkbox" id="level-advanced">
+          <label for="level-advanced">Advanced</label>
+        </div>
+      </div>
+
+      <!-- Price Filter -->
+      <div class="filter-group">
+        <h3>Price</h3>
+        <div class="filter-option">
+          <input type="checkbox" id="price-free">
+          <label for="price-free">Free</label>
+        </div>
+        <div class="filter-option">
+          <input type="checkbox" id="price-paid">
+          <label for="price-paid">Paid</label>
+        </div>
+      </div>
+
+      <!-- Type Filter -->
+      <div class="filter-group">
+        <h3>Type</h3>
+        <div class="filter-option">
+          <input type="checkbox" id="type-career">
+          <label for="type-career">Career path</label>
+          <i class="fas fa-info-circle info-icon"></i>
+        </div>
+        <div class="filter-option">
+          <input type="checkbox" id="type-skill">
+          <label for="type-skill">Skill path</label>
+          <i class="fas fa-info-circle info-icon"></i>
+        </div>
+        <div class="filter-option">
+          <input type="checkbox" id="type-certification">
+          <label for="type-certification">Certification path</label>
+          <i class="fas fa-info-circle info-icon"></i>
+        </div>
+        <div class="filter-option">
+          <input type="checkbox" id="type-course">
+          <label for="type-course">Course</label>
+          <i class="fas fa-info-circle info-icon"></i>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Topics Grid -->
+    <div class="topics-grid" id="topics-container"></div>
+  </main>
+
+  <!-- Footer -->
+  <div id="footer-placeholder"></div>
+
+  <!-- JavaScript -->
+  <script src="/javascript/main.js"></script>
+  <script>
+    fetch("http://localhost:3000/api/topics")
+      .then(res => res.json())
+      .then(data => {
+        const container = document.getElementById("topics-container");
+        container.innerHTML = "";
+
+        data.forEach(item => {
+          const topic = document.createElement("a");
+          topic.href = "#";
+          topic.className = "topic-card";
+          topic.innerHTML = `
+            <div class="topic-icon">
+              <i class="${item.icon}"></i>
+            </div>
+            <div class="topic-content">
+              <h3>${item.name}</h3>
+              <p>${item.description}</p>
+            </div>
+          `;
+          container.appendChild(topic);
+        });
+      })
+      .catch(err => console.error("Fetch error:", err));
+  </script>
+</body>
+</html>
