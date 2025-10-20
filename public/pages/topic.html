@@ -11,17 +11,17 @@
   <link rel="stylesheet" href="/stylesheets/topic.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
-
 <body>
+
   <!-- Header -->
-  <div id="header-placeholder"></div>
+  <header id="header-placeholder"></header>
 
   <!-- Search Banner -->
   <section class="search-banner">
     <h1>Tìm kiếm các danh mục mà bạn quan tâm</h1>
     <form class="search-form">
       <input type="search" placeholder="Nhập tên danh mục, ví dụ: ReactJS...">
-      <button type="submit">
+      <button type="submit" aria-label="Tìm kiếm">
         <i class="fas fa-search"></i>
       </button>
     </form>
@@ -29,102 +29,58 @@
 
   <!-- Main Content -->
   <main class="main-content">
-    <!-- Sidebar Filters -->
-    <aside class="filters">
-      <div class="filters-header">
-        <h2><i class="fas fa-filter"></i> Filters</h2>
-        <a href="#" class="clear-filters">Clear filters</a>
-      </div>
+    <div class="filters-wrapper">
+      <!-- BỘ LỌC DANH MỤC -->
+      <aside class="filters">
+        <div class="filters-section">
+          <h2 class="filter-title">🗂️ Các danh mục</h2>
+          <div id="type-filters" class="type-filters">
+            <!-- Nút lọc danh mục sẽ được tải vào đây -->
+          </div>
+        </div>
+      </aside>
 
-      <!-- Level Filter -->
-      <div class="filter-group">
-        <h3>Level</h3>
-        <div class="filter-option">
-          <input type="checkbox" id="level-beginner">
-          <label for="level-beginner">Beginner</label>
+      <!-- BỘ LỌC TAGS -->
+      <aside class="filters">
+        <div class="filters-section">
+          <h2 class="filter-title">🏷️ Các nhãn chủ đề</h2>
+         
+          <div id="selected-tags-container" class="selected-tags">
+              <p class="no-tags-selected">Chưa có tag nào được chọn.</p>
+          </div>
+      
+          <button id="open-tags-modal-btn" class="btn-primary">Xem và chọn tags</button>
         </div>
-        <div class="filter-option">
-          <input type="checkbox" id="level-intermediate">
-          <label for="level-intermediate">Intermediate</label>
-        </div>
-        <div class="filter-option">
-          <input type="checkbox" id="level-advanced">
-          <label for="level-advanced">Advanced</label>
-        </div>
-      </div>
-
-      <!-- Price Filter -->
-      <div class="filter-group">
-        <h3>Price</h3>
-        <div class="filter-option">
-          <input type="checkbox" id="price-free">
-          <label for="price-free">Free</label>
-        </div>
-        <div class="filter-option">
-          <input type="checkbox" id="price-paid">
-          <label for="price-paid">Paid</label>
-        </div>
-      </div>
-
-      <!-- Type Filter -->
-      <div class="filter-group">
-        <h3>Type</h3>
-        <div class="filter-option">
-          <input type="checkbox" id="type-career">
-          <label for="type-career">Career path</label>
-          <i class="fas fa-info-circle info-icon"></i>
-        </div>
-        <div class="filter-option">
-          <input type="checkbox" id="type-skill">
-          <label for="type-skill">Skill path</label>
-          <i class="fas fa-info-circle info-icon"></i>
-        </div>
-        <div class="filter-option">
-          <input type="checkbox" id="type-certification">
-          <label for="type-certification">Certification path</label>
-          <i class="fas fa-info-circle info-icon"></i>
-        </div>
-        <div class="filter-option">
-          <input type="checkbox" id="type-course">
-          <label for="type-course">Course</label>
-          <i class="fas fa-info-circle info-icon"></i>
-        </div>
-      </div>
-    </aside>
+      </aside>
+    </div>
 
     <!-- Topics Grid -->
-    <div class="topics-grid" id="topics-container"></div>
+    <section class="topics-grid" id="topics-container">
+   
+    </section>
   </main>
 
+  <!-- HỘP THOẠI CHỌN TAGS -->
+  <div id="tags-modal-overlay" class="modal-overlay">
+    <div class="modal-content">
+      <header class="modal-header">
+        <h2>Chọn Tags bạn quan tâm</h2>
+        <button id="close-modal-btn" class="close-btn">&times;</button>
+      </header>
+      <div id="modal-tags-list" class="modal-body">
+
+      </div>
+      <footer class="modal-footer">
+          <button id="apply-tags-btn" class="btn-primary">Áp dụng</button>
+      </footer>
+    </div>
+  </div>
+
   <!-- Footer -->
-  <div id="footer-placeholder"></div>
+  <footer id="footer-placeholder"></footer>
 
   <!-- JavaScript -->
   <script src="/javascript/main.js"></script>
-  <script>
-    fetch("http://localhost:3000/api/topics")
-      .then(res => res.json())
-      .then(data => {
-        const container = document.getElementById("topics-container");
-        container.innerHTML = "";
-
-        data.forEach(item => {
-          const topic = document.createElement("a");
-          topic.href = "#";
-          topic.className = "topic-card";
-          topic.innerHTML = `
-            <div class="topic-icon">
-              <i class="${item.icon}"></i>
-            </div>
-            <div class="topic-content">
-              <h3>${item.name}</h3>
-              <p>${item.description}</p>
-            </div>
-          `;
-          container.appendChild(topic);
-        });
-      })
-      .catch(err => console.error("Fetch error:", err));
-  </script>
+  <script src="/javascript/topic-page.js" defer></script>
 </body>
 </html>
