@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // 3. Render dữ liệu (đã được server lọc sẵn)
                 grid.innerHTML = ""; // Xóa nội dung cũ
                 if (filteredTopics.length === 0) {
-                    grid.innerHTML = "<p>Không tìm thấy chủ đề nào phù hợp với bộ lọc của bạn.</p>";
+                    grid.innerHTML = "<p class='noresults'>Không tìm thấy chủ đề nào phù hợp với bộ lọc của bạn!</p>";
                     return;
                 }
 
@@ -121,9 +121,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const applyTagsBtn = document.getElementById('apply-tags-btn');
         const modalTagsList = document.getElementById('modal-tags-list');
         const selectedTagsContainer = document.getElementById('selected-tags-container');
+        const clearTagsBtn = document.getElementById('clear-tags-btn');
 
         // Kiểm tra nếu thiếu phần tử DOM thì không chạy
-        if (!openModalBtn || !modalOverlay || !closeModalBtn || !applyTagsBtn || !modalTagsList || !selectedTagsContainer) {
+        if (!openModalBtn || !modalOverlay || !closeModalBtn || !applyTagsBtn || !modalTagsList || !selectedTagsContainer || !clearTagsBtn) {
             console.warn("Một số phần tử DOM của modal tag bị thiếu. Tính năng lọc tag có thể không hoạt động.");
             return;
         }
@@ -222,6 +223,11 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Gọi hàm fetch chính để cập nhật danh sách
             fetchAndRenderTopics();
+        });
+
+        clearTagsBtn.addEventListener('click', () => {
+            modalTemporaryTags.clear();
+            populateTagsModal(); 
         });
 
         // Hiển thị các tag đã chọn (nếu có) khi tải trang
