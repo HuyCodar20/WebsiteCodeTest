@@ -58,13 +58,13 @@ body {
 
 .search-form input[type="search"]:focus {
     background-color: #5a667a;
-    border-color: #7b2cbf;
+    border-color: #1c29a1;
 }
 
 .search-form button {
     padding: 0 25px;
     border: none;
-    background-color: #7b2cbf;
+    background-color: #2c5abf;
     color: #ffffff;
     border-radius: 0 10px 10px 0;
     cursor: pointer;
@@ -73,7 +73,7 @@ body {
 }
 
 .search-form button:hover {
-    background-color: #6a25a3;
+    background-color: #2540a3;
 }
 
 /* --- Main Layout --- */
@@ -352,6 +352,10 @@ body {
         grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
         gap: 15px;
         width: 100%;
+    }
+
+    .search-banner {
+    background-size: 120%;    
     }
 }
 

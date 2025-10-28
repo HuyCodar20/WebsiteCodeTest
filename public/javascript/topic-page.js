@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Các biến này sẽ lưu trạng thái bộ lọc của toàn trang
     let activeTypeFilters = new Set();
     let activeTagFilters = new Set();
+    let currentSearchTerm = "";
 
     /**
      * HÀM CHÍNH: Lấy dữ liệu từ server VỚI BỘ LỌC
@@ -25,6 +26,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (activeTagFilters.size > 0) {
             url.searchParams.set('tags', Array.from(activeTagFilters).join(','));
+        }
+
+        if (currentSearchTerm) {
+            url.searchParams.set('search', currentSearchTerm);
         }
 
         console.log("Đang fetch từ:", url.toString());
@@ -234,8 +239,34 @@ document.addEventListener('DOMContentLoaded', () => {
         updateSelectedTagsDisplay();
     }
 
+    function setupSearch() {
+    const searchForm = document.querySelector('.search-form');
+    if (!searchForm) {
+        console.error("Lỗi: Không tìm thấy .search-form");
+        return;
+    }
+
+    const searchInput = searchForm.querySelector('input[type="search"]');
+    if (!searchInput) {
+        console.error("Lỗi: Không tìm thấy input[type='search'] bên trong .search-form");
+        return;
+    }
+
+    searchForm.addEventListener('submit', (event) => {
+        // Ngăn trình duyệt tải lại trang
+        event.preventDefault(); 
+        
+        // Cập nhật state tìm kiếm
+        currentSearchTerm = searchInput.value.trim();
+        
+        // Gọi hàm fetch chính để cập nhật danh sách
+        fetchAndRenderTopics();
+    });
+}
+
     // --- KHỞI CHẠY ỨNG DỤNG ---
     loadTypeFilters();      // 1. Tải các nút lọc 'type'
     setupTagModal();        // 2. Thiết lập logic cho 'tags' modal
     fetchAndRenderTopics(); // 3. Tải dữ liệu lần đầu tiên (không có bộ lọc)
+    setupSearch();          // 4. Thiết lập chức năng tìm kiếm
 });
