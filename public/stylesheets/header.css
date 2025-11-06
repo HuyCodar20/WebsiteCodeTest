@@ -1,23 +1,65 @@
+/* =================================== */
+/* Global Styles & Variables
+/* =================================== */
+:root {
+    --primary-color: #008cff;
+    --primary-color-hover: #1887fd;
+    --text-color-dark: #333;
+    --text-color-light: #666;
+    --background-color: #f4f4f4;
+    --border-color: #e0e0e0;
+    --white-color: #ffffff;
+    --black-color: #000000;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
+    background-color: var(--background-color);
 }
 
 /* =================================== */
 /* Header Layout
 /* =================================== */
 .main-header {
-    position: relative;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 30px;
-    background: linear-gradient(to right, #ffffff, #e2f7ff);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    border-bottom: none;
-    gap: 30px;
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 30px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(6px);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+  gap: 30px;
+  width: 100%;
+  z-index: 1000;
+  box-sizing: border-box;
+  transition: all 0.8s ease; 
 }
+
+.main-header.sticky {
+  position: fixed;
+  top: 0;
+  left: 0;
+  animation: dropDown 0.8s ease;
+}
+
+/* Hiệu ứng xuất hiện */
+@keyframes dropDown {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
 
 .header-left,
 .header-right {
@@ -35,15 +77,6 @@ body {
 /* =================================== */
 /* Navigation & User Actions
 /* =================================== */
-.main-nav a {
-    padding: 5px 10px;
-    color: #000000;
-    font-size: 18px;
-    font-weight: bold;
-    text-decoration: none;
-    transition: color 0.3s;
-}
-
 .nav-wrapper {
     display: flex;
     justify-content: space-between;
@@ -51,15 +84,24 @@ body {
     flex-grow: 1;
 }
 
+.main-nav a {
+    padding: 5px 10px;
+    color: var(--black-color);
+    font-size: 18px;
+    font-weight: bold;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
 .main-nav a:hover {
-    color: #008cff;
+    color: var(--primary-color);
 }
 
 .user-login {
     display: flex;
     align-items: center;
     gap: 8px;
-    color: #000000;
+    color: var(--black-color);
     font-size: 18px;
     font-weight: bold;
     text-decoration: none;
@@ -67,7 +109,7 @@ body {
 }
 
 .user-login:hover {
-    color: #008cff;
+    color: var(--primary-color);
 }
 
 .user-login i {
@@ -77,12 +119,12 @@ body {
 .settings-btn i {
     font-size: 20px;
     cursor: pointer;
-    color: #000000;
+    color: var(--black-color);
     transition: color 0.3s;
 }
 
 .settings-btn i:hover {
-    color: #008cff;
+    color: var(--primary-color);
 }
 
 /* =================================== */
@@ -103,14 +145,14 @@ body {
     display: none;
     position: absolute;
     top: 150%;
-    left: 340%;
+    left: 320%; 
+    transform: translateX(-50%); /* Dịch chuyển lại 50% chiều rộng của chính nó */
     z-index: 100;
     width: 1200px;
     padding: 25px;
-    background-color: #ffffff;
+    background-color: var(--white-color);
     border-radius: 8px;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-    transform: translateX(-50%);
     flex-direction: column;
     gap: 20px;
 }
@@ -125,21 +167,21 @@ body {
 
 .dropdown-intro {
     padding-bottom: 20px;
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .dropdown-intro h4 {
     margin-top: 0;
     margin-bottom: 8px;
     font-size: 18px;
-    color: #333;
+    color: var(--text-color-dark);
 }
 
 .dropdown-intro p {
     margin: 0;
     font-size: 14px;
     line-height: 1.5;
-    color: #666;
+    color: var(--text-color-light);
 }
 
 .dropdown-columns {
@@ -160,7 +202,7 @@ body {
     margin-top: 0;
     margin-bottom: 15px;
     font-size: 16px;
-    color: #333;
+    color: var(--text-color-dark);
 }
 
 .dropdown-grid {
@@ -183,7 +225,7 @@ body {
     font-size: 15px;
     font-weight: 500;
     text-decoration: none;
-    border: 1px solid #e0e0e0;
+    border: 1px solid var(--border-color);
     border-radius: 6px;
     transition: all 0.2s ease;
 }
@@ -194,12 +236,12 @@ body {
 
 .topic-item:hover {
     background-color: #f5f9ff;
-    border-color: #1887fd;
-    color: #1887fd;
+    border-color: var(--primary-color-hover);
+    color: var(--primary-color-hover);
 }
 
 .topic-item:hover i {
-    color: #1887fd;
+    color: var(--primary-color-hover);
 }
 
 .view-all-link {
@@ -207,7 +249,7 @@ body {
     margin-top: 15px;
     padding: 12px 20px;
     background-color: #d2d2d2;
-    color: #ffffff;
+    color: var(--white-color);
     text-align: center;
     font-weight: bold;
     text-decoration: none;
@@ -224,10 +266,15 @@ body {
 }
 
 /* =================================== */
-/* Hamburger Menu (Desktop Default)
+/* Hamburger Menu (Hidden on Desktop)
 /* =================================== */
 .hamburger-btn {
     display: none;
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: var(--black-color);
+    cursor: pointer;
 }
 
 /* =================================== */
@@ -258,11 +305,6 @@ body {
 
     .hamburger-btn {
         display: block;
-        background: none;
-        border: none;
-        font-size: 24px;
-        color: #000;
-        cursor: pointer;
     }
 
     .nav-wrapper {
@@ -274,41 +316,39 @@ body {
         width: 100%;
         background-color: #f8f9fa;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        box-sizing: border-box;
     }
     
     .nav-wrapper.active {
         display: block; 
     }
 
-    /* --- Style lại các mục bên trong menu --- */
     .main-nav,
     .header-right {
         width: 100%;
     }
     
-    /* Style chung cho tất cả các mục trong menu mobile */
-    .main-nav a,
-    .user-login,
-    .sound-icon {
+    /* Gom nhóm các style chung cho các mục menu mobile */
+    .nav-wrapper .main-nav a,
+    .nav-wrapper .user-login,
+    .nav-wrapper .sound-icon {
         display: flex;
         align-items: center;
         padding: 15px 20px;
         text-decoration: none;
-        color: #333;
+        color: var(--text-color-dark);
         border-bottom: 1px solid #e9ecef;
     }
 
+    /* Style riêng cho user-login nếu cần */
     .user-login {
         justify-content: space-between;
     }
 
     .sound-icon i {
-        color: #333;
+        color: var(--text-color-dark);
     }
 
     .dropdown-content {
-        display: none;
         position: static; 
         width: auto;
         padding: 10px 0 10px 20px; 
@@ -321,18 +361,15 @@ body {
     
     .dropdown .arrow-icon {
         display: inline-block; 
-        transition: transform 0.3s ease;
     }
 
     .dropdown.active .dropdown-content {
         display: block; 
     }
 
-
     .dropdown.active .arrow-icon {
         transform: rotate(180deg);
     }
-    
 
     .dropdown-columns {
         flex-direction: column;
@@ -354,8 +391,6 @@ body {
 /* =================================== */
 /* Settings Modal Styles
 /* =================================== */
-
-/* --- Lớp phủ nền --- */
 .modal-overlay {
     display: none;
     position: fixed;
@@ -367,7 +402,6 @@ body {
     z-index: 1999;
 }
 
-/* --- Khung hộp thoại --- */
 .modal {
     display: none;
     position: fixed;
@@ -376,25 +410,23 @@ body {
     transform: translate(-50%, -50%);
     width: 90%;
     max-width: 450px;
-    background-color: #ffffff;
+    background-color: var(--white-color);
     border-radius: 8px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
     z-index: 2000;
 }
 
-/* Trạng thái hiển thị */
 .modal-overlay.active,
 .modal.active {
     display: block;
 }
 
-/* --- Các thành phần bên trong hộp thoại --- */
 .modal-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 15px 20px;
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .modal-header h3 {
@@ -414,7 +446,7 @@ body {
 }
 
 .close-btn:hover {
-    color: #333;
+    color: var(--text-color-dark);
 }
 
 .modal-body {
@@ -431,7 +463,7 @@ body {
 }
 
 .setting-item label {
-    color: #333;
+    color: var(--text-color-dark);
 }
 
 .setting-input {
@@ -443,7 +475,7 @@ body {
     font-size: 16px;
 }
 
-/* --- Style cho nút gạt (Toggle Switch) --- */
+/* --- Toggle Switch --- */
 .switch {
     position: relative;
     display: inline-block;
@@ -482,9 +514,16 @@ body {
 }
 
 input:checked + .slider {
-    background-color: #2196F3;
+    background-color: var(--primary-color-hover);
 }
 
 input:checked + .slider:before {
     transform: translateX(22px);
+}
+
+.slider-container span {
+    width: 30px;
+    text-align: right;
+    font-weight: bold;
+    color: var(--text-color-dark);
 }

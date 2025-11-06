@@ -26,6 +26,7 @@ document.addEventListener("DOMContentLoaded", function() {
      * Khởi tạo các script cho header (dropdown, menu mobile, modal settings).
      */
     const initializeHeaderScripts = () => {
+        // --- Các biến và logic cũ ---
         const categoryBtn = document.getElementById('category-btn');
         const hamburgerBtn = document.getElementById('hamburger-btn');
         const navWrapper = document.getElementById('nav-wrapper');
@@ -34,7 +35,6 @@ document.addEventListener("DOMContentLoaded", function() {
         const settingsOverlay = document.getElementById('settings-overlay');
         const closeModalBtn = document.getElementById('close-modal-btn');
 
-        // Logic cho dropdown danh mục
         if (categoryBtn) {
             const dropdown = categoryBtn.closest('.dropdown');
             categoryBtn.addEventListener('click', function(event) {
@@ -44,7 +44,6 @@ document.addEventListener("DOMContentLoaded", function() {
             });
         }
 
-        // Logic cho menu mobile (hamburger)
         if (hamburgerBtn && navWrapper) {
             hamburgerBtn.addEventListener('click', function(event) {
                 event.stopPropagation();
@@ -52,25 +51,39 @@ document.addEventListener("DOMContentLoaded", function() {
             });
         }
 
-        // Logic cho modal cài đặt
-        if (settingsBtn && settingsModal && settingsOverlay && closeModalBtn) {
-            const openSettingsModal = () => {
+        const openSettingsModal = () => {
+            if (settingsModal && settingsOverlay) {
                 settingsModal.classList.add('active');
                 settingsOverlay.classList.add('active');
-            };
+            }
+        };
 
-            const closeSettingsModal = () => {
+        const closeSettingsModal = () => {
+            if (settingsModal && settingsOverlay) {
                 settingsModal.classList.remove('active');
                 settingsOverlay.classList.remove('active');
-            };
+            }
+        };
 
-            settingsBtn.addEventListener('click', (event) => {
+        if (settingsBtn && settingsModal && settingsOverlay && closeModalBtn) {
+            settingsBtn.addEventListener('click', function(event) {
                 event.preventDefault();
                 openSettingsModal();
             });
             closeModalBtn.addEventListener('click', closeSettingsModal);
             settingsOverlay.addEventListener('click', closeSettingsModal);
         }
+
+        window.addEventListener('click', function(event) {
+            const activeDropdown = document.querySelector('.dropdown.active');
+            if (activeDropdown && !activeDropdown.contains(event.target)) {
+                activeDropdown.classList.remove('active');
+            }
+
+            if (navWrapper && navWrapper.classList.contains('active') && !navWrapper.contains(event.target) && !hamburgerBtn.contains(event.target)) {
+                navWrapper.classList.remove('active');
+            }
+        });
     };
 
     /**
@@ -189,4 +202,15 @@ document.addEventListener("DOMContentLoaded", function() {
 
     initializeSlideshow();
     initializeTabs();
+    
 });
+
+window.addEventListener("scroll", function() {
+  const header = document.querySelector(".main-header");
+  if (window.scrollY > 50) { // scroll 50px thì dính
+    header.classList.add("sticky");
+  } else {
+    header.classList.remove("sticky");
+  }
+});
+
