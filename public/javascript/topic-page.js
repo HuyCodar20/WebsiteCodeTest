@@ -52,8 +52,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 filteredTopics.forEach(item => {
                     const topicLink = document.createElement("a");
-                    // Sử dụng _id từ MongoDB cho URL nếu có
-                    topicLink.href = `/topic/${item._id || '#'}`; 
+                    // Sử dụng _id từ MongoDB cho URL
+                    topicLink.href = `/pages/selectTest.html?id=${item._id}`; 
                     topicLink.className = "topic-card";
                     topicLink.innerHTML = `
                       <div class="topic-icon">
