@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Header</title>
-    <link rel="stylesheet" href="/public/stylesheets/header.css">
+    <link rel="stylesheet" href="/stylesheets/header.css"> 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 
@@ -25,68 +25,25 @@
                         Danh mục <i class="fas fa-chevron-down arrow-icon"></i>
                     </a>
                     <div class="dropdown-content">
-                        <div class="dropdown-intro">
-                            <h4>Khám phá các chủ đề</h4>
-                            <p>
-                                Chọn chủ đề để làm bài test, hãy ưu tiên những lĩnh vực phù hợp với mục tiêu và kỹ năng của bạn và chọn chủ đề cơ bản để dễ tiếp cận.
-                            </p>
                         </div>
-                        <div class="dropdown-columns">
-                            <div class="dropdown-section">
-                                <h5>Ngôn ngữ phổ biến</h5>
-                                <div class="dropdown-grid">
-                                    <a href="#" class="topic-item"><i class="fab fa-python"></i> Python</a>
-                                    <a href="#" class="topic-item"><i class="fab fa-js-square"></i> JavaScript</a>
-                                    <a href="#" class="topic-item"><i class="fab fa-html5"></i> HTML & CSS</a>
-                                    <a href="#" class="topic-item"><i class="fab fa-php"></i> PHP</a>
-                                    <a href="#" class="topic-item"><i class="fab fa-java"></i> Java</a>
-                                    <a href="#" class="topic-item"><i class="fas fa-database"></i> SQL</a>
-                                </div>
-                            </div>
-                            <div class="dropdown-section">
-                                <h5>Chủ đề phổ biến</h5>
-                                <div class="dropdown-grid">
-                                    <a href="#" class="topic-item"><i class="fas fa-robot"></i> AI</a>
-                                    <a href="#" class="topic-item"><i class="fas fa-laptop-code"></i> Web Dev</a>
-                                    <a href="#" class="topic-item"><i class="fas fa-shield-alt"></i> Cybersecurity</a>
-                                    <a href="#" class="topic-item"><i class="fas fa-server"></i> IT</a>
-                                    <a href="#" class="topic-item"><i class="fas fa-cloud"></i> Cloud</a>
-                                    <a href="#" class="topic-item"><i class="fas fa-drafting-compass"></i> Web Design</a>
-                                </div>
-                            </div>
-                            <div class="dropdown-section">
-                                <h5>Công cụ & Nền tảng</h5>
-                                <div class="dropdown-grid">
-                                    <a href="#" class="topic-item"><i class="fab fa-git-alt"></i> Git</a>
-                                    <a href="#" class="topic-item"><i class="fab fa-docker"></i> Docker</a>
-                                    <a href="#" class="topic-item"><i class="fab fa-aws"></i> AWS</a>
-                                    <a href="#" class="topic-item"><i class="fas fa-cogs"></i> Kubernetes</a>
-                                    <a href="#" class="topic-item"><i class="fab fa-jira"></i> Jira</a>
-                                    <a href="#" class="topic-item"><i class="fab fa-jenkins"></i> Jenkins</a>
-                                </div>
-                            </div>
-                        </div>
-
-                        <a href="#" class="view-all-link"> Xem toàn bộ danh mục <i class="fas fa-arrow-right"></i></a>
-
-                    </div>
                 </div>
                 <a href="#">Xếp hạng</a>
-                <a href="#">Thi đấu</a>
+                <a href="#">Thi đấu</a>
                 <a href="#">Đóng góp</a>
-                <a href="#">Chia sẽ</a>
+                <a href="#">Chia sẻ</a>
             </nav>
 
             <div class="header-right">
-                <a href="#" class="user-login">
-                    <span>Đăng nhập</span>
-                    <i class="fas fa-user-circle"></i>
-                </a>
-
+                
+                <div id="user-session-container">
+                    <a href="/pages/login.html" class="user-login">
+                        <span>Đăng nhập</span>
+                        <i class="fas fa-user-circle"></i>
+                    </a>
+                </div>
                 <a href="#" class="settings-btn" id="settings-btn">
-                <i class="fas fa-cog"></i>
+                    <i class="fas fa-cog"></i>
                 </a>
-
             </div>
         </div>
 
@@ -96,48 +53,9 @@
     </header>
 
     <div class="modal-overlay" id="settings-overlay"></div>
-
     <div class="modal" id="settings-modal">
-    <div class="modal-header">
-        <h3>Cài đặt</h3>
-        <button class="close-btn" id="close-modal-btn">&times;</button>
-    </div>
-    <div class="modal-body">
-        <div class="setting-item">
-            <label for="bg-music">Nhạc nền</label>
-            <label class="switch">
-                <input type="checkbox" id="bg-music" checked>
-                <span class="slider"></span>
-            </label>
         </div>
-        <div class="setting-item">
-            <label for="sound-effects">Hiệu ứng âm thanh</label>
-            <label class="switch">
-                <input type="checkbox" id="sound-effects" checked>
-                <span class="slider"></span>
-            </label>
-        </div>
-        <div class="setting-item">
-            <label for="question-timer">Đồng hồ đếm giờ (từng câu)</label>
-            <label class="switch">
-                <input type="checkbox" id="question-timer">
-                <span class="slider"></span>
-            </label>
-        </div>
-        <div class="setting-item">
-            <label for="num-questions">Số câu hỏi mỗi bài</label>
-            <input type="number" class="setting-input" id="num-questions" value="5" min="5" max="50">
-        </div>
-        <div class="setting-item">
-            <label for="total-time">Thời gian tổng (phút)</label>
-            <input type="number" class="setting-input" id="total-time" value="15" min="1">
-        </div>
-    </div>
 
-</div>
-
-</body>
-
-<script src="/public/javascript/main.js"></script>
-
+    <script src="/javascript/main.js"></script> 
+    </body>
 </html>

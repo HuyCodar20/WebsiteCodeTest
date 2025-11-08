@@ -6,40 +6,28 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  
-   <!-- Navbar -->
-   <nav class="navbar">
-    <div class="container">
-      <a href="index.html" class="logo">WebApp Trắc Nghiệm</a>
-      <span class="menu-toggle">&#9776;</span>
-      <ul class="menu">
-        <li><a href="index.html" >Trang chủ</a></li>
-        <li><a href="login.html" class="active">Đăng nhập</a></li>
-        <li><a href="register.html">Đăng ký</a></li>
-        <li><a href="topics.html">Chọn đề tài</a></li>
-        <li><a href="#">Xếp hạng</a></li>
-        <li><a href="#">Đăng câu hỏi</a></li>
-        <li><a href="#">Admin</a></li>
-      </ul>
-    </div>
-  </nav>
+  <div id="header-placeholder"></div>
 
-  <!-- Nội dung -->
   <div class="form-container">
     <h2>Đăng nhập</h2>
-    <form>
+    <div class="avatar-container">
+      <img src="" alt="User Avatar" class="avatar">
+    </div>
+
+    <form id="login-form">
       <div class="input-field">
-        <input type="text" placeholder="Tên đăng nhập" required>
+        <input type="text" id="username" placeholder="Tên đăng nhập" required>
       </div>
       <div class="input-field">
-        <input type="password" placeholder="Mật khẩu" required>
+        <input type="password" id="password" placeholder="Mật khẩu" required>
       </div>
-      <button type="submit" class="btn btn-primary">Đăng nhập</button>
+      
+      <button type="button" id="login-btn" class="btn btn-primary">Đăng nhập</button>
+      
       <p class="form-text">Chưa có tài khoản? <a href="register.html">Đăng ký ngay</a></p>
     </form>
   </div>
-      <!-- JS bật/tắt menu mobile -->
-  <script>
+      <script>
     const toggle = document.querySelector('.menu-toggle');
     const menu = document.querySelector('.menu');
 
