@@ -1,40 +1,93 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <title>Đăng ký - WebApp Trắc Nghiệm</title>
+  <meta charset="UTF-8">
+  <title>Đăng ký - WebApp Trắc Nghiệm</title>
 
-  <link rel="stylesheet" href="/stylesheets/style.css">
-  <link rel="stylesheet" href="/stylesheets/header.css">
+  <link rel="stylesheet" href="/stylesheets/style.css">
+  <link rel="stylesheet" href="/stylesheets/header.css">
+  <style>
+    /* Thêm style cho phần upload avatar */
+    .avatar-upload-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .avatar-preview {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 3px solid #eee;
+      object-fit: cover;
+      background-color: #f8f8f8;
+      cursor: pointer;
+    }
+    /* Ẩn input file mặc định */
+    input[type="file"]#avatar {
+      display: none;
+    }
+    /* Nút chọn ảnh (label) */
+    .avatar-upload-label {
+      margin-top: 10px;
+      padding: 8px 15px;
+      background-color: #007bff;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .avatar-upload-label:hover {
+      background-color: #0056b3;
+    }
+  </style>
 </head>
 <body>
-  <div id="header-placeholder"></div>
+  <div id="header-placeholder"></div>
 
-  <div class="form-container">
-    <h2>Đăng ký</h2>
-    <div class="avatar-container">
-      <img src="" alt="User Avatar" class="avatar">
-    
-    <form id="register-form">
-      <div class="input-field">
-        <input type="text" id="username" placeholder="Tên đăng nhập" required>
-      </div>
-      <div class="input-field">
-        <input type="email" id="email" placeholder="Email" required>
-      </div>
-      <div class="input-field">
-        <input type="password" id="password" placeholder="Mật khẩu" required>
-      </div>
-      <div class="input-field">
-        <input type="password" id="confirm-password" placeholder="Xác nhận mật khẩu" required>
-      </div>
-      
-      <button type="button" id="register-btn" class="btn btn-success">Đăng ký</button>
-      
-      <p class="form-text">Đã có tài khoản? <a href="login.html">Đăng nhập ngay</a></p>
-    </form>
-  </div>
-   
-  <script src="/javascript/main.js"></script>
+  <div class="form-container">
+    <h2>Đăng ký</h2>
+
+    <!-- BẮT ĐẦU THAY ĐỔI: Thêm khu vực upload -->
+    <div class="avatar-upload-container">
+      <!-- 1. Ảnh xem trước -->
+      <img 
+        src="/images/default-avatar.png" 
+        alt="" 
+        class="avatar-preview" 
+        id="avatar-preview"
+      >
+      <!-- 2. Nút bấm (label) trỏ tới input -->
+      <label for="avatar" class="avatar-upload-label">
+        Chọn ảnh đại diện
+      </label>
+      <!-- 3. Input file thật (bị ẩn đi) -->
+      <input type="file" id="avatar" name="avatar" accept="image/png, image/jpeg">
+    </div>
+    <!-- KẾT THÚC THAY ĐỔI -->
+
+    <form id="register-form">
+      <div class="input-field">
+        <input type="text" id="username" placeholder="Tên đăng nhập" required>
+      </div>
+      <div class="input-field">
+        <input type="email" id="email" placeholder="Email" required>
+      </div>
+      <div class="input-field">
+        <input type="password" id="password" placeholder="Mật khẩu" required>
+      </div>
+      <div class="input-field">
+        <input type="password" id="confirm-password" placeholder="Xác nhận mật khẩu" required>
+      </div>
+      
+      <button type="submit" id="register-btn" class="btn btn-success">Đăng ký</button>
+      
+      <p class="form-text">Đã có tài khoản? <a href="login.html">Đăng nhập ngay</a></p>
+    </form>
+  </div>
+  
+  <!-- Tải main.js (cho header) và auth.js (cho form) -->
+  <script src="/javascript/main.js"></script>
+  <script src="/javascript/auth.js"></script>
 </body>
 </html>

@@ -1,36 +1,37 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <title>Đăng nhập - WebApp Trắc Nghiệm</title>
-  
-  <link rel="stylesheet" href="/stylesheets/style.css">
-  <link rel="stylesheet" href="/stylesheets/header.css">
+  <meta charset="UTF-8">
+  <title>Đăng nhập - WebApp Trắc Nghiệm</title>
+  
+  <link rel="stylesheet" href="/stylesheets/style.css">
+  <link rel="stylesheet" href="/stylesheets/header.css">
 </head>
 <body>
-  <div id="header-placeholder"></div>
+  <div id="header-placeholder"></div>
 
-  <div class="form-container">
-    <h2>Đăng nhập</h2>
-    <div class="avatar-container">
-      <img src="" alt="User Avatar" class="avatar">
-    </div>
+  <div class="form-container">
+    <h2>Đăng nhập</h2>
+    
+    <!-- ĐÃ GỠ BỎ DIV AVATAR-CONTAINER KHỎI ĐÂY -->
 
-    <form id="login-form">
-      <div class="input-field">
-        <input type="text" id="username" placeholder="Tên đăng nhập" required>
-      </div>
-      <div class="input-field">
-        <input type="password" id="password" placeholder="Mật khẩu" required>
-      </div>
-      
-      <button type="button" id="login-btn" class="btn btn-primary">Đăng nhập</button>
-      
-      <p class="form-text">Chưa có tài khoản? <a href="register.html">Đăng ký ngay</a></p>
-    </form>
-  </div>
-  
-  <script src="/javascript/main.js"></script>
+    <form id="login-form">
+      <div class="input-field">
+        <input type="text" id="username" placeholder="Tên đăng nhập" required>
+      </div>
+      <div class="input-field">
+        <input type="password" id="password" placeholder="Mật khẩu" required>
+      </div>
+      
+      <button type="submit" id="login-btn" class="btn btn-primary">Đăng nhập</button>
+      
+      <p class="form-text">Chưa có tài khoản? <a href="register.html">Đăng ký ngay</a></p>
+    </form>
+  </div>
+  
+  <!-- THÊM main.js để tải header -->
+
+  <script src="/javascript/auth.js"></script>
 
 </body>
 </html>

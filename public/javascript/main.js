@@ -1,5 +1,11 @@
+// public/javascript/main.js (ĐÃ DỌN DẸP)
+
 document.addEventListener("DOMContentLoaded", function() {
 
+    /**
+     * Hàm này sẽ được gọi SAU KHI header.html được tải xong
+     * Nó chứa TẤT CẢ logic của header (dropdown, modal, check login)
+     */
     const initializeHeaderScripts = () => {
         const categoryBtn = document.getElementById('category-btn');
         const hamburgerBtn = document.getElementById('hamburger-btn');
@@ -16,21 +22,18 @@ document.addEventListener("DOMContentLoaded", function() {
         if (hamburgerBtn && navWrapper) {
             // ... (giữ nguyên)
         }
-        const openSettingsModal = () => {
-            // ... (giữ nguyên)
-        };
-        const closeSettingsModal = () => {
-            // ... (giữ nguyên)
-        };
+        // ... (giữ nguyên code xử lý modal settings) ...
         if (settingsBtn && settingsModal && settingsOverlay && closeModalBtn) {
             // ... (giữ nguyên)
-        }
+        }
+        // ... (giữ nguyên code window.addEventListener('click', ...))
         window.addEventListener('click', function(event) {
-            // ... (giữ nguyên)
-        });
+            // ... (giữ nguyên)
+ });
 
         // ==================================================
-        // === CẬP NHẬT 1: THÊM LOGIC KIỂM TRA USER VÀO HEADER ===
+        // LOGIC KIỂM TRA USER VÀ ĐĂNG XUẤT (VẪN GIỮ Ở ĐÂY)
+        // Vì header được tải trên MỌI trang
         // ==================================================
         const userContainer = document.getElementById('user-session-container');
         const storedUser = localStorage.getItem('currentUser'); // Lấy user từ bộ nhớ
@@ -41,7 +44,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 const user = JSON.parse(storedUser); // Đọc user
                 
                 // Thay thế HTML bằng avatar và tên
-                // (Hãy chắc chắn bạn có class .user-profile-link, .header-avatar...)
                 userContainer.innerHTML = `
                     <a href="/pages/profile.html" class="user-profile-link">
                         <img src="${user.avatarUrl || '/images/default-avatar.png'}" alt="Avatar" class="header-avatar">
@@ -69,6 +71,9 @@ document.addEventListener("DOMContentLoaded", function() {
         // === KẾT THÚC CẬP NHẬT 1 ===
     };
 
+    /**
+     * Hàm tải các thành phần HTML (header, footer)
+     */
     const loadComponent = (url, elementId, callback) => {
         fetch(url)
             .then(response => {
@@ -79,69 +84,28 @@ document.addEventListener("DOMContentLoaded", function() {
                 const element = document.getElementById(elementId);
                 if (element) {
                     element.innerHTML = data;
-                    if (callback) callback();
+                    if (callback) callback(); // Chạy hàm callback (initializeHeaderScripts)
                 }
             })
             .catch(error => console.error('Lỗi khi tải thành phần:', error));
     };
 
-    // (Code loadComponent của bạn giữ nguyên)
-    loadComponent('/pages/header.html', 'header-placeholder', initializeHeaderScripts);
+    // --- TẢI CÁC THÀNH PHẦN CHUNG ---
+    // Tải header, VÀ SAU ĐÓ chạy initializeHeaderScripts
+    loadComponent('/pages/header.html', 'header-placeholder', initializeHeaderScripts); 
     loadComponent('/pages/footer.html', 'footer-placeholder');
 
+    // --- LOGIC CỦA TRANG CHỦ (Slideshow, Tabs...) ---
     // (Code Slideshow và Tabs của bạn giữ nguyên)
     // --- Logic cho Slideshow ---
     // ... (giữ nguyên)
     // --- Logic cho Tabs ---
     // ... (giữ nguyên)
     
-    // (Code Form Đăng Ký của bạn giữ nguyên)
-    // --- Logic cho Form Đăng Ký ---
-    const registerForm = document.getElementById('register-form');
-    if (registerForm) {
-        // ... (giữ nguyên)
-    }
 
-    // ==================================================
-    // === CẬP NHẬT 2: SỬA LOGIC FORM ĐĂNG NHẬP ===
-    // ==================================================
-    const loginForm = document.getElementById('login-form');
-    if (loginForm) { // Chỉ chạy nếu tìm thấy form đăng nhập
-        const loginBtn = document.getElementById('login-btn');
+    // (PHẦN FORM ĐĂNG KÝ ĐÃ BỊ XÓA)
 
-        loginBtn.addEventListener('click', async () => {
-            // 1. Lấy giá trị
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
+    // (PHẦN FORM ĐĂNG NHẬP ĐÃ BỊ XÓA)
 
-            // 2. Gửi dữ liệu lên API /api/login
-            try {
-                const response = await fetch('/api/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password }),
-                });
-
-                const data = await response.json(); // Đọc data { message, user }
-
-                if (response.ok) {
-                    // --- BẮT ĐẦU SỬA ĐỔI ---
-                    // 1. Lưu user (data.user) vào localStorage
-                    localStorage.setItem('currentUser', JSON.stringify(data.user));
-                    
-                    // 2. Thông báo và tải lại trang chủ
-                    alert(data.message); // Thông báo từ server (Mocked)
-                    window.location.href = '/'; // Chuyển về trang chủ
-                    // --- KẾT THÚC SỬA ĐỔI ---
-                } else {
-                    alert('Lỗi: ' + data.message);
-                }
-            } catch (error) {
-                console.error('Lỗi khi gọi API đăng nhập:', error);
-                alert('Không thể kết nối đến server.');
-            }
-        });
-    }
-    // === KẾT THÚC CẬP NHẬT 2 ===
 
 }); // Đóng DOMContentLoaded

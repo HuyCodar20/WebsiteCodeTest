@@ -73,6 +73,29 @@ body {
 .user-login i {
     font-size: 20px;
 }
+/* --- BẮT ĐẦU BỔ SUNG CSS CHO AVATAR ĐÃ ĐĂNG NHẬP --- */
+.user-profile-link {
+     display: flex;
+     align-items: center;
+     gap: 10px; /* Khoảng cách giữa ảnh và tên */
+     text-decoration: none;
+     font-weight: bold;
+     color: #000;
+     transition: color 0.3s;
+    }
+    
+    .user-profile-link:hover {
+     color: #008cff;
+    }
+    
+    /* Đây là class quan trọng để sửa kích thước ảnh */
+    .header-avatar {
+     width: 40px;  /* Quy định chiều rộng */
+     height: 40px; /* Quy định chiều cao */
+     border-radius: 50%; /* Bo tròn ảnh */
+     object-fit: cover; /* Đảm bảo ảnh lấp đầy, không bị méo */
+     border: 2px solid #ddd; /* Thêm viền mỏng */
+    }
 
 .settings-btn i {
     font-size: 20px;
