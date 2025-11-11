@@ -1,47 +1,68 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
   <meta charset="UTF-8">
   <title>Đăng ký - WebApp Trắc Nghiệm</title>
-  <link rel="stylesheet" href="/stylesheets/style.css">
-  <link rel="stylesheet" href="/stylesheets/header.css">
-</head>
-<body>
-  <!-- Header -->
-<div id="header-placeholder"></div>
 
-  <!-- Nội dung -->
+  <link rel="stylesheet" href="/stylesheets/auth.css">
+  <link rel="stylesheet" href="/stylesheets/footer.css">
+  <link rel="stylesheet" href="/stylesheets/header.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+</head>
+
+<body>
+  <div id="header-placeholder"></div>
+
   <div class="form-container">
     <h2>Đăng ký</h2>
-    <div class="avatar-container">
-      <img src="" alt="User Avatar" class="avatar">
-    <form>
+
+    <form id="register-form" enctype="multipart/form-data">
+
+      <div class="avatar-upload-container">
+        <img 
+          src="/images/default-avatar.png" 
+          alt="Ảnh đại diện xem trước" 
+          class="avatar-preview"
+          id="avatar-preview"
+        >
+        <label for="avatar" class="avatar-upload-label">
+          Chọn ảnh đại diện
+        </label>
+        <input 
+          type="file" 
+          id="avatar" 
+          name="avatar" 
+          accept="image/png, image/jpeg" 
+          required 
+        >
+        </div>
+
       <div class="input-field">
-        <input type="text" placeholder="Tên đăng nhập" required>
+        <input type="text" id="username" name="username" placeholder="Tên đăng nhập" required>
       </div>
       <div class="input-field">
-        <input type="email" placeholder="Email" required>
+        <input type="email" id="email" name="email" placeholder="Email" required>
       </div>
       <div class="input-field">
-        <input type="password" placeholder="Mật khẩu" required>
+        <input type="password" id="password" name="password" placeholder="Mật khẩu" required>
       </div>
       <div class="input-field">
-        <input type="password" placeholder="Xác nhận mật khẩu" required>
+        <input type="password" id="confirm-password" placeholder="Xác nhận mật khẩu" required>
       </div>
-      <button type="submit" class="btn btn-success">Đăng ký</button>
+
+      <button type="submit" id="register-btn" class="btn btn-success">Đăng ký</button>
+
       <p class="form-text">Đã có tài khoản? <a href="login.html">Đăng nhập ngay</a></p>
     </form>
-  </div>
-   <!-- JS bật/tắt menu mobile -->
-   <script>
-    const toggle = document.querySelector('.menu-toggle');
-    const menu = document.querySelector('.menu');
+    </div>
 
-    toggle.addEventListener('click', () => {
-      menu.classList.toggle('show');
-    });
-  </script>
+  <div id="footer-placeholder"></div>
 
   <script src="/javascript/main.js"></script>
+  <script src="/javascript/auth.js"></script>
+
 </body>
+
 </html>

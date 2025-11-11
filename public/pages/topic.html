@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Danh Mục | DevArena</title>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="/stylesheets/header.css">
+  <link rel="stylesheet" href="/stylesheets/footer.css">
+  <link rel="stylesheet" href="/stylesheets/topic.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+<body>
+
+  <!-- Header -->
+  <header id="header-placeholder"></header>
+
+  <!-- Search Banner -->
+  <section class="search-banner">
+    <h1>Tìm kiếm các danh mục mà bạn quan tâm</h1>
+    <form class="search-form">
+      <input type="search" placeholder="Nhập tên danh mục, ví dụ: ReactJS...">
+      <button type="submit" aria-label="Tìm kiếm">
+        <i class="fas fa-search"></i>
+      </button>
+    </form>
+  </section>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="filters-wrapper">
+      <!-- BỘ LỌC DANH MỤC -->
+      <aside class="filters">
+        <div class="filters-section">
+          <h2 class="filter-title">🗂️ Các danh mục</h2>
+          <div id="type-filters" class="type-filters">
+          </div>
+        </div>
+      </aside>
+
+      <!-- BỘ LỌC TAGS -->
+      <aside class="filters">
+        <div class="filters-section">
+          <h2 class="filter-title">🏷️ Các nhãn chủ đề</h2>
+         
+          <div id="selected-tags-container" class="selected-tags">
+              <p class="no-tags-selected">Chưa có tag nào được chọn.</p>
+          </div>
+      
+          <button id="open-tags-modal-btn" class="btn-primary">Xem và chọn tags</button>
+        </div>
+      </aside>
+    </div>
+
+    <!-- Topics Grid -->
+    <section class="topics-grid" id="topics-container"> </section>
+    
+  </main>
+
+  <!-- HỘP THOẠI CHỌN TAGS -->
+  <div id="tags-modal-overlay" class="modal-overlay">
+    <div class="modal-content">
+      <header class="modal-header">
+        <h2>Chọn Tags bạn quan tâm</h2>
+        <button id="close-modal-btn" class="close-btn">&times;</button>
+      </header>
+      <div id="modal-tags-list" class="modal-body">
+
+      </div>
+      <footer class="modal-footer">
+          <button id="apply-tags-btn" class="btn-primary">Áp dụng</button>
+          <button type="button" id="clear-tags-btn" class="btn-secondary">Xóa lựa chọn</button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer id="footer-placeholder"></footer>
+
+  <!-- JavaScript -->
+  <script src="/javascript/main.js"></script>
+  <script src="/javascript/topic-page.js" defer></script>
+</body>
+</html>

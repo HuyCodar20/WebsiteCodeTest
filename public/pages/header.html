@@ -21,7 +21,7 @@
         <div class="nav-wrapper" id="nav-wrapper">
             <nav class="main-nav">
                 <div class="dropdown">
-                    <a href="#" class="dropdown-toggle" id="category-btn">
+                    <a href="#" class="dropdown-toggle" id="category-btn" role="button" aria-haspopup="true" aria-expanded="false">
                         Danh mục <i class="fas fa-chevron-down arrow-icon"></i>
                     </a>
                     <div class="dropdown-content">
@@ -67,74 +67,75 @@
                             </div>
                         </div>
 
-                        <a href="#" class="view-all-link"> Xem toàn bộ danh mục <i class="fas fa-arrow-right"></i></a>
+                        <a href="/pages/topic.html" class="view-all-link"> Xem toàn bộ danh mục <i class="fas fa-arrow-right"></i></a>
 
                     </div>
                 </div>
                 <a href="#">Xếp hạng</a>
-                <a href="#">Thi đấu</a>
+                <a href="#">Thi đấu</a>
                 <a href="#">Đóng góp</a>
-                <a href="#">Chia sẻ</a>
+                <a href="#">Chia sẻ</a> 
             </nav>
 
             <div class="header-right">
                 <a href="/pages/login.html" class="user-login">
                     <span>Đăng nhập</span>
-                    <i class="fas fa-user-circle"></i>
+                    <i class="fas fa-user-circle" aria-hidden="true"></i> 
                 </a>
 
-                <a href="#" class="settings-btn" id="settings-btn">
-                <i class="fas fa-cog"></i>
+                <a href="#" class="settings-btn" id="settings-btn" aria-label="Mở cài đặt" aria-haspopup="dialog" aria-expanded="false">
+                    <i class="fas fa-cog" aria-hidden="true"></i> 
                 </a>
-
             </div>
         </div>
 
-        <button class="hamburger-btn" id="hamburger-btn">
-            <i class="fas fa-bars"></i>
+        <button class="hamburger-btn" id="hamburger-btn" aria-label="Mở menu" aria-controls="nav-wrapper" aria-expanded="false">
+            <i class="fas fa-bars" aria-hidden="true"></i> 
         </button>
     </header>
 
     <div class="modal-overlay" id="settings-overlay"></div>
 
-    <div class="modal" id="settings-modal">
-    <div class="modal-header">
-        <h3>Cài đặt</h3>
-        <button class="close-btn" id="close-modal-btn">&times;</button>
-    </div>
-    <div class="modal-body">
-        <div class="setting-item">
-            <label for="bg-music">Nhạc nền</label>
-            <label class="switch">
-                <input type="checkbox" id="bg-music" checked>
-                <span class="slider"></span>
-            </label>
+    <div class="modal" id="settings-modal" role="dialog" aria-labelledby="modal-title" aria-modal="true">
+        <div class="modal-header">
+            <h3 id="modal-title">Cài đặt</h3>
+            <button class="close-btn" id="close-modal-btn" aria-label="Đóng">&times;</button>
         </div>
-        <div class="setting-item">
-            <label for="sound-effects">Hiệu ứng âm thanh</label>
-            <label class="switch">
-                <input type="checkbox" id="sound-effects" checked>
-                <span class="slider"></span>
-            </label>
-        </div>
-        <div class="setting-item">
-            <label for="question-timer">Đồng hồ đếm giờ (từng câu)</label>
-            <label class="switch">
-                <input type="checkbox" id="question-timer">
-                <span class="slider"></span>
-            </label>
-        </div>
-        <div class="setting-item">
-            <label for="num-questions">Số câu hỏi mỗi bài</label>
-            <input type="number" class="setting-input" id="num-questions" value="5" min="5" max="50">
-        </div>
-        <div class="setting-item">
-            <label for="total-time">Thời gian tổng (phút)</label>
-            <input type="number" class="setting-input" id="total-time" value="15" min="1">
-        </div>
-    </div>
+        
+        <div class="modal-body">
+            <div class="setting-item">
+                <label for="bg-music">Nhạc nền</label>
+                <label class="switch">
+                    <input type="checkbox" id="bg-music" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
 
-</div>
+            <div class="setting-item">
+                <label for="sound-effects">Hiệu ứng âm thanh</label>
+                <label class="switch">
+                    <input type="checkbox" id="sound-effects" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="setting-item">
+                <label>Đồng hồ đếm giờ (từng câu)</label>
+                <label class="switch">
+                    <input type="checkbox" id="question-timer">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="setting-item">
+                <label for="num-questions">Số câu hỏi mỗi bài</label>
+                <input type="number" class="setting-input" id="num-questions" value="5" min="5" max="50">
+            </div>
+            <div class="setting-item">
+                <label for="total-time">Thời gian tổng (phút)</label>
+                <input type="number" class="setting-input" id="total-time" value="15" min="1">
+            </div>
+        </div>
+    </div>
 
 </body>
 

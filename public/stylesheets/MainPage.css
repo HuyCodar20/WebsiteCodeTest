@@ -11,6 +11,7 @@ body {
 
 .main-content {
     flex-grow: 1; 
+    background-color: #f3fbff;
 }
 
 .container {
@@ -22,6 +23,8 @@ body {
 /* --- PHẦN BANNER --- */
 .banner-section {
     margin-bottom: 30px;
+    border: #f2fdff solid 5px;
+    border-radius: 10px;
 }
 
 .slideshow-container {
@@ -29,7 +32,7 @@ body {
     width: 100%;
     max-height: 350px; 
     overflow: hidden;
-    border-radius: 10px;
+    border-radius: 5px;
 }
 
 .slide {
@@ -197,11 +200,9 @@ body {
 
 .test-card:hover {
     transform: translateY(-5px); 
-    box-shadow: rgba(59, 130, 246, 0.4) -5px 5px, 
-            rgba(59, 130, 246, 0.3) -10px 10px, 
-            rgba(59, 130, 246, 0.2) -15px 15px, 
-            rgba(59, 130, 246, 0.1) -20px 20px, 
-            rgba(59, 130, 246, 0.05) -25px 25px;
+    box-shadow: rgba(37, 37, 37, 0.5) -5px 5px, 
+            rgba(37, 37, 37, 0.5) -10px 10px,
+            rgba(37, 37, 37, 0.5) -15px 15px;
 }
 
 .test-card img {
@@ -271,7 +272,7 @@ body {
 /* --- PHẦN DANH MỤC KĨ NĂNG (CATEGORY SECTION) --- */
 .category-section {
     color: #005d8c;
-    background-color: #e7e7e7;
+    background-color: #ffffff;
     padding: 0 0 50px 0;
     border-radius: 20px;
     margin-top: 50px;

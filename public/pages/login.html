@@ -1,44 +1,55 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
   <meta charset="UTF-8">
   <title>Đăng nhập - WebApp Trắc Nghiệm</title>
-  <link rel="stylesheet" href="/stylesheets/style.css">
-  <link rel="stylesheet" href="/stylesheets/header.css">
-</head>
-<body>
-  <!-- Header -->
-<div id="header-placeholder"></div>
 
-  <!-- Nội dung -->
+  <link rel="stylesheet" href="/stylesheets/auth.css">
+  <link rel="stylesheet" href="/stylesheets/footer.css">
+  <link rel="stylesheet" href="/stylesheets/header.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+</head>
+
+<body>
+
+  <div id="header-placeholder"></div>
+
   <div class="form-container">
     <h2>Đăng nhập</h2>
-    <div class="avatar-container">
-      <img src="" alt="User Avatar" class="avatar">
-    </div>
 
-    <form>
+    <form id="login-form">
       <div class="input-field">
-        <input type="text" placeholder="Tên đăng nhập" required>
+        <input 
+          type="text" 
+          id="username" 
+          name="username" 
+          placeholder="Tên đăng nhập" 
+          required
+        >
       </div>
       <div class="input-field">
-        <input type="password" placeholder="Mật khẩu" required>
+        <input 
+          type="password" 
+          id="password" 
+          name="password" 
+          placeholder="Mật khẩu" 
+          required
+        >
       </div>
-      <button type="submit" class="btn btn-primary">Đăng nhập</button>
+
+      <button type="submit" id="login-btn" class="btn btn-primary">Đăng nhập</button>
+
       <p class="form-text">Chưa có tài khoản? <a href="register.html">Đăng ký ngay</a></p>
     </form>
   </div>
-      <!-- JS bật/tắt menu mobile -->
-  <script>
-    const toggle = document.querySelector('.menu-toggle');
-    const menu = document.querySelector('.menu');
 
-    toggle.addEventListener('click', () => {
-      menu.classList.toggle('show');
-    });
-  </script>
+  <div id="footer-placeholder"></div>
 
   <script src="/javascript/main.js"></script>
+  <script src="/javascript/auth.js"></script>
 
 </body>
+
 </html>

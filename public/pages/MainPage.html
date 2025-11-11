@@ -14,239 +14,240 @@
 
     <div id="header-placeholder"></div>
 
-<main class="main-content">
-    <div class="container">
-        <section class="banner-section">
-            <div class="slideshow-container">
-                <div class="slide fade">
-                    <img src="/images/bannerTest.png" alt="Banner Sự kiện 1">
+    <main class="main-content">
+        <div class="container">
+            <section class="banner-section">
+                <div class="slideshow-container">
+                    <div class="slide fade">
+                        <img src="/images/bannerTest.png" alt="Banner Sự kiện 1">
+                    </div>
+                    <div class="slide fade">
+                        <img src="/images/bannerTest2.png" alt="Banner Sự kiện 2">
+                    </div>
+                    <div class="slide fade">
+                        <img src="/images/bannerTest3.png" alt="Banner Sự kiện 3">
+                    </div>
+
+                    <a class="prev" onclick="plusSlides(-1)">&#10094;</a>
+                    <a class="next" onclick="plusSlides(1)">&#10095;</a>
                 </div>
-                <div class="slide fade">
-                    <img src="/images/bannerTest2.png" alt="Banner Sự kiện 2">
+            </section>
+
+            <section class="search-filter-section">
+                <div class="search-bar">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" placeholder="Tìm kiếm bài trắc nghiệm...">
                 </div>
-
-                <a class="prev" onclick="plusSlides(-1)">&#10094;</a>
-                <a class="next" onclick="plusSlides(1)">&#10095;</a>
-            </div>
-        </section>
-
-        <section class="search-filter-section">
-            <div class="search-bar">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" placeholder="Tìm kiếm bài trắc nghiệm...">
-            </div>
-            <div class="filter-bar">
-                <select name="sort-by" id="sort-by">
-                    <option value="most-relevant">Liên quan nhất</option>
-                    <option value="most-popular">Phổ biến nhất</option>
-                    <option value="newest">Mới nhất</option>
-                </select>
-            </div>
-        </section>
-
-        <section class="test-grid-section">
-            <h2>Những bài được làm nhiều nhất</h2>
-            <div class="test-grid">
-    <div class="test-card">
-        <img src="/images/reactjs.png" alt="Hình ảnh bài test ReactJS">
-        <div class="card-content">
-            <h3>Trắc nghiệm ReactJS cho người mới bắt đầu</h3>
-            <p class="author">Đăng bởi: DevArena Team</p>
-            <p class="description">Kiểm tra kiến thức cơ bản về ReactJS, components, props và state.</p>
-            <div class="level">
-                <span>Cấp độ:</span>
-                <div class="stars">
-                    <i class="fa-solid fa-star"></i>
-                    <i class="fa-regular fa-star"></i>
-                    <i class="fa-regular fa-star"></i>
+                <div class="filter-bar">
+                    <select name="sort-by" id="sort-by">
+                        <option value="most-relevant">Liên quan nhất</option>
+                        <option value="most-popular">Phổ biến nhất</option>
+                        <option value="newest">Mới nhất</option>
+                    </select>
                 </div>
-            </div>
-        </div>
-    </div>
+            </section>
 
-    <div class="test-card">
-        <img src="/images/JSCript.jpeg" alt="Hình ảnh bài test JavaScript">
-        <div class="card-content">
-            <h3>JavaScript nâng cao và ES6</h3>
-            <p class="author">Đăng bởi: Jane Doe</p>
-            <p class="description">Các câu hỏi về aync/await, closures, promises và các tính năng ES6 khác.</p>
-            <div class="level">
-                <span>Cấp độ:</span>
-                <div class="stars">
-                    <i class="fa-solid fa-star"></i>
-                    <i class="fa-solid fa-star"></i>
-                    <i class="fa-solid fa-star"></i>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="test-card">
-        <img src="/images/CSharp.png" alt="Hình ảnh bài test C# và .NET">
-        <div class="card-content">
-            <h3>Hoàn thiện ứng dụng với C# và .NET</h3>
-            <p class="author">Đăng bởi: John Smith</p>
-            <p class="description">Bài test tổng hợp kiến thức về lập trình hướng đối tượng với C#.</p>
-            <div class="level">
-                <span>Cấp độ:</span>
-                <div class="stars">
-                    <i class="fa-solid fa-star"></i>
-                    <i class="fa-solid fa-star"></i>
-                    <i class="fa-regular fa-star"></i>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="test-card">
-        <img src="/images/Pythonbanner.jpg" alt="Hình ảnh bài test Python">
-        <div class="card-content">
-            <h3>Kiến thức Python cơ bản</h3>
-            <p class="author">Đăng bởi: Alex Ray</p>
-            <p class="description">Tổng hợp các câu hỏi về kiểu dữ liệu, vòng lặp và hàm trong Python.</p>
-            <div class="level">
-                <span>Cấp độ:</span>
-                <div class="stars">
-                    <i class="fa-solid fa-star"></i>
-                    <i class="fa-regular fa-star"></i>
-                    <i class="fa-regular fa-star"></i>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="test-card">
-        <img src="/images/sqlbanner.png" alt="Hình ảnh bài test SQL">
-        <div class="card-content">
-            <h3>Truy vấn SQL từ A-Z</h3>
-            <p class="author">Đăng bởi: Sarah Dane</p>
-            <p class="description">Luyện tập kỹ năng truy vấn dữ liệu với các câu lệnh SELECT, JOIN, GROUP BY.</p>
-            <div class="level">
-                <span>Cấp độ:</span>
-                <div class="stars">
-                    <i class="fa-solid fa-star"></i>
-                    <i class="fa-solid fa-star"></i>
-                    <i class="fa-regular fa-star"></i>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="test-card">
-        <img src="/images/cssbanner.jpg" alt="Hình ảnh bài test CSS">
-        <div class="card-content">
-            <h3>Thành thạo Flexbox & Grid Layout</h3>
-            <p class="author">Đăng bởi: CSS Masters</p>
-            <p class="description">Bài test tập trung vào kỹ năng xây dựng layout hiện đại với Flexbox và CSS Grid.</p>
-            <div class="level">
-                <span>Cấp độ:</span>
-                <div class="stars">
-                    <i class="fa-solid fa-star"></i>
-                    <i class="fa-solid fa-star"></i>
-                    <i class="fa-solid fa-star"></i>
-                </div>
-            </div>
-        </div>
-    </div>
-
-</div>
-              <div class="see-more-container">
-        <button class="see-more-btn">Xem thêm</button>
-    </div>
-
-        </section>
-
-        </section>
-
-        <section class="category-section">
-            <div class="container">
-                <h2 class="section-title">Kiểm tra kĩ năng theo danh mục</h2>
-
-                <div class="category-tabs-nav">
-                    <button class="tab-btn active" data-tab="roles">Theo vai trò</button>
-                    <button class="tab-btn" data-tab="tech">Theo công nghệ</button>
-                </div>
-
-                <div class="category-tabs-content">
-                    <div id="roles" class="tab-pane active">
-                        <div class="category-grid">
-                            <a href="#" class="category-item">
-                                <i class="fa-solid fa-code"></i>
-                                <span>Frontend Developer</span>
-                            </a>
-                            <a href="#" class="category-item">
-                                <i class="fa-solid fa-server"></i>
-                                <span>Backend Developer</span>
-                            </a>
-                            <a href="#" class="category-item">
-                                <i class="fa-solid fa-mobile-screen-button"></i>
-                                <span>Mobile Developer</span>
-                            </a>
-                            <a href="#" class="category-item">
-                                <i class="fa-solid fa-chart-simple"></i>
-                                <span>Data Analyst</span>
-                            </a>
-                             <a href="#" class="category-item">
-                                <i class="fa-solid fa-database"></i>
-                                <span>Database Admin</span>
-                            </a>
-                            <a href="#" class="category-item">
-                                <i class="fa-solid fa-shield-halved"></i>
-                                <span>Security</span>
-                            </a>
-                             <a href="#" class="category-item">
-                                <i class="fa-solid fa-bug"></i>
-                                <span>Tester (QA/QC)</span>
-                            </a>
-                             <a href="#" class="category-item">
-                                <i class="fa-solid fa-cloud"></i>
-                                <span>DevOps</span>
-                            </a>
+            <section class="test-grid-section">
+                <h2>Những bài được làm nhiều nhất</h2>
+                <div class="test-grid">
+                    <div class="test-card">
+                        <img src="/images/reactjs.png" alt="Hình ảnh bài test ReactJS">
+                        <div class="card-content">
+                            <h3>Trắc nghiệm ReactJS cho người mới bắt đầu</h3>
+                            <p class="author">Đăng bởi: DevArena Team</p>
+                            <p class="description">Kiểm tra kiến thức cơ bản về ReactJS, components, props và state.</p>
+                            <div class="level">
+                                <span>Cấp độ:</span>
+                                <div class="stars">
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-regular fa-star"></i>
+                                    <i class="fa-regular fa-star"></i>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div id="tech" class="tab-pane">
-                        <div class="category-grid">
-                            <a href="#" class="category-item">
-                                <i class="fa-brands fa-python"></i>
-                                <span>Python</span>
-                            </a>
-                            <a href="#" class="category-item">
-                                <i class="fa-brands fa-js"></i>
-                                <span>JavaScript</span>
-                            </a>
-                             <a href="#" class="category-item">
-                                <i class="fa-brands fa-html5"></i>
-                                <span>HTML & CSS</span>
-                            </a>
-                            <a href="#" class="category-item">
-                                <i class="fa-solid fa-database"></i>
-                                <span>SQL</span>
-                            </a>
-                            <a href="#" class="category-item">
-                                <i class="fa-brands fa-java"></i>
-                                <span>Java</span>
-                            </a>
-                            <a href="#" class="category-item">
-                                <i class="fa-solid fa-c"></i>
-                                <span>C++</span>
-                            </a>
-                             <a href="#" class="category-item">
-                                <i class="fa-brands fa-react"></i>
-                                <span>ReactJS</span>
-                            </a>
-                             <a href="#" class="category-item">
-                                <i class="fa-brands fa-node-js"></i>
-                                <span>Node.js</span>
-                            </a>
+                    <div class="test-card">
+                        <img src="/images/JSCript.jpeg" alt="Hình ảnh bài test JavaScript">
+                        <div class="card-content">
+                            <h3>JavaScript nâng cao và ES6</h3>
+                            <p class="author">Đăng bởi: Jane Doe</p>
+                            <p class="description">Các câu hỏi về aync/await, closures, promises và các tính năng ES6 khác.</p>
+                            <div class="level">
+                                <span>Cấp độ:</span>
+                                <div class="stars">
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="test-card">
+                        <img src="/images/CSharp.png" alt="Hình ảnh bài test C# và .NET">
+                        <div class="card-content">
+                            <h3>Hoàn thiện ứng dụng với C# và .NET</h3>
+                            <p class="author">Đăng bởi: John Smith</p>
+                            <p class="description">Bài test tổng hợp kiến thức về lập trình hướng đối tượng với C#.</p>
+                            <div class="level">
+                                <span>Cấp độ:</span>
+                                <div class="stars">
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-regular fa-star"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="test-card">
+                        <img src="/images/Pythonbanner.jpg" alt="Hình ảnh bài test Python">
+                        <div class="card-content">
+                            <h3>Kiến thức Python cơ bản</h3>
+                            <p class="author">Đăng bởi: Alex Ray</p>
+                            <p class="description">Tổng hợp các câu hỏi về kiểu dữ liệu, vòng lặp và hàm trong Python.</p>
+                            <div class="level">
+                                <span>Cấp độ:</span>
+                                <div class="stars">
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-regular fa-star"></i>
+                                    <i class="fa-regular fa-star"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="test-card">
+                        <img src="/images/sqlbanner.png" alt="Hình ảnh bài test SQL">
+                        <div class="card-content">
+                            <h3>Truy vấn SQL từ A-Z</h3>
+                            <p class="author">Đăng bởi: Sarah Dane</p>
+                            <p class="description">Luyện tập kỹ năng truy vấn dữ liệu với các câu lệnh SELECT, JOIN, GROUP BY.</p>
+                            <div class="level">
+                                <span>Cấp độ:</span>
+                                <div class="stars">
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-regular fa-star"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="test-card">
+                        <img src="/images/cssbanner.jpg" alt="Hình ảnh bài test CSS">
+                        <div class="card-content">
+                            <h3>Thành thạo Flexbox & Grid Layout</h3>
+                            <p class="author">Đăng bởi: CSS Masters</p>
+                            <p class="description">Bài test tập trung vào kỹ năng xây dựng layout hiện đại với Flexbox và CSS Grid.</p>
+                            <div class="level">
+                                <span>Cấp độ:</span>
+                                <div class="stars">
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="see-more-container">
+                    <button class="see-more-btn">Xem thêm</button>
+                </div>
+
+            </section>
+
+            <section class="category-section">
+                <div class="container">
+                    <h2 class="section-title">Kiểm tra kĩ năng theo danh mục</h2>
+
+                    <div class="category-tabs-nav">
+                        <button class="tab-btn active" data-tab="roles">Theo vai trò</button>
+                        <button class="tab-btn" data-tab="tech">Theo công nghệ</button>
+                    </div>
+
+                    <div class="category-tabs-content">
+                        <div id="roles" class="tab-pane active">
+                            <div class="category-grid">
+                                <a href="#" class="category-item">
+                                    <i class="fa-solid fa-code"></i>
+                                    <span>Frontend Developer</span>
+                                </a>
+                                <a href="#" class="category-item">
+                                    <i class="fa-solid fa-server"></i>
+                                    <span>Backend Developer</span>
+                                </a>
+                                <a href="#" class="category-item">
+                                    <i class="fa-solid fa-mobile-screen-button"></i>
+                                    <span>Mobile Developer</span>
+                                </a>
+                                <a href="#" class="category-item">
+                                    <i class="fa-solid fa-chart-simple"></i>
+                                    <span>Data Analyst</span>
+                                </a>
+                                <a href="#" class="category-item">
+                                    <i class="fa-solid fa-database"></i>
+                                    <span>Database Admin</span>
+                                </a>
+                                <a href="#" class="category-item">
+                                    <i class="fa-solid fa-shield-halved"></i>
+                                    <span>Security</span>
+                                </a>
+                                <a href="#" class="category-item">
+                                    <i class="fa-solid fa-bug"></i>
+                                    <span>Tester (QA/QC)</span>
+                                </a>
+                                <a href="#" class="category-item">
+                                    <i class="fa-solid fa-cloud"></i>
+                                    <span>DevOps</span>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div id="tech" class="tab-pane">
+                            <div class="category-grid">
+                                <a href="#" class="category-item">
+                                    <i class="fa-brands fa-python"></i>
+                                    <span>Python</span>
+                                </a>
+                                <a href="#" class="category-item">
+                                    <i class="fa-brands fa-js"></i>
+                                    <span>JavaScript</span>
+                                </a>
+                                <a href="#" class="category-item">
+                                    <i class="fa-brands fa-html5"></i>
+                                    <span>HTML & CSS</span>
+                                </a>
+                                <a href="#" class="category-item">
+                                    <i class="fa-solid fa-database"></i>
+                                    <span>SQL</span>
+                                </a>
+                                <a href="#" class="category-item">
+                                    <i class="fa-brands fa-java"></i>
+                                    <span>Java</span>
+                                </a>
+                                <a href="#" class="category-item">
+                                    <i class="fa-solid fa-c"></i>
+                                    <span>C++</span>
+                                </a>
+                                <a href="#" class="category-item">
+                                    <i class="fa-brands fa-react"></i>
+                                    <span>ReactJS</span>
+                                </a>
+                                <a href="#" class="category-item">
+                                    <i class="fa-brands fa-node-js"></i>
+                                    <span>Node.js</span>
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </section>
+            </section>
 
-    </div>
-</main>
+        </div>
+    </main>
 
     <div id="footer-placeholder"></div>
 
