@@ -23,10 +23,10 @@ document.addEventListener("DOMContentLoaded", function() {
     };
 
     /**
-     * Khởi tạo các script cho header (dropdown, menu mobile, modal settings).
+     * Khởi tạo các script cho header (dropdown, menu mobile, modal, logic user).
      */
     const initializeHeaderScripts = () => {
-        // --- Các biến và logic cũ ---
+        // --- Các biến và logic cho menu/modal ---
         const categoryBtn = document.getElementById('category-btn');
         const hamburgerBtn = document.getElementById('hamburger-btn');
         const navWrapper = document.getElementById('nav-wrapper');
@@ -74,16 +74,53 @@ document.addEventListener("DOMContentLoaded", function() {
             settingsOverlay.addEventListener('click', closeSettingsModal);
         }
 
+        // --- Logic đóng menu/dropdown khi click ra ngoài ---
         window.addEventListener('click', function(event) {
             const activeDropdown = document.querySelector('.dropdown.active');
             if (activeDropdown && !activeDropdown.contains(event.target)) {
                 activeDropdown.classList.remove('active');
             }
 
-            if (navWrapper && navWrapper.classList.contains('active') && !navWrapper.contains(event.target) && !hamburgerBtn.contains(event.target)) {
+            if (navWrapper && navWrapper.classList.contains('active') && !navWrapper.contains(event.target) && hamburgerBtn && !hamburgerBtn.contains(event.target)) {
                 navWrapper.classList.remove('active');
             }
         });
+
+        // ==================================================
+        // LOGIC KIỂM TRA USER VÀ ĐĂNG XUẤT (GỘP TỪ MAIN 2)
+        // ==================================================
+        const userContainer = document.getElementById('user-session-container');
+        const storedUser = localStorage.getItem('currentUser'); // Lấy user từ bộ nhớ
+
+        if (storedUser && userContainer) {
+            // 1. NẾU CÓ USER (Đã đăng nhập)
+            try {
+                const user = JSON.parse(storedUser); // Đọc user
+                
+                // Thay thế HTML bằng avatar và tên
+                userContainer.innerHTML = `
+                    <a href="/pages/profile.html" class="user-profile-link">
+                        <img src="${user.avatarUrl || '/images/default-avatar.png'}" alt="Avatar" class="header-avatar">
+                        <span>${user.username}</span>
+                    </a>
+                    <a href="#" id="logout-btn" class="nav-link">Đăng xuất</a>
+                `;
+
+                // Gắn sự kiện cho nút Đăng xuất
+                const logoutBtn = document.getElementById('logout-btn');
+                if (logoutBtn) {
+                    logoutBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        localStorage.removeItem('currentUser'); // Xóa user
+                        alert('Bạn đã đăng xuất.');
+                        window.location.href = '/'; // Tải lại trang chủ
+                    });
+                }
+            } catch (e) {
+                console.error("Lỗi đọc user:", e);
+                localStorage.removeItem('currentUser'); // Xóa data lỗi
+            }
+        }
     };
 
     /**
@@ -91,40 +128,35 @@ document.addEventListener("DOMContentLoaded", function() {
      */
     const initializeSlideshow = () => {
         const slides = document.getElementsByClassName("slide");
-        if (slides.length === 0) return;
+        if (slides.length === 0) return; // Không làm gì nếu không có slide
 
-        let slideIndex = 1; // Bắt đầu từ slide đầu tiên
+        let slideIndex = 1; 
         let slideInterval;
 
         const showSlide = (n) => {
-            // Xử lý vòng lặp index
             if (n > slides.length) { slideIndex = 1; } 
             else if (n < 1) { slideIndex = slides.length; } 
             else { slideIndex = n; }
 
-            // Ẩn tất cả các slide
             for (let i = 0; i < slides.length; i++) {
                 slides[i].style.display = "none";
             }
 
-            // Hiển thị slide hiện tại
             slides[slideIndex - 1].style.display = "block";
         };
 
         const startSlideShow = () => {
-            clearInterval(slideInterval); // Xóa interval cũ trước khi tạo mới
+            clearInterval(slideInterval); 
             slideInterval = setInterval(() => {
                 showSlide(slideIndex + 1);
             }, 5000);
         };
         
-        // Gán hàm plusSlides ra window để HTML có thể gọi
         window.plusSlides = (n) => {
             showSlide(slideIndex + n);
-            startSlideShow(); // Khởi động lại timer sau khi người dùng nhấn
+            startSlideShow(); 
         };
         
-        // Bắt đầu slideshow
         showSlide(slideIndex);
         startSlideShow();
     };
@@ -134,6 +166,8 @@ document.addEventListener("DOMContentLoaded", function() {
      */
     const initializeTabs = () => {
         const tabButtons = document.querySelectorAll('.tab-btn');
+        if (tabButtons.length === 0) return; // Không làm gì nếu không có tab
+
         const tabPanes = document.querySelectorAll('.tab-pane');
 
         tabButtons.forEach(button => {
@@ -144,19 +178,25 @@ document.addEventListener("DOMContentLoaded", function() {
                 tabPanes.forEach(pane => pane.classList.remove('active'));
 
                 button.classList.add('active');
-                document.getElementById(targetTab).classList.add('active');
+                const targetPane = document.getElementById(targetTab);
+                if (targetPane) {
+                    targetPane.classList.add('active');
+                }
             });
         });
     };
     
     /**
-     * Khởi tạo các thanh trượt âm lượng.
+     * Khởi tạo các thanh trượt âm lượng (trong modal settings).
      */
     const initializeVolumeSliders = () => {
         const setupSlider = (sliderId, valueId) => {
             const slider = document.getElementById(sliderId);
             const valueDisplay = document.getElementById(valueId);
             if (slider && valueDisplay) {
+                // Hiển thị giá trị ban đầu
+                valueDisplay.textContent = slider.value;
+                // Cập nhật khi trượt
                 slider.addEventListener('input', function() {
                     valueDisplay.textContent = this.value;
                 });
@@ -167,50 +207,33 @@ document.addEventListener("DOMContentLoaded", function() {
         setupSlider('sound-effects-volume', 'sound-effects-value');
     };
     
-    /**
-     * Lắng nghe các sự kiện click toàn cục để đóng menu/dropdown.
-     */
-    const initializeGlobalClickListeners = () => {
-        const navWrapper = document.getElementById('nav-wrapper');
-        const hamburgerBtn = document.getElementById('hamburger-btn');
-
-        window.addEventListener('click', function(event) {
-            // Đóng dropdown khi click ra ngoài
-            const activeDropdown = document.querySelector('.dropdown.active');
-            if (activeDropdown && !activeDropdown.contains(event.target)) {
-                activeDropdown.classList.remove('active');
-            }
-
-            // Đóng nav-wrapper (menu mobile) khi click ra ngoài
-            if (navWrapper && navWrapper.classList.contains('active') && 
-                !navWrapper.contains(event.target) && 
-                !hamburgerBtn.contains(event.target)) {
-                navWrapper.classList.remove('active');
-            }
-        });
-    };
-
 
     // --- KHỞI CHẠY CÁC CHỨC NĂNG ---
 
+    // 1. Tải Header, SAU ĐÓ chạy các script liên quan đến header
     loadComponent('/pages/header.html', 'header-placeholder', () => {
-        initializeHeaderScripts();
-        initializeGlobalClickListeners();
-        initializeVolumeSliders();
+        initializeHeaderScripts();   // Chứa menu, modal, VÀ logic user
+        initializeVolumeSliders();   // Chạy sau khi modal settings được tải
     });
+    
+    // 2. Tải Footer
     loadComponent('/pages/footer.html', 'footer-placeholder');
 
+    // 3. Khởi tạo các script CHỈ DÀNH CHO TRANG CHỦ
+    // (Những hàm này sẽ tự kiểm tra xem element có tồn tại hay không)
     initializeSlideshow();
     initializeTabs();
     
-});
+}); // Hết DOMContentLoaded
 
 window.addEventListener("scroll", function() {
-  const header = document.querySelector(".main-header");
-  if (window.scrollY > 50) { // scroll 50px thì dính
-    header.classList.add("sticky");
-  } else {
-    header.classList.remove("sticky");
-  }
+    const header = document.querySelector(".main-header");
+    // Cần kiểm tra header có tồn tại không, vì nó được load bất đồng bộ
+    if (header) { 
+        if (window.scrollY > 50) { // scroll 50px thì dính
+            header.classList.add("sticky");
+        } else {
+            header.classList.remove("sticky");
+        }
+    }
 });
-

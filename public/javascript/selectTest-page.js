@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            container.innerHTML = ''; // Xóa loading
+            container.innerHTML = ''; 
 
             const themeColor = categoryData.theme_color || '#63b3ed';
             const iconUrl = categoryData.icon_url;
