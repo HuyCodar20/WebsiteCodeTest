@@ -1,11 +1,7 @@
-// public/javascript/main.js (ĐÃ DỌN DẸP)
+// public/javascript/main.js (CHỈNH SỬA CUỐI CÙNG)
 
 document.addEventListener("DOMContentLoaded", function() {
 
-    /**
-     * Hàm này sẽ được gọi SAU KHI header.html được tải xong
-     * Nó chứa TẤT CẢ logic của header (dropdown, modal, check login)
-     */
     const initializeHeaderScripts = () => {
         const categoryBtn = document.getElementById('category-btn');
         const hamburgerBtn = document.getElementById('hamburger-btn');
@@ -15,60 +11,37 @@ document.addEventListener("DOMContentLoaded", function() {
         const settingsOverlay = document.getElementById('settings-overlay');
         const closeModalBtn = document.getElementById('close-modal-btn');
 
-        // (Code xử lý dropdown, hamburger, modal của bạn giữ nguyên)
-        if (categoryBtn) {
-            // ... (giữ nguyên)
-        }
-        if (hamburgerBtn && navWrapper) {
-            // ... (giữ nguyên)
-        }
-        // ... (giữ nguyên code xử lý modal settings) ...
-        if (settingsBtn && settingsModal && settingsOverlay && closeModalBtn) {
-            // ... (giữ nguyên)
-        }
-        // ... (giữ nguyên code window.addEventListener('click', ...))
-        window.addEventListener('click', function(event) {
-            // ... (giữ nguyên)
- });
+        // ... (GIỮ NGUYÊN code xử lý dropdown, hamburger, modal, và window.addEventListener) ...
 
         // ==================================================
-        // LOGIC KIỂM TRA USER VÀ ĐĂNG XUẤT (VẪN GIỮ Ở ĐÂY)
-        // Vì header được tải trên MỌI trang
+        // LOGIC KIỂM TRA USER VÀ HEADER
         // ==================================================
         const userContainer = document.getElementById('user-session-container');
-        const storedUser = localStorage.getItem('currentUser'); // Lấy user từ bộ nhớ
+        const storedUser = localStorage.getItem('currentUser');
 
         if (storedUser && userContainer) {
-            // 1. NẾU CÓ USER (Đã đăng nhập)
             try {
-                const user = JSON.parse(storedUser); // Đọc user
+                const user = JSON.parse(storedUser);
                 
-                // Thay thế HTML bằng avatar và tên
+                // ⚠️ BƯỚC CẦN THIẾT: TẠO URL AVATAR MỚI VỚI TIMESTAMP
+                let avatarUrl = user.avatarUrl || '/images/default-avatar.png';
+                // Thêm timestamp để buộc trình duyệt tải lại ảnh mới (tránh cache)
+                avatarUrl += `?t=${new Date().getTime()}`;
+                
+                // Thay thế HTML bằng avatar và tên (LOẠI BỎ ĐĂNG XUẤT)
                 userContainer.innerHTML = `
-                    <a href="/pages/profile.html" class="user-profile-link">
-                        <img src="${user.avatarUrl || '/images/default-avatar.png'}" alt="Avatar" class="header-avatar">
+                    <a href="/profile" class="user-profile-link">
+                        <img src="${avatarUrl}" alt="Avatar" class="header-avatar">
                         <span>${user.username}</span>
                     </a>
-                    <a href="#" id="logout-btn" class="nav-link">Đăng xuất</a>
-                `;
+                    `;
 
-                // Gắn sự kiện cho nút Đăng xuất
-                const logoutBtn = document.getElementById('logout-btn');
-                if (logoutBtn) {
-                    logoutBtn.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        localStorage.removeItem('currentUser'); // Xóa user
-                        alert('Bạn đã đăng xuất.');
-                        window.location.href = '/'; // Tải lại trang chủ
-                    });
-                }
             } catch (e) {
                 console.error("Lỗi đọc user:", e);
-                localStorage.removeItem('currentUser'); // Xóa data lỗi
+                localStorage.removeItem('currentUser');
             }
         }
-        // 2. NẾU KHÔNG CÓ USER -> không làm gì, giữ nguyên nút "Đăng nhập"
-        // === KẾT THÚC CẬP NHẬT 1 ===
+        // === KẾT THÚC LOGIC HEADER ===
     };
 
     /**
@@ -84,28 +57,15 @@ document.addEventListener("DOMContentLoaded", function() {
                 const element = document.getElementById(elementId);
                 if (element) {
                     element.innerHTML = data;
-                    if (callback) callback(); // Chạy hàm callback (initializeHeaderScripts)
+                    if (callback) callback();
                 }
             })
             .catch(error => console.error('Lỗi khi tải thành phần:', error));
     };
 
     // --- TẢI CÁC THÀNH PHẦN CHUNG ---
-    // Tải header, VÀ SAU ĐÓ chạy initializeHeaderScripts
     loadComponent('/pages/header.html', 'header-placeholder', initializeHeaderScripts); 
     loadComponent('/pages/footer.html', 'footer-placeholder');
 
-    // --- LOGIC CỦA TRANG CHỦ (Slideshow, Tabs...) ---
-    // (Code Slideshow và Tabs của bạn giữ nguyên)
-    // --- Logic cho Slideshow ---
-    // ... (giữ nguyên)
-    // --- Logic cho Tabs ---
-    // ... (giữ nguyên)
-    
-
-    // (PHẦN FORM ĐĂNG KÝ ĐÃ BỊ XÓA)
-
-    // (PHẦN FORM ĐĂNG NHẬP ĐÃ BỊ XÓA)
-
-
-}); // Đóng DOMContentLoaded
+    // ... (GIỮ NGUYÊN code LOGIC CỦA TRANG CHỦ) ...
+});

@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", function() {
     console.log("auth.js đã được tải!"); 
 
     // ===============================================
-    // LOGIC FORM ĐĂNG NHẬP (Giữ nguyên)
+    // LOGIC FORM ĐĂNG NHẬP (ĐÃ CẬP NHẬT DÙNG EMAIL)
     // ===============================================
     const loginForm = document.getElementById('login-form');
     
@@ -11,18 +11,22 @@ document.addEventListener("DOMContentLoaded", function() {
         console.log("Đã tìm thấy form đăng nhập."); 
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault(); 
-            const username = document.getElementById('username').value;
+            // ⚠️ THAY ĐỔI 1: Lấy giá trị từ ID 'email' thay vì 'username'
+            const email = document.getElementById('email').value; 
             const password = document.getElementById('password').value;
 
             try {
                 const response = await fetch('/api/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password }),
+                    // ⚠️ THAY ĐỔI 2: Gửi giá trị email dưới key 'username'
+                    // để khớp với route API tìm kiếm bằng Email trong server.js
+                    body: JSON.stringify({ username: email, password }), 
                 });
                 const data = await response.json(); 
                 if (response.ok) {
-                    localStorage.setItem('currentUser', JSON.stringify(data.user));
+                    // Giữ nguyên key 'currentUser'
+                    localStorage.setItem('currentUser', JSON.stringify(data.user)); 
                     alert(data.message); 
                     window.location.href = '/'; 
                 } else {
@@ -38,7 +42,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     // ===============================================
-    // LOGIC FORM ĐĂNG KÝ (ĐÃ CẬP NHẬT VỚI FORMDATA)
+    // LOGIC FORM ĐĂNG KÝ (Giữ nguyên)
     // ===============================================
     const registerForm = document.getElementById('register-form');
     
@@ -46,7 +50,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const avatarInput = document.getElementById('avatar');
     const avatarPreview = document.getElementById('avatar-preview');
 
-    // Logic xem trước ảnh
+    // Logic xem trước ảnh (Giữ nguyên)
     if (avatarInput && avatarPreview) {
         avatarInput.addEventListener('change', function(e) {
             const file = e.target.files[0];
@@ -99,7 +103,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 return;
             }
 
-            // 3. THAY ĐỔI: Dùng FormData thay vì JSON
+            // 3. Dùng FormData thay vì JSON
             const formData = new FormData();
             formData.append('username', username);
             formData.append('email', email);
@@ -111,7 +115,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 const response = await fetch('/api/register', {
                     method: 'POST',
                     // KHÔNG set 'Content-Type'
-                    // Trình duyệt sẽ tự động set 'multipart/form-data'
                     body: formData, 
                 });
 
