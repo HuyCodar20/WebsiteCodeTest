@@ -15,7 +15,7 @@ body {
 }
 
 .container {
-    max-width: 1200px;
+    max-width: 1300px;
     margin: 0 auto; 
     padding: 30px 20px; 
 }
@@ -32,7 +32,9 @@ body {
     width: 100%;
     max-height: 350px; 
     overflow: hidden;
-    border-radius: 5px;
+    border-radius: 20px;
+    border: solid 1px #a8eeff;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
 }
 
 .slide {

@@ -31,6 +31,44 @@
 
     </div>
     </section>
+
+    <div id="test-detail-modal" class="modal-overlay">
+    <div class="modal-content">
+        <span class="close-modal-btn">&times;</span>
+        
+        <!-- Phần Header của Modal (Chứa Banner) -->
+        <div class="modal-header-banner" id="modal-banner">
+            <div class="modal-banner-overlay">
+                <h2 id="modal-test-title">Tên bài test</h2>
+            </div>
+        </div>
+
+        <!-- Phần Nội dung chi tiết -->
+        <div class="modal-body">
+            <div class="modal-info-row">
+                <span id="modal-question-count"><i class="fas fa-list"></i> 0 câu hỏi</span>
+                <span id="modal-difficulty"><i class="fas fa-layer-group"></i> Dễ</span>
+                <span><i class="fas fa-user"></i> DevArena Team</span>
+            </div>
+
+            <p id="modal-description">Mô tả bài test...</p>
+
+            <!-- Khu vực Reviews -->
+            <div class="reviews-section">
+                <h3>Đánh giá & Bình luận</h3>
+                <div id="reviews-list-container">
+                    <!-- Các review sẽ được JS nạp vào đây -->
+                    <p>Đang tải đánh giá...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Nút hành động -->
+        <div class="modal-footer">
+            <a href="#" id="btn-start-test" class="btn-start">Bắt đầu làm bài</a>
+        </div>
+    </div>
+</div>
     
     <!-- Hiển thị các bài tests -->
     <main> <div class="test-list-container" id="test-list-container"></div></main>

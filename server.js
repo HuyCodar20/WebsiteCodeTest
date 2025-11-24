@@ -1,7 +1,7 @@
 const express = require("express");
 const path = require("path");
 const mongoose = require("mongoose");
-const multer = require("multer"); // Đã thêm: Cần thiết cho upload ảnh
+const multer = require("multer");
 
 const app = express();
 const PORT = 3000;
@@ -20,7 +20,7 @@ mongoose.connect(uri)
 
 // --- DEFINITIONS: SCHEMAS & MODELS ---
 
-// User Schema
+// 1. User Model
 const userSchema = new mongoose.Schema({
   UserID: { type: Number, required: true, unique: true },
   Username: { type: String, required: true, unique: true },
@@ -29,11 +29,59 @@ const userSchema = new mongoose.Schema({
   AvatarURL: { type: String, default: '/images/default-avatar.png' },
   Role: { type: String, default: 'user' },
   CreatedAt: { type: Date, default: Date.now }
-}, {
-  collection: 'users'
-});
+}, { collection: 'users' });
 
 const User = mongoose.model('User', userSchema);
+
+// 2. Category (Topic) Model
+const categorySchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  description: String,
+  icon: String,
+  type: String, // 'framework', 'language', 'tool', etc.
+  tags: [String],
+  banner_image_url: String,
+  long_description: String,
+  theme_color: String
+}, { collection: 'categories' }); // Map đúng vào collection 'categories' trong DB
+
+const Category = mongoose.model('Category', categorySchema);
+
+// 3. Test Model
+const questionSchema = new mongoose.Schema({
+  questionText: String,
+  choices: [{
+    choiceText: String,
+    isCorrect: Boolean
+  }]
+});
+
+const testSchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  description: String,
+  categoryId: { type: mongoose.Schema.Types.ObjectId, ref: 'Category', required: true },
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  reviewedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
+  status: { type: String, default: 'pending' },
+  difficulty: { type: String, enum: ['easy', 'medium', 'hard'], default: 'easy' },
+  numQuestions: Number,
+  createdAt: { type: Date, default: Date.now },
+  endDate: Date,
+  questions: [questionSchema]
+}, { collection: 'Tests' }); // Map đúng vào collection 'Tests'
+
+const Test = mongoose.model('Test', testSchema);
+
+// 4. Review Model
+const reviewSchema = new mongoose.Schema({
+  testId: { type: mongoose.Schema.Types.ObjectId, ref: 'Test', required: true },
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  rating: { type: Number, required: true, min: 1, max: 5 },
+  createdAt: { type: Date, default: Date.now }
+}, { collection: 'TestReviews' }); // Map đúng vào collection 'TestReviews'
+
+const Review = mongoose.model('Review', reviewSchema);
+
 
 // --- CẤU HÌNH MULTER (UPLOAD FILE) ---
 const storage = multer.diskStorage({
@@ -50,7 +98,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 
-// --- HELPER FUNCTIONS ---
+// --- SUPPORT FUNCTIONS ---
 
 // Hàm xóa dấu tiếng Việt
 function removeDiacritics(str) {
@@ -76,6 +124,7 @@ app.get('/api/topics', async (req, res) => {
     const { types, tags, search } = req.query;
     const queryObject = {};
 
+    // Lọc theo type và tags ngay tại Database
     if (types) {
       queryObject.type = { $in: types.split(',') };
     }
@@ -84,11 +133,12 @@ app.get('/api/topics', async (req, res) => {
       queryObject.tags = { $in: tags.split(',') };
     }
 
-    const Topic = mongoose.connection.collection('categories');
-    const dataFromDB = await Topic.find(queryObject).toArray();
+    // Sử dụng Model Category để find
+    const dataFromDB = await Category.find(queryObject);
 
     let filteredData;
 
+    // Logic tìm kiếm (Search) giữ nguyên: Xử lý phía Server sau khi lấy data
     if (search && search.trim() !== '') {
       const normalizedSearch = removeDiacritics(search.trim());
       const escapedSearch = escapeRegex(normalizedSearch);
@@ -96,7 +146,7 @@ app.get('/api/topics', async (req, res) => {
 
       filteredData = dataFromDB.filter(topic => {
         const topicName = removeDiacritics(topic.name);
-        const topicDesc = removeDiacritics(topic.description);
+        const topicDesc = removeDiacritics(topic.description || ""); // Handle null description
         return searchRegex.test(topicName) || searchRegex.test(topicDesc);
       });
     } else {
@@ -120,10 +170,8 @@ app.get('/api/category/:id', async (req, res) => {
       return res.status(400).json({ message: "ID danh mục không hợp lệ." });
     }
 
-    const CategoryCollection = mongoose.connection.collection('categories');
-    const category = await CategoryCollection.findOne({
-      _id: new mongoose.Types.ObjectId(categoryId)
-    });
+    // Sử dụng Model Category để findById
+    const category = await Category.findById(categoryId);
 
     if (!category) {
       return res.status(404).json({ message: "Không tìm thấy danh mục này." });
@@ -150,10 +198,8 @@ app.get('/api/tests', async (req, res) => {
       return res.status(400).json({ message: "categoryId không hợp lệ." });
     }
 
-    const TestsCollection = mongoose.connection.collection('Tests');
-    const tests = await TestsCollection.find({
-      categoryId: new mongoose.Types.ObjectId(categoryId)
-    }).toArray();
+    // Sử dụng Model Test để find
+    const tests = await Test.find({ categoryId: categoryId });
 
     res.json(tests);
 
@@ -163,7 +209,28 @@ app.get('/api/tests', async (req, res) => {
   }
 });
 
-// 4. API: Đăng ký User
+// 4. API: Lấy danh sách Reviews cho một bài Test
+app.get('/api/reviews', async (req, res) => {
+  try {
+    const { testId } = req.query;
+
+    if (!testId || !mongoose.Types.ObjectId.isValid(testId)) {
+      return res.status(400).json({ message: "testId không hợp lệ." });
+    }
+
+    // Sử dụng Model Review để find và sort
+    const reviews = await Review.find({ testId: testId })
+      .sort({ createdAt: -1 });
+
+    res.json(reviews);
+
+  } catch (error) {
+    console.error("Lỗi khi lấy reviews:", error);
+    res.status(500).json({ message: "Lỗi server khi lấy reviews." });
+  }
+});
+
+// 5. API: Đăng ký User (Logic cũ, dùng Model User)
 app.post('/api/register', upload.single('avatar'), async (req, res) => {
   const { username, email, password } = req.body;
   const avatarFile = req.file;
@@ -189,7 +256,7 @@ app.post('/api/register', upload.single('avatar'), async (req, res) => {
     if (lastUser) {
       newUserID = lastUser.UserID + 1;
     }
-    
+
     const avatarUrlPath = `/uploads/${avatarFile.filename}`;
 
     const newUser = new User({
@@ -217,7 +284,7 @@ app.post('/api/register', upload.single('avatar'), async (req, res) => {
   }
 });
 
-// 5. API: Đăng nhập
+// 6. API: Đăng nhập (Logic cũ, dùng Model User)
 app.post('/api/login', async (req, res) => {
   const { username, password } = req.body;
 

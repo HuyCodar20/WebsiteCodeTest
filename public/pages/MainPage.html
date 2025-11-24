@@ -168,80 +168,111 @@
                         <button class="tab-btn" data-tab="tech">Theo công nghệ</button>
                     </div>
 
-                    <div class="category-tabs-content">
-                        <div id="roles" class="tab-pane active">
-                            <div class="category-grid">
-                                <a href="#" class="category-item">
-                                    <i class="fa-solid fa-code"></i>
-                                    <span>Frontend Developer</span>
-                                </a>
-                                <a href="#" class="category-item">
-                                    <i class="fa-solid fa-server"></i>
-                                    <span>Backend Developer</span>
-                                </a>
-                                <a href="#" class="category-item">
-                                    <i class="fa-solid fa-mobile-screen-button"></i>
-                                    <span>Mobile Developer</span>
-                                </a>
-                                <a href="#" class="category-item">
-                                    <i class="fa-solid fa-chart-simple"></i>
-                                    <span>Data Analyst</span>
-                                </a>
-                                <a href="#" class="category-item">
-                                    <i class="fa-solid fa-database"></i>
-                                    <span>Database Admin</span>
-                                </a>
-                                <a href="#" class="category-item">
-                                    <i class="fa-solid fa-shield-halved"></i>
-                                    <span>Security</span>
-                                </a>
-                                <a href="#" class="category-item">
-                                    <i class="fa-solid fa-bug"></i>
-                                    <span>Tester (QA/QC)</span>
-                                </a>
-                                <a href="#" class="category-item">
-                                    <i class="fa-solid fa-cloud"></i>
-                                    <span>DevOps</span>
-                                </a>
-                            </div>
-                        </div>
+                    <!-- FILE: MainPage.html (hoặc file chứa đoạn code bạn gửi) -->
 
-                        <div id="tech" class="tab-pane">
-                            <div class="category-grid">
-                                <a href="#" class="category-item">
-                                    <i class="fa-brands fa-python"></i>
-                                    <span>Python</span>
-                                </a>
-                                <a href="#" class="category-item">
-                                    <i class="fa-brands fa-js"></i>
-                                    <span>JavaScript</span>
-                                </a>
-                                <a href="#" class="category-item">
-                                    <i class="fa-brands fa-html5"></i>
-                                    <span>HTML & CSS</span>
-                                </a>
-                                <a href="#" class="category-item">
-                                    <i class="fa-solid fa-database"></i>
-                                    <span>SQL</span>
-                                </a>
-                                <a href="#" class="category-item">
-                                    <i class="fa-brands fa-java"></i>
-                                    <span>Java</span>
-                                </a>
-                                <a href="#" class="category-item">
-                                    <i class="fa-solid fa-c"></i>
-                                    <span>C++</span>
-                                </a>
-                                <a href="#" class="category-item">
-                                    <i class="fa-brands fa-react"></i>
-                                    <span>ReactJS</span>
-                                </a>
-                                <a href="#" class="category-item">
-                                    <i class="fa-brands fa-node-js"></i>
-                                    <span>Node.js</span>
-                                </a>
-                            </div>
-                        </div>
+<div id="roles" class="tab-pane active">
+    <div class="category-grid">
+        <!-- Frontend: Lọc theo tag 'frontend' -->
+        <a href="/pages/topic.html?tags=frontend" class="category-item">
+            <i class="fa-solid fa-code"></i>
+            <span>Frontend Developer</span>
+        </a>
+        
+        <!-- Backend: Lọc theo tag 'backend' -->
+        <a href="/pages/topic.html?tags=backend" class="category-item">
+            <i class="fa-solid fa-server"></i>
+            <span>Backend Developer</span>
+        </a>
+        
+        <!-- Mobile: Lọc theo tag 'mobile' -->
+        <a href="/pages/topic.html?tags=mobile" class="category-item">
+            <i class="fa-solid fa-mobile-screen-button"></i>
+            <span>Mobile Developer</span>
+        </a>
+        
+        <!-- Data Analyst: Lọc theo tag 'data' -->
+        <a href="/pages/topic.html?tags=data" class="category-item">
+            <i class="fa-solid fa-chart-simple"></i>
+            <span>Data Analyst</span>
+        </a>
+        
+        <!-- Database: Lọc theo tag 'database' -->
+        <a href="/pages/topic.html?tags=database" class="category-item">
+            <i class="fa-solid fa-database"></i>
+            <span>Database Admin</span>
+        </a>
+        
+        <!-- Security: Lọc theo tag 'security' -->
+        <a href="/pages/topic.html?tags=security" class="category-item">
+            <i class="fa-solid fa-shield-halved"></i>
+            <span>Security</span>
+        </a>
+        
+        <!-- Tester: Lọc theo tag 'testing' (Giả sử bạn có tag này) -->
+        <a href="/pages/topic.html?tags=testing" class="category-item">
+            <i class="fa-solid fa-bug"></i>
+            <span>Tester (QA/QC)</span>
+        </a>
+        
+        <!-- DevOps: Lọc theo tag 'devops' -->
+        <a href="/pages/topic.html?tags=devops" class="category-item">
+            <i class="fa-solid fa-cloud"></i>
+            <span>DevOps</span>
+        </a>
+    </div>
+</div>
+
+<div id="tech" class="tab-pane">
+    <div class="category-grid">
+        <!-- Python: Trỏ thẳng sang select.html -->
+        <a href="/pages/selectTest.html?id=68ef00000000000000000002" class="category-item">
+            <i class="fa-brands fa-python"></i>
+            <span>Python</span>
+        </a>
+        
+        <!-- JavaScript -->
+        <a href="/pages/selectTest.html?id=68ef00000000000000000003" class="category-item">
+            <i class="fa-brands fa-js"></i>
+            <span>JavaScript</span>
+        </a>
+        
+        <!-- HTML/CSS -->
+        <a href="/pages/select.html?tech=html-css" class="category-item">
+            <i class="fa-brands fa-html5"></i>
+            <span>HTML & CSS</span>
+        </a>
+        
+        <!-- SQL -->
+        <a href="/pages/selectTest.html?id=68ef00000000000000000005" class="category-item">
+            <i class="fa-solid fa-database"></i>
+            <span>SQL</span>
+        </a>
+        
+        <!-- Java -->
+        <a href="/pages/select.html?tech=java" class="category-item">
+            <i class="fa-brands fa-java"></i>
+            <span>Java</span>
+        </a>
+        
+        <!-- C++ -->
+        <a href="/pages/select.html?tech=cpp" class="category-item">
+            <i class="fa-solid fa-c"></i>
+            <span>C++</span>
+        </a>
+
+        <!-- ReactJS -->
+        <a href="/pages/select.html?tech=reactjs" class="category-item">
+            <i class="fa-brands fa-react"></i>
+            <span>ReactJS</span>
+        </a>
+
+        <!-- Node.js -->
+        <a href="/pages/select.html?tech=nodejs" class="category-item">
+            <i class="fa-brands fa-node-js"></i>
+            <span>Node.js</span>
+        </a>
+    </div>
+</div>
                     </div>
                 </div>
             </section>
@@ -252,6 +283,8 @@
     <div id="footer-placeholder"></div>
 
     <script src="/javascript/main.js"></script>
+    <script src="/javascript/topic-page.js"></script>
+    <script src="/javascript/selectTest.js"></script>
 
 </body>
 </html>
