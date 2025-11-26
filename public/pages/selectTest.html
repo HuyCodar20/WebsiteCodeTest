@@ -1,11 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bài test | DevArena</title>
-
-    <!-- Styles -->
+    <title>Luyện thi trắc nghiệm | DevArena</title>
     <link rel="stylesheet" href="/stylesheets/header.css">
     <link rel="stylesheet" href="/stylesheets/footer.css">
     <link rel="stylesheet" href="/stylesheets/selectTest.css">
@@ -13,71 +11,189 @@
 </head>
 <body>
 
-    <!-- Header -->
     <header id="header-placeholder"></header>
 
     <section class="topic-banner">
-    <div class="topic-overlay">
-
-        <h1 id="category-name"></h1>
-        <p id="category-description"></p>
-
-        <form class="search-form-test">
-            <input type="search" id="test-search-input" placeholder="Tìm bài test, ví dụ: 'React Hooks'...">
-            <button type="submit" aria-label="Tìm kiếm">
-                <i class="fas fa-search"></i>
-            </button>
-        </form>
-
-    </div>
+        <div class="topic-overlay">
+            <h1 id="category-name">Đang tải...</h1>
+            <p id="category-description"></p>
+        </div>
     </section>
 
-    <div id="test-detail-modal" class="modal-overlay">
-    <div class="modal-content">
-        <span class="close-modal-btn">&times;</span>
+    <div class="main-container">
         
-        <!-- Phần Header của Modal (Chứa Banner) -->
-        <div class="modal-header-banner" id="modal-banner">
-            <div class="modal-banner-overlay">
-                <h2 id="modal-test-title">Tên bài test</h2>
+        <section class="start-action-section">
+            <div class="start-card">
+                <h2>Sẵn sàng thử thách?</h2>
+                <p>Kiểm tra kiến thức của bạn ngay bây giờ với bộ câu hỏi ngẫu nhiên.</p>
+                <button id="btn-open-config" class="btn-hero-start">
+                    <i class="fas fa-play"></i> Bắt đầu làm bài
+                </button>
+            </div>
+        </section>
+
+        <section class="search-filter-wrapper">
+            <form class="search-form-test">
+                <input type="search" id="test-search-input" placeholder="Tìm câu hỏi...">
+                <button type="submit" aria-label="Tìm kiếm"><i class="fas fa-search"></i></button>
+            </form>
+            <div class="filter-box">
+                <select id="browser-filter-difficulty" class="filter-select">
+                    <option value="all">Tất cả độ khó</option>
+                    <option value="easy">Dễ</option>
+                    <option value="medium">Trung bình</option>
+                    <option value="hard">Khó</option>
+                </select>
+            </div>
+        </section>
+
+        <main class="question-browser">
+            <div class="browser-header">
+                <h3><i class="fas fa-database"></i> Ngân hàng câu hỏi tham khảo</h3>
+                <span id="modal-question-count" class="badge-count">...</span>
+            </div>
+            <div id="question-list-container" class="question-list"></div>
+            <div id="pagination-controls" class="pagination-controls" style="display: none;">
+                <button id="btn-prev-page" class="btn-page"><i class="fas fa-chevron-left"></i></button>
+                <span id="page-info">Trang 1</span>
+                <button id="btn-next-page" class="btn-page"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </main>
+    </div>
+
+    <div id="config-modal" class="modal-overlay">
+        <div class="modal-content config-modal-box">
+            <span class="close-modal-btn">&times;</span>
+            
+            <div class="modal-header">
+                <h2><i class="fas fa-sliders-h"></i> Thiết lập bài thi</h2>
+            </div>
+
+            <div class="modal-body">
+                <div class="config-section">
+                    <h4 class="section-title">Cài đặt chung</h4>
+                    <div class="form-row">
+                        <div class="form-group half">
+                            <label>Số câu hỏi</label>
+                            <select id="config-limit" class="form-control">
+                                <option value="5">5 câu</option>
+                                <option value="10" selected>10 câu</option>
+                                <option value="15">15 câu</option>
+                                <option value="20">20 câu</option>
+                                <option value="30">30 câu</option>
+                                <option value="40">40 câu</option>
+                            </select>
+                        </div>
+                        <div class="form-group half">
+                            <label>Độ khó</label>
+                            <select id="config-difficulty" class="form-control">
+                                <option value="all" selected>Ngẫu nhiên</option>
+                                <option value="easy">Dễ</option>
+                                <option value="medium">Trung bình</option>
+                                <option value="hard">Khó</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="divider">
+
+                <div class="config-section">
+                    <h4 class="section-title">Chế độ thời gian</h4>
+                    
+                    <div class="mode-option" id="mode-classic-row">
+                        <div class="radio-header">
+                            <input type="radio" name="timeMode" id="mode-classic" value="classic" checked>
+                            <label for="mode-classic">
+                                <strong>Thi tiêu chuẩn</strong> (Tính tổng thời gian)
+                            </label>
+                        </div>
+                        <div class="mode-controls">
+                            <div class="control-item full-width">
+                                <label>Tổng thời gian làm bài:</label>
+                                <select id="config-total-time" class="form-control sm" checked>
+                                    <option value="300">5 Phút</option>
+                                    <option value="600">10 Phút</option>
+                                    <option value="900" selected>15 Phút</option>
+                                    <option value="1800">30 Phút</option>
+                                    <option value="2700">45 Phút</option>
+                                    <option value="3600">60 Phút</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="mode-option" id="mode-paced-row">
+                        <div class="radio-header">
+                            <input type="radio" name="timeMode" id="mode-paced" value="paced">
+                            <label for="mode-paced">
+                                <strong>Thử thách tốc độ</strong> (Tính giờ từng câu)
+                            </label>
+                        </div>
+                        <div class="mode-controls">
+                            <div class="control-item">
+                                <label>Giây/Câu:</label>
+                                <select id="config-time-per-question" class="form-control sm" disabled>
+                                    <option value="30">30 giây</option>
+                                    <option value="45">45 giây</option>
+                                    <option value="60" selected>60 giây</option>
+                                    <option value="90">90 giây</option>
+                                    <option value="120">120 giây</option>
+                                </select>
+                            </div>
+                            <div class="control-item">
+                                <label>Tổng (Tự tính):</label>
+                                <input type="text" id="config-total-calc" class="form-control sm readonly" value="10 phút" readonly>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button id="btn-start-game-confirm" class="btn-confirm-start">
+                    Vào thi ngay <i class="fas fa-arrow-right"></i>
+                </button>
             </div>
         </div>
+    </div>
 
-        <!-- Phần Nội dung chi tiết -->
+
+    <div id="practice-modal" class="modal-overlay">
+    <div class="modal-content practice-modal-box">
+        
+        <div class="modal-header practice-header">
+            <h2><i class="fas fa-bolt"></i> Luyện tập nhanh</h2>
+            <span class="close-practice-btn">&times;</span>
+        </div>
+
         <div class="modal-body">
-            <div class="modal-info-row">
-                <span id="modal-question-count"><i class="fas fa-list"></i> 0 câu hỏi</span>
-                <span id="modal-difficulty"><i class="fas fa-layer-group"></i> Dễ</span>
-                <span><i class="fas fa-user"></i> DevArena Team</span>
-            </div>
+            <div id="practice-question-text" class="practice-q-text"></div>
+            
+            <div id="practice-options" class="practice-options-list"></div>
 
-            <p id="modal-description">Mô tả bài test...</p>
-
-            <!-- Khu vực Reviews -->
-            <div class="reviews-section">
-                <h3>Đánh giá & Bình luận</h3>
-                <div id="reviews-list-container">
-                    <!-- Các review sẽ được JS nạp vào đây -->
-                    <p>Đang tải đánh giá...</p>
+            <div id="practice-result" class="practice-result-box" style="display:none;">
+                <h4 id="practice-status" class="result-status"></h4>
+                <div class="result-explanation">
+                    <i class="fas fa-lightbulb"></i>
+                    <span id="practice-explanation"></span>
                 </div>
             </div>
         </div>
 
-        <!-- Nút hành động -->
         <div class="modal-footer">
-            <a href="#" id="btn-start-test" class="btn-start">Bắt đầu làm bài</a>
+            <button id="btn-check-practice" class="btn-confirm-start practice-check-btn">
+                Kiểm tra đáp án
+            </button>
         </div>
     </div>
 </div>
-    
-    <!-- Hiển thị các bài tests -->
-    <main> <div class="test-list-container" id="test-list-container"></div></main>
 
-    <!-- Footer -->
+
     <footer id="footer-placeholder"></footer>
-    
-<!-- JavaScript -->
-<script src="/javascript/main.js"></script>
-<script src="/javascript/selectTest-page.js" defer></script>
+    <script src="/javascript/main.js"></script>
+    <script src="/javascript/selectTest-page.js" defer></script>
 </body>
 </html>

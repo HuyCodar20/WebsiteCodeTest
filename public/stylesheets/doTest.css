@@ -1,0 +1,680 @@
+/* =========================================
+   1. VARIABLES & GLOBAL SETTINGS
+   ========================================= */
+:root {
+    /* Bảng màu hiện đại (Indigo - Slate - Emerald) */
+    --primary: #6366f1;       /* Indigo 500 - Màu chủ đạo */
+    --primary-dark: #4f46e5;  /* Indigo 600 - Hover */
+    --primary-light: #eef2ff; /* Indigo 50 - Nền nhạt */
+    
+    --success: #10b981;       /* Emerald 500 - Đúng/Đã làm */
+    --success-bg: #d1fae5;    /* Emerald 100 */
+    
+    --warning: #f59e0b;       /* Amber 500 - Review */
+    --warning-bg: #fef3c7;    /* Amber 100 */
+    
+    --danger: #ef4444;        /* Rose 500 - Sai */
+    --danger-bg: #ffe4e6;     /* Rose 100 */
+    
+    --text-main: #1e293b;     /* Slate 800 - Chữ chính */
+    --text-sub: #64748b;      /* Slate 500 - Chữ phụ */
+    
+    --bg-body: #f8fafc;       /* Slate 50 - Nền body */
+    --bg-card: #ffffff;       /* Trắng - Nền khung */
+    
+    --border: #e2e8f0;        /* Slate 200 - Viền */
+    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+}
+
+* { 
+    box-sizing: border-box; 
+    margin: 0; 
+    padding: 0; 
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+body { 
+    background-color: var(--bg-body); 
+    height: 100vh; 
+    display: flex; 
+    flex-direction: column; 
+    color: var(--text-main);
+}
+
+/* Scrollbar đẹp hơn cho Webkit */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+/* =========================================
+   2. TOP BAR
+   ========================================= */
+.test-topbar {
+    background: var(--bg-card); 
+    padding: 15px 30px; 
+    border-bottom: 1px solid var(--border);
+    box-shadow: var(--shadow-sm); 
+    text-align: center;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: var(--text-main);
+    font-size: 1.2rem;
+}
+
+/* =========================================
+   3. MAIN LAYOUT
+   ========================================= */
+.test-container {
+    display: flex; 
+    flex: 1; 
+    height: calc(100vh - 60px); 
+    overflow: hidden;
+    gap: 20px;
+    padding: 20px;
+    max-width: 1600px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+/* =========================================
+   4. LEFT: QUESTION AREA
+   ========================================= */
+.question-area {
+    flex: 3; 
+    padding: 40px; 
+    display: flex; 
+    flex-direction: column; 
+    overflow-y: auto;
+    background-color: var(--bg-card); 
+    border-radius: 16px; 
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border);
+    margin: 0; /* Bỏ margin cũ vì đã dùng gap ở container */
+}
+
+.question-header { 
+    margin-bottom: 25px; 
+    border-bottom: 2px solid var(--bg-body); 
+    padding-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.question-header h3 {
+    color: var(--primary);
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.question-body { 
+    flex: 1; 
+}
+
+#question-text { 
+    font-size: 1.35rem; 
+    font-weight: 600; 
+    margin-bottom: 30px; 
+    line-height: 1.6; 
+    color: var(--text-main);
+}
+
+/* --- Options Styling (Radio Buttons) --- */
+.option-item {
+    display: flex; 
+    align-items: center; 
+    padding: 16px 20px; 
+    margin-bottom: 12px;
+    border: 2px solid var(--border); 
+    border-radius: 12px; 
+    cursor: pointer; 
+    transition: all 0.2s ease;
+    background: #fff;
+    position: relative;
+}
+
+.option-item:hover { 
+    background-color: var(--primary-light); 
+    border-color: #c7d2fe; /* Màu tím nhạt */
+}
+
+.option-item input[type="radio"] { 
+    margin-right: 18px; 
+    transform: scale(1.3); 
+    accent-color: var(--primary); /* Đổi màu nút tròn radio */
+    cursor: pointer;
+}
+
+/* Khi được chọn */
+.option-item.selected { 
+    background-color: var(--primary-light); 
+    border-color: var(--primary); 
+    color: var(--primary-dark);
+    font-weight: 600;
+    box-shadow: 0 0 0 1px var(--primary); /* Tạo hiệu ứng viền kép nhẹ */
+}
+
+/* Footer Buttons */
+.question-footer {
+    margin-top: 40px; 
+    padding-top: 20px; 
+    border-top: 1px solid var(--border);
+    display: flex; 
+    justify-content: space-between;
+}
+
+button { 
+    padding: 12px 24px; 
+    border: none; 
+    border-radius: 10px; 
+    cursor: pointer; 
+    font-size: 1rem; 
+    font-weight: 600;
+    transition: all 0.2s; 
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-nav { 
+    background-color: white; 
+    color: var(--text-main); 
+    border: 1px solid var(--border);
+    margin-left: 10px; 
+    box-shadow: var(--shadow-sm);
+}
+.btn-nav:hover { 
+    background-color: var(--bg-body); 
+    border-color: #cbd5e1;
+    transform: translateY(-1px);
+}
+
+.btn-submit { 
+    background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+    color: white; 
+    margin-left: 10px; 
+    box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.4);
+}
+.btn-submit:hover { 
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.5);
+    filter: brightness(1.1);
+}
+
+.btn-secondary { 
+    background-color: #94a3b8; 
+    color: white; 
+}
+.btn-secondary:hover { 
+    background-color: #64748b; 
+}
+
+/* Legend (Chú thích) */
+.status-legend { 
+    display: flex; 
+    gap: 25px; 
+    margin-top: 25px; 
+    font-size: 0.9rem; 
+    color: var(--text-sub); 
+    justify-content: center; 
+}
+
+.legend-item { 
+    display: flex; 
+    align-items: center; 
+    gap: 8px; 
+}
+
+.dot { 
+    width: 14px; 
+    height: 14px; 
+    border-radius: 4px; /* Hình vuông bo góc thay vì tròn */
+    display: inline-block; 
+}
+.dot.current { background-color: var(--primary); }
+.dot.answered { background-color: var(--success); }
+.dot.not-visited { background-color: #e2e8f0; }
+.dot.review { background-color: var(--warning); }
+
+
+/* =========================================
+   5. RIGHT: SIDEBAR AREA
+   ========================================= */
+.sidebar-area {
+    flex: 1; 
+    min-width: 320px; 
+    max-width: 380px;
+    padding: 0;
+    display: flex; 
+    flex-direction: column; 
+    gap: 20px;
+    background-color: transparent;
+}
+
+.timer-box, .palette-box {
+    background: var(--bg-card); 
+    padding: 25px; 
+    border-radius: 16px; 
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border);
+}
+
+.timer-box h4, .palette-box h4 { 
+    text-align: center; 
+    margin-bottom: 20px; 
+    color: var(--text-sub); 
+    text-transform: uppercase; 
+    font-size: 0.85rem; 
+    letter-spacing: 1.5px;
+    font-weight: 700;
+}
+
+/* Countdown Timer */
+.countdown-display { 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    font-size: 2rem; 
+    font-weight: 800; 
+    color: var(--text-main); 
+}
+
+.time-unit { 
+    text-align: center; 
+    background: var(--bg-body);
+    padding: 10px 15px;
+    border-radius: 8px;
+    min-width: 60px;
+}
+
+.time-unit small { 
+    display: block; 
+    font-size: 0.7rem; 
+    color: var(--text-sub); 
+    font-weight: 600; 
+    margin-top: 5px; 
+    text-transform: uppercase;
+}
+
+.colon { 
+    margin: 0 5px; 
+    padding-bottom: 25px; 
+    color: var(--text-sub);
+}
+
+/* Palette Grid */
+.palette-grid { 
+    display: grid; 
+    grid-template-columns: repeat(5, 1fr); 
+    gap: 12px; 
+}
+
+.palette-item {
+    aspect-ratio: 1; 
+    display: flex; 
+    justify-content: center; 
+    align-items: center;
+    background-color: #f1f5f9; 
+    border-radius: 8px; 
+    cursor: pointer; 
+    font-weight: 600; 
+    font-size: 0.95rem;
+    color: var(--text-sub);
+    transition: all 0.2s;
+    border: 1px solid transparent;
+}
+
+.palette-item:hover { 
+    background-color: #e2e8f0; 
+    transform: scale(1.05);
+}
+
+/* Palette Colors States */
+.palette-item.current { 
+    background-color: white; 
+    border: 2px solid var(--primary);
+    color: var(--primary); 
+}
+.palette-item.answered { 
+    background-color: var(--success); 
+    color: white; 
+}
+.palette-item.review { 
+    background-color: var(--warning); 
+    color: white; 
+}
+
+
+/* =========================================
+   6. RESULT & REVIEW SECTION
+   ========================================= */
+.result-container {
+    max-width: 900px; 
+    margin: 30px auto; 
+    text-align: center;
+    padding: 0 20px;
+}
+
+.score-header {
+    background: white; 
+    padding: 40px; 
+    border-radius: 20px;
+    box-shadow: var(--shadow-md); 
+    margin-bottom: 40px;
+    border: 1px solid var(--border);
+}
+
+.score-circle {
+    width: 140px; 
+    height: 140px; 
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); 
+    color: white;
+    border-radius: 50%; 
+    display: flex; 
+    flex-direction: column;
+    justify-content: center; 
+    align-items: center; 
+    margin: 0 auto 25px;
+    font-size: 3rem; 
+    font-weight: 800;
+    box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.4);
+}
+
+.score-circle small { 
+    font-size: 1rem; 
+    font-weight: 500; 
+    opacity: 0.9; 
+}
+
+.btn-home {
+    display: inline-block; 
+    margin-top: 20px; 
+    padding: 14px 35px;
+    background: var(--text-main); 
+    color: white; 
+    text-decoration: none; 
+    border-radius: 12px;
+    font-weight: 600;
+    transition: transform 0.2s;
+}
+.btn-home:hover {
+    transform: translateY(-2px);
+    background: #0f172a;
+}
+
+/* Result Detail Container */
+.result-detail-container {
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: left;
+    padding-bottom: 50px;
+}
+
+.review-item {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.2s;
+}
+.review-item:hover {
+    box-shadow: var(--shadow-md);
+}
+
+/* Đánh dấu câu đúng/sai ở border trái */
+.review-item.correct-box { border-left: 5px solid var(--success); }
+.review-item.wrong-box { border-left: 5px solid var(--danger); }
+
+.review-question-text {
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 20px;
+    font-size: 1.1rem;
+    line-height: 1.5;
+}
+
+.review-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.review-option, .opt-review {
+    padding: 12px 16px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--text-sub);
+    background: #fff;
+    font-size: 0.95rem;
+}
+
+/* Các trạng thái đáp án trong Review */
+.review-option.correct, .opt-review.correct {
+    background-color: var(--success-bg);
+    border-color: var(--success);
+    color: #065f46; /* Xanh đậm hơn */
+    font-weight: 600;
+}
+
+.review-option.wrong, .opt-review.wrong {
+    background-color: var(--danger-bg);
+    border-color: var(--danger);
+    color: #9f1239; /* Đỏ đậm hơn */
+}
+
+.review-option.missed {
+    border-color: var(--success);
+    border-style: dashed;
+    border-width: 2px;
+    color: var(--success);
+    background-color: rgba(16, 185, 129, 0.05);
+}
+
+.user-badge {
+    font-size: 0.75rem;
+    padding: 4px 10px;
+    border-radius: 20px;
+    margin-left: 10px;
+    background: white;
+    border: 1px solid currentColor;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+/* =========================================
+   7. NEW FEATURES & RESULT LAYOUT
+   ========================================= */
+
+/* --- Nút Đánh dấu (Flag) --- */
+.btn-secondary.flagged-active {
+    background-color: var(--warning); /* Màu vàng cam */
+    color: white;
+    border: 1px solid #d97706;
+}
+.btn-secondary.flagged-active:hover {
+    background-color: #d97706;
+}
+
+/* --- Layout Kết quả 2 cột (New) --- */
+.result-layout-wrapper {
+    display: flex;
+    gap: 30px;
+    width: 100%;
+    padding-top: 20px;
+    align-items: flex-start; /* Quan trọng để Sticky hoạt động */
+}
+
+/* Sidebar Trái (Sticky) */
+.result-sidebar-sticky {
+    flex: 0 0 280px; /* Chiều rộng cố định */
+    position: sticky;
+    top: 20px; /* Dính cách mép trên 20px */
+    z-index: 100;
+}
+
+.score-card {
+    background: white;
+    padding: 25px;
+    border-radius: 16px;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border);
+    text-align: center;
+}
+
+.score-circle-mini {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    color: white;
+    font-size: 1.8rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 15px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.score-card h3 {
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+    color: var(--text-main);
+}
+
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    font-size: 0.95rem;
+    border-bottom: 1px dashed #eee;
+}
+
+.stat-row:last-of-type { border-bottom: none; }
+
+.btn-home-mini, .btn-retry-mini {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+}
+
+.btn-home-mini { background: var(--text-main); color: white; }
+.btn-home-mini:hover { background: #0f172a; }
+
+.btn-retry-mini { background: #e2e8f0; color: var(--text-main); }
+.btn-retry-mini:hover { background: #cbd5e1; }
+
+
+/* Main Content Phải (Scrollable) */
+.result-detail-list {
+    flex: 1; /* Chiếm phần còn lại */
+}
+
+.result-heading {
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+    color: var(--text-main);
+    border-left: 5px solid var(--primary);
+    padding-left: 15px;
+}
+
+.review-item-new {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border);
+}
+
+.review-item-new.correct-border { border-left: 5px solid var(--success); }
+.review-item-new.wrong-border { border-left: 5px solid var(--danger); }
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+.q-tag {
+    background: #f1f5f9;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: var(--text-sub);
+}
+
+.q-text-new {
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+/* Đáp án trong Review */
+.options-review-new {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.opt-review-simple {
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    font-size: 0.95rem;
+    color: var(--text-sub);
+}
+
+/* Styles cho đúng/sai */
+.is-correct-answer {
+    background-color: var(--success-bg);
+    border-color: var(--success);
+    color: #065f46;
+    font-weight: 600;
+}
+
+.is-wrong-choice {
+    background-color: var(--danger-bg);
+    border-color: var(--danger);
+    color: #9f1239;
+    opacity: 0.8;
+}
+
+.is-user-selected {
+    /* Trường hợp chọn đúng, style đã gộp với is-correct-answer */
+    /* Có thể thêm border đậm hơn nếu muốn */
+    box-shadow: 0 0 0 1px var(--success);
+}
+
+.explanation-box {
+    margin-top: 15px;
+    padding: 15px;
+    background: #fffbeb; /* Vàng nhạt */
+    border-radius: 8px;
+    color: #92400e;
+    font-size: 0.9rem;
+    border: 1px dashed #f59e0b;
+}

@@ -1,15 +1,121 @@
 document.addEventListener("DOMContentLoaded", function() {
 
-    /**
-     * Tải một thành phần HTML từ một URL và chèn vào một element.
-     * @param {string} url - Đường dẫn đến file HTML.
-     * @param {string} elementId - ID của element để chèn nội dung vào.
-     * @param {Function} [callback] - Hàm sẽ được gọi sau khi tải thành công.
-     */
+    // --- CẤU HÌNH NHẠC & DATABASE ---
+    const BACKGROUND_MUSIC_KEY = 'devarena_bg_music_enabled';
+    const BACKGROUND_MUSIC_TIME_KEY = 'devarena_bg_music_current_time';
+
+    const backgroundMusic = new Audio('../audio/background_quiz.mp3');
+    backgroundMusic.loop = true;
+    backgroundMusic.volume = 0.5;
+
+    // Khôi phục thời gian phát nhạc nếu có
+    const savedTime = sessionStorage.getItem(BACKGROUND_MUSIC_TIME_KEY);
+    if (savedTime) {
+        backgroundMusic.currentTime = parseFloat(savedTime);
+    }
+
+    // Kiểm tra trạng thái bật/tắt
+    let isMusicEnabled;
+    const storedMusicState = localStorage.getItem(BACKGROUND_MUSIC_KEY);
+
+    if (storedMusicState === null) {
+        isMusicEnabled = false;
+        localStorage.setItem(BACKGROUND_MUSIC_KEY, "false");
+    } else {
+        isMusicEnabled = storedMusicState === "true";
+    }
+
+    // Thử phát nhạc nếu đang bật
+    if (isMusicEnabled) {
+        const playPromise = backgroundMusic.play();
+        if (playPromise !== undefined) {
+            playPromise.catch(() => {
+                console.log("Auto-play blocked, waiting for interaction.");
+            });
+        }
+    }
+
+    // Lưu thời gian nhạc khi rời trang
+    window.addEventListener("beforeunload", () => {
+        if (isMusicEnabled) {
+            localStorage.setItem(BACKGROUND_MUSIC_TIME_KEY, backgroundMusic.currentTime);
+        } else {
+            localStorage.removeItem(BACKGROUND_MUSIC_TIME_KEY);
+        }
+    });
+
+    // Mock User ID & DB
+    let CURRENT_USER_ID = 106;
+
+    const mockUserSettings = [
+        { UserID: 101, BackgroundMusic: true, SoundEffects: true, TimerPerQuestion: false, DefaultNumQuestions: 10, TestTimer: 15 },
+        { UserID: 102, BackgroundMusic: false, SoundEffects: true, TimerPerQuestion: false, DefaultNumQuestions: 20, TestTimer: 30 },
+        { UserID: 103, BackgroundMusic: true, SoundEffects: true, TimerPerQuestion: true, DefaultNumQuestions: 10, TestTimer: 15 },
+        { UserID: 104, BackgroundMusic: true, SoundEffects: true, TimerPerQuestion: false, DefaultNumQuestions: 15, TestTimer: 20 },
+        { UserID: 105, BackgroundMusic: true, SoundEffects: false, TimerPerQuestion: false, DefaultNumQuestions: 10, TestTimer: 10 },
+        { UserID: 106, BackgroundMusic: true, SoundEffects: true, TimerPerQuestion: false, DefaultNumQuestions: 10, TestTimer: 15 },
+        { UserID: 107, BackgroundMusic: true, SoundEffects: true, TimerPerQuestion: true, DefaultNumQuestions: 5, TestTimer: 5 },
+        { UserID: 108, BackgroundMusic: false, SoundEffects: true, TimerPerQuestion: false, DefaultNumQuestions: 25, TestTimer: 45 },
+        { UserID: 109, BackgroundMusic: true, SoundEffects: true, TimerPerQuestion: false, DefaultNumQuestions: 10, TestTimer: 15 },
+        { UserID: 110, BackgroundMusic: true, SoundEffects: true, TimerPerQuestion: false, DefaultNumQuestions: 10, TestTimer: 15 },
+        { UserID: 111, BackgroundMusic: true, SoundEffects: true, TimerPerQuestion: true, DefaultNumQuestions: 20, TestTimer: 30 }
+    ];
+
+    function fetchUserSettings(userId) {
+        return new Promise(resolve => {
+            setTimeout(() => {
+                const settings = mockUserSettings.find(s => s.UserID === userId);
+                resolve(settings || { BackgroundMusic: true, SoundEffects: true, TimerPerQuestion: false, DefaultNumQuestions: 10, TestTimer: 15 });
+            }, 100);
+        });
+    }
+
+    function saveUserSettings(userId, settings) {
+        console.log(`[DB] Settings saved for User ${userId}:`, settings);
+        const index = mockUserSettings.findIndex(s => s.UserID === userId);
+        if (index > -1) Object.assign(mockUserSettings[index], settings);
+        return Promise.resolve();
+    }
+
+    function toggleBackgroundMusic(isEnabled) {
+        isMusicEnabled = isEnabled;
+        localStorage.setItem(BACKGROUND_MUSIC_KEY, isEnabled ? "true" : "false");
+
+        if (isEnabled) {
+            const savedTime = localStorage.getItem(BACKGROUND_MUSIC_TIME_KEY);
+            if (savedTime) backgroundMusic.currentTime = parseFloat(savedTime);
+            
+            const play = backgroundMusic.play();
+            if (play) play.catch(() => console.warn("Waiting for interaction"));
+        } else {
+            backgroundMusic.pause();
+        }
+    }
+
+    function getCurrentSettingsFromUI() {
+        return {
+            BackgroundMusic: document.getElementById('bg-music')?.checked ?? isMusicEnabled,
+            SoundEffects: document.getElementById('sound-effects')?.checked ?? true,
+            TimerPerQuestion: document.getElementById('question-timer')?.checked ?? false,
+            DefaultNumQuestions: parseInt(document.getElementById('num-questions')?.value ?? 10),
+            TestTimer: parseInt(document.getElementById('total-time')?.value ?? 15)
+        };
+    }
+
+    // Fix Autoplay chrome
+    document.addEventListener("click", function once() {
+        if (isMusicEnabled && backgroundMusic.paused) {
+            toggleBackgroundMusic(true);
+        }
+        document.removeEventListener("click", once);
+    });
+
+    // --- CÁC HÀM UI CHÍNH ---
+
     const loadComponent = (url, elementId, callback) => {
         fetch(url)
             .then(response => {
-                if (!response.ok) throw new Error(`Không thể tải ${url}. Trạng thái: ${response.status}`);
+                if (!response.ok) throw new Error(`Status: ${response.status}`);
                 return response.text();
             })
             .then(data => {
@@ -19,14 +125,10 @@ document.addEventListener("DOMContentLoaded", function() {
                     if (callback) callback();
                 }
             })
-            .catch(error => console.error('Lỗi khi tải thành phần:', error));
+            .catch(error => console.error('Load Error:', error));
     };
 
-    /**
-     * Khởi tạo các script cho header (dropdown, menu mobile, modal, logic user).
-     */
     const initializeHeaderScripts = () => {
-        // --- Các biến và logic cho menu/modal ---
         const categoryBtn = document.getElementById('category-btn');
         const hamburgerBtn = document.getElementById('hamburger-btn');
         const navWrapper = document.getElementById('nav-wrapper');
@@ -74,30 +176,25 @@ document.addEventListener("DOMContentLoaded", function() {
             settingsOverlay.addEventListener('click', closeSettingsModal);
         }
 
-        // --- Logic đóng menu/dropdown khi click ra ngoài ---
         window.addEventListener('click', function(event) {
             const activeDropdown = document.querySelector('.dropdown.active');
             if (activeDropdown && !activeDropdown.contains(event.target)) {
                 activeDropdown.classList.remove('active');
             }
-
             if (navWrapper && navWrapper.classList.contains('active') && !navWrapper.contains(event.target) && hamburgerBtn && !hamburgerBtn.contains(event.target)) {
                 navWrapper.classList.remove('active');
             }
         });
 
-        // ==================================================
-        // LOGIC KIỂM TRA USER VÀ ĐĂNG XUẤT (GỘP TỪ MAIN 2)
-        // ==================================================
+        // User Session & Logout
         const userContainer = document.getElementById('user-session-container');
-        const storedUser = localStorage.getItem('currentUser'); // Lấy user từ bộ nhớ
+        const storedUser = localStorage.getItem('currentUser'); 
 
         if (storedUser && userContainer) {
-            // 1. NẾU CÓ USER (Đã đăng nhập)
             try {
-                const user = JSON.parse(storedUser); // Đọc user
-                
-                // Thay thế HTML bằng avatar và tên
+                const user = JSON.parse(storedUser);
+                if (user.UserID) CURRENT_USER_ID = user.UserID;
+
                 userContainer.innerHTML = `
                     <a href="/pages/profile.html" class="user-profile-link">
                         <img src="${user.avatarUrl || '/images/default-avatar.png'}" alt="Avatar" class="header-avatar">
@@ -106,134 +203,143 @@ document.addEventListener("DOMContentLoaded", function() {
                     <a href="#" id="logout-btn" class="nav-link">Đăng xuất</a>
                 `;
 
-                // Gắn sự kiện cho nút Đăng xuất
                 const logoutBtn = document.getElementById('logout-btn');
                 if (logoutBtn) {
                     logoutBtn.addEventListener('click', (e) => {
                         e.preventDefault();
-                        localStorage.removeItem('currentUser'); // Xóa user
+                        localStorage.removeItem('currentUser');
+                        localStorage.removeItem(BACKGROUND_MUSIC_KEY);
+                        localStorage.removeItem(BACKGROUND_MUSIC_TIME_KEY);
                         alert('Bạn đã đăng xuất.');
-                        window.location.href = '/'; // Tải lại trang chủ
+                        window.location.href = '/';
                     });
                 }
             } catch (e) {
-                console.error("Lỗi đọc user:", e);
-                localStorage.removeItem('currentUser'); // Xóa data lỗi
+                console.error("User parse error:", e);
+                localStorage.removeItem('currentUser');
             }
         }
     };
 
-    /**
-     * Khởi tạo slideshow.
-     */
+    const initializeUserSettings = () => {
+        const ids = [ "bg-music", "sound-effects", "question-timer", "num-questions", "total-time" ];
+
+        const handleSettingChange = function () {
+            const allSettings = getCurrentSettingsFromUI();
+            saveUserSettings(CURRENT_USER_ID, allSettings);
+            if (this.id === "bg-music") toggleBackgroundMusic(this.checked);
+        };
+
+        ids.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener("change", handleSettingChange);
+        });
+
+        const applySettingsToUI = (settings) => {
+            const bgMusicEl = document.getElementById('bg-music');
+            if(bgMusicEl) bgMusicEl.checked = isMusicEnabled;
+            
+            const soundEffectsEl = document.getElementById('sound-effects');
+            if(soundEffectsEl) soundEffectsEl.checked = settings.SoundEffects;
+            
+            const questionTimerEl = document.getElementById('question-timer');
+            if(questionTimerEl) questionTimerEl.checked = settings.TimerPerQuestion;
+            
+            const numQuestionsEl = document.getElementById('num-questions');
+            if(numQuestionsEl) numQuestionsEl.value = settings.DefaultNumQuestions;
+            
+            const totalTimeEl = document.getElementById('total-time');
+            if(totalTimeEl) totalTimeEl.value = settings.TestTimer;
+        };
+
+        const loadUserSettings = async () => {
+            const settings = await fetchUserSettings(CURRENT_USER_ID);
+            applySettingsToUI(settings);
+        };
+
+        loadUserSettings();
+    };
+
     const initializeSlideshow = () => {
         const slides = document.getElementsByClassName("slide");
-        if (slides.length === 0) return; // Không làm gì nếu không có slide
+        if (slides.length === 0) return;
 
-        let slideIndex = 1; 
+        let slideIndex = 1;
         let slideInterval;
 
         const showSlide = (n) => {
-            if (n > slides.length) { slideIndex = 1; } 
-            else if (n < 1) { slideIndex = slides.length; } 
-            else { slideIndex = n; }
+            if (n > slides.length) slideIndex = 1;
+            else if (n < 1) slideIndex = slides.length;
+            else slideIndex = n;
 
-            for (let i = 0; i < slides.length; i++) {
-                slides[i].style.display = "none";
-            }
-
+            for (let i = 0; i < slides.length; i++) slides[i].style.display = "none";
             slides[slideIndex - 1].style.display = "block";
         };
 
         const startSlideShow = () => {
-            clearInterval(slideInterval); 
-            slideInterval = setInterval(() => {
-                showSlide(slideIndex + 1);
-            }, 5000);
+            clearInterval(slideInterval);
+            slideInterval = setInterval(() => showSlide(slideIndex + 1), 5000);
         };
-        
+
         window.plusSlides = (n) => {
             showSlide(slideIndex + n);
-            startSlideShow(); 
+            startSlideShow();
         };
-        
+
         showSlide(slideIndex);
         startSlideShow();
     };
 
-    /**
-     * Khởi tạo chức năng chuyển tab.
-     */
     const initializeTabs = () => {
         const tabButtons = document.querySelectorAll('.tab-btn');
-        if (tabButtons.length === 0) return; // Không làm gì nếu không có tab
+        if (tabButtons.length === 0) return;
 
         const tabPanes = document.querySelectorAll('.tab-pane');
 
         tabButtons.forEach(button => {
             button.addEventListener('click', () => {
                 const targetTab = button.getAttribute('data-tab');
-
                 tabButtons.forEach(btn => btn.classList.remove('active'));
                 tabPanes.forEach(pane => pane.classList.remove('active'));
-
                 button.classList.add('active');
                 const targetPane = document.getElementById(targetTab);
-                if (targetPane) {
-                    targetPane.classList.add('active');
-                }
+                if (targetPane) targetPane.classList.add('active');
             });
         });
     };
-    
-    /**
-     * Khởi tạo các thanh trượt âm lượng (trong modal settings).
-     */
+
     const initializeVolumeSliders = () => {
         const setupSlider = (sliderId, valueId) => {
             const slider = document.getElementById(sliderId);
             const valueDisplay = document.getElementById(valueId);
             if (slider && valueDisplay) {
-                // Hiển thị giá trị ban đầu
                 valueDisplay.textContent = slider.value;
-                // Cập nhật khi trượt
                 slider.addEventListener('input', function() {
                     valueDisplay.textContent = this.value;
                 });
             }
         };
-
         setupSlider('bg-music-volume', 'bg-music-value');
         setupSlider('sound-effects-volume', 'sound-effects-value');
     };
-    
 
-    // --- KHỞI CHẠY CÁC CHỨC NĂNG ---
-
-    // 1. Tải Header, SAU ĐÓ chạy các script liên quan đến header
+    // --- KHỞI CHẠY ---
     loadComponent('/pages/header.html', 'header-placeholder', () => {
-        initializeHeaderScripts();   // Chứa menu, modal, VÀ logic user
-        initializeVolumeSliders();   // Chạy sau khi modal settings được tải
+        initializeHeaderScripts();
+        initializeUserSettings();
+        initializeVolumeSliders();
     });
-    
-    // 2. Tải Footer
+
     loadComponent('/pages/footer.html', 'footer-placeholder');
 
-    // 3. Khởi tạo các script CHỈ DÀNH CHO TRANG CHỦ
-    // (Những hàm này sẽ tự kiểm tra xem element có tồn tại hay không)
     initializeSlideshow();
     initializeTabs();
-    
-}); // Hết DOMContentLoaded
+});
 
 window.addEventListener("scroll", function() {
     const header = document.querySelector(".main-header");
-    // Cần kiểm tra header có tồn tại không, vì nó được load bất đồng bộ
-    if (header) { 
-        if (window.scrollY > 50) { // scroll 50px thì dính
-            header.classList.add("sticky");
-        } else {
-            header.classList.remove("sticky");
-        }
+    if (header) {
+        if (window.scrollY > 50) header.classList.add("sticky");
+        else header.classList.remove("sticky");
     }
 });

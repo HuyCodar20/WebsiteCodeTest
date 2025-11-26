@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Làm bài thi | DevArena</title>
+    <link rel="stylesheet" href="/stylesheets/doTest.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+<body>
+
+    <div class="test-topbar">
+        <h2 id="test-title-display">Đang chuẩn bị đề thi...</h2>
+    </div>
+
+    <div id="paced-progress-bar-container" style="display: none; width: 100%; height: 5px; background: #ddd;">
+        <div id="paced-progress-bar" style="width: 100%; height: 100%; background: #e74c3c; transition: width 1s linear;"></div>
+    </div>
+
+    <div class="test-container">
+        <main class="question-area">
+            <div class="question-header">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3 id="question-number-display">Câu hỏi 1</h3>
+                    <span id="question-timer-badge" style="display: none; background: #e74c3c; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.9rem;">
+                        <i class="fas fa-clock"></i> <span id="q-timer-val">60</span>s
+                    </span>
+                </div>
+            </div>
+
+            <div class="question-body">
+                <p id="question-text">Đang tải dữ liệu...</p>
+                <div class="options-list" id="options-container"></div>
+            </div>
+
+            <div class="question-footer">
+                <div class="footer-left">
+                    <button id="btn-review" class="btn-secondary">
+                        <i class="fas fa-flag"></i> Đánh dấu
+                    </button>
+                </div>
+                <div class="footer-right">
+                    <button id="btn-prev" class="btn-nav">Trước</button>
+                    <button id="btn-next" class="btn-nav">Sau</button>
+                    <button id="btn-submit" class="btn-submit">Nộp bài</button>
+                </div>
+            </div>
+            
+            <div class="status-legend" id="classic-legend">
+                <div class="legend-item"><span class="dot current"></span>Hiện tại</div>
+                <div class="legend-item"><span class="dot answered"></span>Đã chọn</div>
+                <div class="legend-item"><span class="dot review"></span>Đánh dấu</div>
+            </div>
+        </main>
+
+        <aside class="sidebar-area">
+            
+            <div class="timer-box" id="classic-timer-box">
+                <h4>Thời gian còn lại</h4>
+                <div class="countdown-display">
+                    <div class="time-unit"><span id="timer-minutes">00</span><small>Phút</small></div>
+                    <span class="colon">:</span>
+                    <div class="time-unit"><span id="timer-seconds">00</span><small>Giây</small></div>
+                </div>
+            </div>
+
+            <div class="palette-box">
+                <h4>Danh sách câu hỏi</h4>
+                <div class="palette-grid" id="question-palette"></div>
+            </div>
+        </aside>
+    </div>
+
+    <script src="/javascript/doTest.js"></script>
+</body>
+</html>
