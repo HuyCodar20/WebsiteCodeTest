@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Thông tin cá nhân - DevArena</title>
+    <link rel="stylesheet" href="/stylesheets/style.css">
+    <link rel="stylesheet" href="/stylesheets/header.css">
+    <link rel="stylesheet" href="/stylesheets/profile.css">
+</head>
+<body>
+    <div id="header-placeholder"></div>
+
+    <div class="profile-container">
+        <div class="profile-header">
+            <div class="profile-avatar-wrapper">
+                <img id="profile-avatar" src="/images/user_icon.png" alt="Avatar" class="profile-avatar">
+                <div id="change-avatar-overlay" class="change-avatar-overlay">
+                    Đổi ảnh
+                </div>
+                <input type="file" id="avatar-file-input" class="hidden-input" name="avatar" accept="image/*">
+            </div>
+            <h2>
+                <span id="profile-username-display">Tên người dùng</span>
+                <input type="text" id="profile-username-input" class="hidden-input" placeholder="Tên người dùng mới">
+            </h2>
+        </div>
+        
+        <div class="profile-info-details">
+            <p><strong>UserID:</strong> <span id="profile-userid">...</span></p>
+            <p><strong>Email:</strong> <span id="profile-email">...</span></p>
+            <p><strong>Vai trò:</strong> <span id="profile-role">...</span></p>
+            <p><strong>Ngày tham gia:</strong> <span id="profile-createdat">...</span></p>
+        </div>
+
+        <div class="edit-controls">
+            <button id="edit-profile-btn" class="btn btn-primary">Sửa Profile</button>
+            <button id="save-profile-btn" class="btn btn-success hidden-input">Lưu Thay Đổi</button>
+            <button id="cancel-edit-btn" class="btn btn-secondary hidden-input">Hủy</button>
+            <button id="change-password-trigger" class="btn btn-warning">Đổi mật khẩu</button>
+            <button id="logout-profile-btn" class="btn btn-secondary">Đăng xuất</button>
+        </div>
+    </div>
+
+    <div id="password-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h3>Đổi Mật Khẩu</h3>
+            <form id="change-password-form">
+                <input type="password" id="old-password" placeholder="Mật khẩu cũ" required>
+                <input type="password" id="new-password" placeholder="Mật khẩu mới" required>
+                <input type="password" id="confirm-new-password" placeholder="Xác nhận mật khẩu mới" required>
+                <button type="submit" class="btn btn-success">Cập nhật Mật khẩu</button>
+            </form>
+        </div>
+    </div>
+    
+    <script src="/javascript/main.js"></script>
+    <script src="/javascript/profile.js"></script>
+</body>
+</html>

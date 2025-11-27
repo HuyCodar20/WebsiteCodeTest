@@ -316,6 +316,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 2. Render Nội dung
         practiceQText.innerHTML = escapeHtml(q.QuestionText);
+
+        const imgEl = document.getElementById('practice-question-image');
+        if (imgEl) {
+            if (q.Image) {
+
+                let imageUrl = q.Image.replace(/\\/g, '/'); 
+                if (imageUrl.startsWith('public')) {
+                    imageUrl = '/' + imageUrl.substring(6); 
+                } else if (!imageUrl.startsWith('/')) {
+                    imageUrl = '/' + imageUrl;
+                }
+
+                imgEl.src = imageUrl;
+                imgEl.style.display = 'block';
+            } else {
+                imgEl.style.display = 'none';  
+                imgEl.src = "";
+            }
+        }
+        
         practiceOptions.innerHTML = '';
 
         q.choices.forEach(c => {

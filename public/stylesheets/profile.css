@@ -1,0 +1,206 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f7f6;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+#header-placeholder {
+    width: 100%;
+}
+
+/* PROFILE CONTAINER - CĂN GIỮA */
+.profile-container {
+    max-width: 600px;
+    width: 90%;
+    margin: 50px auto;
+    padding: 25px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+/* PHẦN ĐẦU PROFILE (AVATAR + USERNAME) */
+.profile-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 25px;
+    width: 100%;
+    justify-content: center;
+}
+
+/* AVATAR */
+.profile-avatar-wrapper {
+    position: relative; 
+    width: 80px; 
+    height: 80px;
+    margin-right: 15px;
+    flex-shrink: 0;
+}
+.profile-avatar {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #007bff;
+}
+
+/* OVERLAY ĐỔI AVATAR */
+.change-avatar-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    text-align: center;
+    font-size: 12px;
+}
+.change-avatar-overlay.active {
+    display: flex;
+}
+.hidden-input {
+    display: none;
+}
+
+/* USERNAME */
+.profile-header h2 {
+    margin: 0;
+    color: #333;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+}
+#profile-username-input {
+    font-size: 24px;
+    border: 1px solid #ddd;
+    padding: 5px 10px;
+    border-radius: 5px;
+    text-align: center;
+}
+
+/* THÔNG TIN CHI TIẾT */
+.profile-info-details {
+    width: 100%;
+    text-align: left;
+    margin-bottom: 25px;
+}
+.profile-info-details p {
+    margin: 12px 0;
+    font-size: 15px;
+    color: #555;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 10%;
+}
+.profile-info-details strong {
+    color: #000;
+    font-weight: 600;
+}
+
+/* BUTTONS */
+.edit-controls {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+.btn-primary { background-color: #007bff; color: white; }
+.btn-primary:hover { background-color: #0056b3; }
+.btn-success { background-color: #28a745; color: white; }
+.btn-success:hover { background-color: #218838; }
+.btn-secondary { background-color: #6c757d; color: white; }
+.btn-secondary:hover { background-color: #5a6268; }
+.btn-warning { background-color: #ffc107; color: #212529; }
+.btn-warning:hover { background-color: #e0a800; }
+
+/* MODAL CONTAINER */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+.modal-content {
+    background-color: #fefefe;
+    padding: 30px;
+    border: 1px solid #888;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 450px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    
+    box-sizing: border-box;
+}
+.close-btn {
+    color: #aaa;
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 30px;
+    font-weight: bold;
+}
+.close-btn:hover, .close-btn:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+#change-password-form h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    text-align: center;
+}
+#change-password-form input[type="password"] {
+    width: calc(100% - 22px);
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 15px;
+}
+#change-password-form button {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .profile-container { margin: 20px auto; padding: 15px; }
+    .profile-header { flex-direction: column; margin-bottom: 20px; }
+    .profile-avatar-wrapper { margin-right: 0; margin-bottom: 15px; }
+    .profile-info-details p { flex-direction: column; align-items: flex-start; padding: 0 5%; }
+    .profile-info-details strong { margin-bottom: 5px; }
+    .edit-controls { flex-direction: column; gap: 8px; }
+    .btn { width: 100%; }
+}
