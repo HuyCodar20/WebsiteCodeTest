@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- 1. KIỂM TRA ĐĂNG NHẬP ---
     const userJson = localStorage.getItem('currentUser');
     if (!userJson) {
-        alert("Bạn cần đăng nhập để thực hiện chức năng này!");
+        alert("Bạn cần đăng nhập để thực hiện tạo câu hỏi này!");
         window.location.href = '/pages/login.html';
         return;
     }
