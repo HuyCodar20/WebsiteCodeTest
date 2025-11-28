@@ -1,0 +1,186 @@
+/* ==================== GLOBAL RESET & FONTS ==================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", sans-serif;
+}
+
+body {
+    background-color: #f0f2f5; /* Màu nền tổng thể sáng sủa */
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* ==================== MAIN LAYOUT ==================== */
+.main-content {
+    flex: 1; /* Đẩy footer xuống dưới cùng */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+}
+
+/* Container chính chia 2 phần */
+.login-wrapper {
+    background: #fff;
+    width: 100%;
+    max-width: 900px; /* Độ rộng tối đa của khung */
+    border: 2px solid #afafaf;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    overflow: hidden; /* Để bo góc ảnh không bị lòi ra */
+    display: flex;
+    min-height: 550px; /* Chiều cao tối thiểu */
+}
+
+/* ==================== LEFT SIDE (IMAGE) ==================== */
+.login-left {
+    flex: 1; 
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    background-image: url('/images/Login_Banner.png'); 
+    background-size: cover;
+    background-position: center;
+}
+
+/* Lớp phủ mờ lên ảnh (Option) để text dễ đọc nếu bạn muốn viết chữ lên ảnh */
+.login-left::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+/* Text trang trí bên phần hình ảnh (Option) */
+.login-brand {
+    position: relative;
+    z-index: 2;
+    color: #fff;
+    text-align: center;
+    padding: 20px;
+}
+
+.login-brand h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+.login-brand p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+/* ==================== RIGHT SIDE (FORM) ==================== */
+.login-right {
+    flex: 1; /* Chiếm 50% */
+    background: #fff;
+    padding: 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.login-header {
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.login-header h2 {
+    color: #0d6efd;
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.login-header p {
+    color: #666;
+    font-size: 14px;
+}
+
+/* ==================== FORM ELEMENTS ==================== */
+.input-group {
+    margin-bottom: 20px;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 14px 16px;
+    font-size: 16px;
+    border: 2px solid #e1e1e1;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    outline: none;
+    background-color: #f9f9f9;
+}
+
+.input-group input:focus {
+    border-color: #0d6efd;
+    background-color: #fff;
+    box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.1);
+}
+
+.btn-login {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(45deg, #0d6efd, #0056b3);
+    color: #fff;
+    font-size: 18px;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+    box-shadow: 0 4px 15px rgba(13, 110, 253, 0.3);
+}
+
+.btn-login:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(13, 110, 253, 0.4);
+    background: linear-gradient(45deg, #0056b3, #0d6efd);
+}
+
+.login-footer {
+    margin-top: 25px;
+    text-align: center;
+    font-size: 15px;
+    color: #666;
+}
+
+.login-footer a {
+    color: #0d6efd;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.login-footer a:hover {
+    text-decoration: underline;
+}
+
+/* ==================== RESPONSIVE (MOBILE) ==================== */
+@media (max-width: 768px) {
+    .login-wrapper {
+        flex-direction: column; /* Xếp chồng lên nhau */
+        max-width: 450px;
+        min-height: auto;
+    }
+
+    .login-left {
+        display: none; /* Ẩn phần hình ảnh trên mobile để tập trung login */
+        /* Hoặc nếu muốn hiện hình thì dùng: height: 150px; flex: none; */
+    }
+
+    .login-right {
+        padding: 40px 30px;
+    }
+}

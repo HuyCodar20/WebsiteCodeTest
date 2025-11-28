@@ -8,13 +8,11 @@ document.addEventListener("DOMContentLoaded", function() {
     backgroundMusic.loop = true;
     backgroundMusic.volume = 0.5;
 
-    // Khôi phục thời gian phát nhạc nếu có
     const savedTime = sessionStorage.getItem(BACKGROUND_MUSIC_TIME_KEY);
     if (savedTime) {
         backgroundMusic.currentTime = parseFloat(savedTime);
     }
 
-    // Kiểm tra trạng thái bật/tắt
     let isMusicEnabled;
     const storedMusicState = localStorage.getItem(BACKGROUND_MUSIC_KEY);
 
@@ -25,7 +23,6 @@ document.addEventListener("DOMContentLoaded", function() {
         isMusicEnabled = storedMusicState === "true";
     }
 
-    // Thử phát nhạc nếu đang bật
     if (isMusicEnabled) {
         const playPromise = backgroundMusic.play();
         if (playPromise !== undefined) {
@@ -35,7 +32,6 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
-    // Lưu thời gian nhạc khi rời trang
     window.addEventListener("beforeunload", () => {
         if (isMusicEnabled) {
             localStorage.setItem(BACKGROUND_MUSIC_TIME_KEY, backgroundMusic.currentTime);
@@ -49,16 +45,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     const mockUserSettings = [
         { UserID: 101, BackgroundMusic: true, SoundEffects: true, TimerPerQuestion: false, DefaultNumQuestions: 10, TestTimer: 15 },
-        { UserID: 102, BackgroundMusic: false, SoundEffects: true, TimerPerQuestion: false, DefaultNumQuestions: 20, TestTimer: 30 },
-        { UserID: 103, BackgroundMusic: true, SoundEffects: true, TimerPerQuestion: true, DefaultNumQuestions: 10, TestTimer: 15 },
-        { UserID: 104, BackgroundMusic: true, SoundEffects: true, TimerPerQuestion: false, DefaultNumQuestions: 15, TestTimer: 20 },
-        { UserID: 105, BackgroundMusic: true, SoundEffects: false, TimerPerQuestion: false, DefaultNumQuestions: 10, TestTimer: 10 },
-        { UserID: 106, BackgroundMusic: true, SoundEffects: true, TimerPerQuestion: false, DefaultNumQuestions: 10, TestTimer: 15 },
-        { UserID: 107, BackgroundMusic: true, SoundEffects: true, TimerPerQuestion: true, DefaultNumQuestions: 5, TestTimer: 5 },
-        { UserID: 108, BackgroundMusic: false, SoundEffects: true, TimerPerQuestion: false, DefaultNumQuestions: 25, TestTimer: 45 },
-        { UserID: 109, BackgroundMusic: true, SoundEffects: true, TimerPerQuestion: false, DefaultNumQuestions: 10, TestTimer: 15 },
-        { UserID: 110, BackgroundMusic: true, SoundEffects: true, TimerPerQuestion: false, DefaultNumQuestions: 10, TestTimer: 15 },
-        { UserID: 111, BackgroundMusic: true, SoundEffects: true, TimerPerQuestion: true, DefaultNumQuestions: 20, TestTimer: 30 }
+        { UserID: 106, BackgroundMusic: true, SoundEffects: true, TimerPerQuestion: false, DefaultNumQuestions: 10, TestTimer: 15 }
     ];
 
     function fetchUserSettings(userId) {
@@ -102,7 +89,6 @@ document.addEventListener("DOMContentLoaded", function() {
         };
     }
 
-    // Fix Autoplay chrome
     document.addEventListener("click", function once() {
         if (isMusicEnabled && backgroundMusic.paused) {
             toggleBackgroundMusic(true);
@@ -129,7 +115,7 @@ document.addEventListener("DOMContentLoaded", function() {
     };
 
     const initializeHeaderScripts = () => {
-        const categoryBtn = document.getElementById('category-btn');
+        // Đã xóa categoryBtn vì không còn dropdown logic
         const hamburgerBtn = document.getElementById('hamburger-btn');
         const navWrapper = document.getElementById('nav-wrapper');
         const settingsBtn = document.getElementById('settings-btn');
@@ -137,15 +123,7 @@ document.addEventListener("DOMContentLoaded", function() {
         const settingsOverlay = document.getElementById('settings-overlay');
         const closeModalBtn = document.getElementById('close-modal-btn');
 
-        if (categoryBtn) {
-            const dropdown = categoryBtn.closest('.dropdown');
-            categoryBtn.addEventListener('click', function(event) {
-                event.preventDefault();
-                event.stopPropagation();
-                dropdown.classList.toggle('active');
-            });
-        }
-
+        // Logic Hamburger Menu cho Mobile
         if (hamburgerBtn && navWrapper) {
             hamburgerBtn.addEventListener('click', function(event) {
                 event.stopPropagation();
@@ -177,10 +155,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
 
         window.addEventListener('click', function(event) {
-            const activeDropdown = document.querySelector('.dropdown.active');
-            if (activeDropdown && !activeDropdown.contains(event.target)) {
-                activeDropdown.classList.remove('active');
-            }
+            // Đã xóa logic đóng dropdown active
             if (navWrapper && navWrapper.classList.contains('active') && !navWrapper.contains(event.target) && hamburgerBtn && !hamburgerBtn.contains(event.target)) {
                 navWrapper.classList.remove('active');
             }
@@ -195,12 +170,13 @@ document.addEventListener("DOMContentLoaded", function() {
                 const user = JSON.parse(storedUser);
                 if (user.UserID) CURRENT_USER_ID = user.UserID;
 
+                // Cấu trúc HTML khi đã đăng nhập
                 userContainer.innerHTML = `
                     <a href="/pages/profile.html" class="user-profile-link">
-                        <img src="${user.avatarUrl || '/images/default-avatar.png'}" alt="Avatar" class="header-avatar">
+                        <img src="${user.avatarUrl || '/images/user_icon.png'}" alt="Avatar" class="header-avatar">
                         <span>${user.username}</span>
                     </a>
-                    <a href="#" id="logout-btn" class="nav-link">Đăng xuất</a>
+                    <a href="#" id="logout-btn">Đăng xuất</a>
                 `;
 
                 const logoutBtn = document.getElementById('logout-btn');
@@ -322,6 +298,20 @@ document.addEventListener("DOMContentLoaded", function() {
         setupSlider('bg-music-volume', 'bg-music-value');
         setupSlider('sound-effects-volume', 'sound-effects-value');
     };
+
+     //Thay đổi đường dẫn khi đã đăng nhập
+    const updateHeroButton = () => {
+        const heroBtn = document.getElementById('hero-cta-btn');
+        const storedUser = localStorage.getItem('currentUser'); // Kiểm tra xem đã đăng nhập chưa
+
+        if (heroBtn && storedUser) {
+            heroBtn.href = '/pages/topic.html'; 
+            heroBtn.innerHTML = 'Khám phá ngay <i class="fa-solid fa-chevron-right"></i>';
+        }
+        
+    };
+
+    updateHeroButton();
 
     // --- KHỞI CHẠY ---
     loadComponent('/pages/header.html', 'header-placeholder', () => {

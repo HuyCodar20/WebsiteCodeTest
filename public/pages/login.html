@@ -3,47 +3,63 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>Đăng nhập - WebApp Trắc Nghiệm</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đăng nhập - DevArena</title>
 
-  <link rel="stylesheet" href="/stylesheets/auth.css">
-  <link rel="stylesheet" href="/stylesheets/style.css">
+  <link rel="stylesheet" href="/stylesheets/login.css">
+  
   <link rel="stylesheet" href="/stylesheets/footer.css">
   <link rel="stylesheet" href="/stylesheets/header.css">
+  
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-
 </head>
 
 <body>
 
   <div id="header-placeholder"></div>
 
-  <div class="form-container">
-    <h2>Đăng nhập</h2>
-
-    <form id="login-form">
-      <div class="input-field">
-        <input 
-          type="text" 
-          id="username" 
-          name="username" 
-          placeholder="Tên đăng nhập" 
-          required
-        >
-      </div>
-      <div class="input-field">
-        <input 
-          type="password" 
-          id="password" 
-          name="password" 
-          placeholder="Mật khẩu" 
-          required
-        >
+  <div class="main-content">
+    <div class="login-wrapper">
+      
+      <div class="login-left">
       </div>
 
-      <button type="submit" id="login-btn" class="btn btn-primary">Đăng nhập</button>
+      <div class="login-right">
+        <div class="login-header">
+          <h2>Chào mừng trở lại!</h2>
+          <p>Vui lòng đăng nhập để tiếp tục</p>
+        </div>
 
-      <p class="form-text">Chưa có tài khoản? <a href="register.html">Đăng ký ngay</a></p>
-    </form>
+        <form id="login-form">
+          <div class="input-group">
+            <input 
+              type="text" 
+              id="username" 
+              name="username" 
+              placeholder="Tên đăng nhập" 
+              required
+            >
+          </div>
+          
+          <div class="input-group">
+            <input 
+              type="password" 
+              id="password" 
+              name="password" 
+              placeholder="Mật khẩu" 
+              required
+            >
+          </div>
+
+          <button type="submit" id="login-btn" class="btn-login">Đăng nhập</button>
+
+          <div class="login-footer">
+            Chưa có tài khoản? <a href="register.html">Đăng ký ngay</a>
+          </div>
+        </form>
+      </div>
+
+    </div>
   </div>
 
   <div id="footer-placeholder"></div>

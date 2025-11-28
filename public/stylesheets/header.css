@@ -50,16 +50,10 @@ body {
   animation: dropDown 0.8s ease;
 }
 
-/* Hiệu ứng xuất hiện */
 @keyframes dropDown {
-  from {
-    transform: translateY(-100%);
-  }
-  to {
-    transform: translateY(0);
-  }
+  from { transform: translateY(-100%); }
+  to { transform: translateY(0); }
 }
-
 
 .header-left,
 .header-right {
@@ -84,19 +78,24 @@ body {
     flex-grow: 1;
 }
 
-.main-nav a {
-    padding: 5px 10px;
+/* Style cho các link menu chính (Danh mục, Đóng góp) */
+.main-nav .nav-link {
+    padding: 5px 15px; /* Tăng padding chút cho thoáng */
     color: var(--black-color);
     font-size: 18px;
     font-weight: bold;
     text-decoration: none;
     transition: color 0.3s;
+    display: inline-flex; /* Để căn chỉnh icon và text */
+    align-items: center;
+    gap: 8px; /* Khoảng cách giữa icon và chữ */
 }
 
-.main-nav a:hover {
+.main-nav .nav-link:hover {
     color: var(--primary-color);
 }
 
+/* Style cho nút đăng nhập mặc định */
 .user-login {
     display: flex;
     align-items: center;
@@ -128,144 +127,6 @@ body {
 }
 
 /* =================================== */
-/* Dropdown Menu
-/* =================================== */
-.dropdown {
-    position: relative;
-    display: inline-block;
-}
-
-.arrow-icon {
-    margin-left: 5px;
-    font-size: 14px;
-    transition: transform 0.3s ease;
-}
-
-.dropdown-content {
-    display: none;
-    position: absolute;
-    top: 150%;
-    left: 320%; 
-    transform: translateX(-50%); /* Dịch chuyển lại 50% chiều rộng của chính nó */
-    z-index: 100;
-    width: 1200px;
-    padding: 25px;
-    background-color: var(--white-color);
-    border-radius: 8px;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-    flex-direction: column;
-    gap: 20px;
-}
-
-.dropdown.active .dropdown-content {
-    display: flex;
-}
-
-.dropdown.active .arrow-icon {
-    transform: rotate(180deg);
-}
-
-.dropdown-intro {
-    padding-bottom: 20px;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.dropdown-intro h4 {
-    margin-top: 0;
-    margin-bottom: 8px;
-    font-size: 18px;
-    color: var(--text-color-dark);
-}
-
-.dropdown-intro p {
-    margin: 0;
-    font-size: 14px;
-    line-height: 1.5;
-    color: var(--text-color-light);
-}
-
-.dropdown-columns {
-    display: flex;
-    gap: 50px;
-}
-
-.dropdown-section {
-    flex: 1;
-}
-
-.dropdown-section:not(:first-child) {
-    padding-left: 40px;
-    border-left: 1px solid #676767;
-}
-
-.dropdown-section h5 {
-    margin-top: 0;
-    margin-bottom: 15px;
-    font-size: 16px;
-    color: var(--text-color-dark);
-}
-
-.dropdown-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-}
-
-.dropdown-grid a {
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-    font-size: 19px;
-}
-
-.topic-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 14px 12px;
-    color: #555;
-    font-size: 15px;
-    font-weight: 500;
-    text-decoration: none;
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
-    transition: all 0.2s ease;
-}
-
-.topic-item i {
-    color: #0e1246;
-}
-
-.topic-item:hover {
-    background-color: #f5f9ff;
-    border-color: var(--primary-color-hover);
-    color: var(--primary-color-hover);
-}
-
-.topic-item:hover i {
-    color: var(--primary-color-hover);
-}
-
-.view-all-link {
-    display: block;
-    margin-top: 15px;
-    padding: 12px 20px;
-    background-color: #d2d2d2;
-    color: var(--white-color);
-    text-align: center;
-    font-weight: bold;
-    text-decoration: none;
-    border-radius: 6px;
-    transition: background-color 0.3s ease;
-}
-
-.view-all-link:hover {
-    background-color: #edfdff;
-}
-
-.view-all-link i {
-    margin-left: 8px;
-}
-
-/* =================================== */
 /* Hamburger Menu (Hidden on Desktop)
 /* =================================== */
 .hamburger-btn {
@@ -280,22 +141,6 @@ body {
 /* =================================== */
 /* Responsive Styles
 /* =================================== */
-
-/* --- Tablet (max-width: 1000px) --- */
-@media (max-width: 1000px) {
-    .dropdown-content {
-        width: 700px;
-    }
-    .dropdown-grid {
-        grid-template-columns: 1fr;
-    }
-    .dropdown-columns {
-        gap: 30px;
-    }
-    .dropdown-section:not(:first-child) {
-        padding-left: 30px;
-    }
-}
 
 /* --- Mobile (max-width: 768px) --- */
 @media (max-width: 768px) {
@@ -316,75 +161,48 @@ body {
         width: 100%;
         background-color: #f8f9fa;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        flex-direction: column; /* Xếp dọc trên mobile */
+        align-items: flex-start;
     }
     
     .nav-wrapper.active {
-        display: block; 
+        display: flex; 
     }
 
     .main-nav,
     .header-right {
         width: 100%;
+        flex-direction: column; /* Đảm bảo header-right cũng xếp dọc bên trong nếu cần */
     }
     
-    /* Gom nhóm các style chung cho các mục menu mobile */
-    .nav-wrapper .main-nav a,
-    .nav-wrapper .user-login,
-    .nav-wrapper .sound-icon {
+    .main-nav .nav-link,
+    .user-login {
         display: flex;
-        align-items: center;
+        width: 100%;
         padding: 15px 20px;
-        text-decoration: none;
-        color: var(--text-color-dark);
         border-bottom: 1px solid #e9ecef;
     }
-
-    /* Style riêng cho user-login nếu cần */
-    .user-login {
-        justify-content: space-between;
+    
+    /* Căn chỉnh lại phần user logged in trên mobile */
+    #user-session-container {
+        width: 100%;
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 0 !important;
     }
 
-    .sound-icon i {
-        color: var(--text-color-dark);
-    }
-
-    .dropdown-content {
-        position: static; 
-        width: auto;
-        padding: 10px 0 10px 20px; 
-        box-shadow: none;
-        border-radius: 0;
-        transform: none;
-        background-color: #f0f0f0;
-        border-top: 1px solid #e9ecef;
+    .user-profile-link, #logout-btn {
+        width: 100%;
+        padding: 15px 20px;
+        border-bottom: 1px solid #e9ecef;
     }
     
-    .dropdown .arrow-icon {
-        display: inline-block; 
+    /* Ẩn settings button trên mobile menu nếu muốn, hoặc style lại */
+    .header-right {
+        gap: 0;
     }
-
-    .dropdown.active .dropdown-content {
-        display: block; 
-    }
-
-    .dropdown.active .arrow-icon {
-        transform: rotate(180deg);
-    }
-
-    .dropdown-columns {
-        flex-direction: column;
-    }
-
-    .dropdown-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .dropdown-section:not(:first-child) {
-        border-left: none;
-        padding-left: 0;
-        border-top: 1px solid #ddd;
-        padding-top: 15px;
-        margin-top: 15px;
+    .settings-btn {
+        display: none; /* Tạm ẩn settings trên mobile menu list để gọn, hoặc bạn có thể style lại */
     }
 }
 
@@ -466,15 +284,6 @@ body {
     color: var(--text-color-dark);
 }
 
-.setting-input {
-    width: 60px;
-    padding: 5px 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    text-align: center;
-    font-size: 16px;
-}
-
 /* --- Toggle Switch --- */
 .switch {
     position: relative;
@@ -521,32 +330,52 @@ input:checked + .slider:before {
     transform: translateX(22px);
 }
 
-.slider-container span {
-    width: 30px;
-    text-align: right;
-    font-weight: bold;
-    color: var(--text-color-dark);
+/* =================================== */
+/* USER SESSION STYLES (Sửa lỗi chồng chéo)
+/* =================================== */
+
+/* Container chứa cả Profile Link và nút Đăng xuất */
+#user-session-container {
+    display: flex;
+    align-items: center;
+    gap: 20px; /* Khoảng cách giữa avatar và nút đăng xuất */
 }
 
+/* Style cho Profile (Ảnh + Tên) */
 .user-profile-link {
-     display: flex;
-     align-items: center;
-     gap: 10px; /* Khoảng cách giữa ảnh và tên */
-     text-decoration: none;
-     font-weight: bold;
-     color: #000;
-     transition: color 0.3s;
-    }
-    
-    .user-profile-link:hover {
-     color: #008cff;
-    }
-    
-    /* Đây là class quan trọng để sửa kích thước ảnh */
-    .header-avatar {
-     width: 40px;  /* Quy định chiều rộng */
-     height: 40px; /* Quy định chiều cao */
-     border-radius: 50%; /* Bo tròn ảnh */
-     object-fit: cover; /* Đảm bảo ảnh lấp đầy, không bị méo */
-     border: 2px solid #ddd; /* Thêm viền mỏng */
-    }
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    font-weight: bold;
+    color: #000;
+    transition: color 0.3s;
+}
+
+.user-profile-link:hover {
+    color: #008cff;
+}
+
+.header-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ddd;
+}
+
+/* Style riêng cho nút Đăng xuất khi đã đăng nhập */
+#logout-btn {
+    text-decoration: none;
+    color: var(--text-color-dark);
+    font-weight: bold;
+    font-size: 16px;
+    padding: 5px 10px;
+    border: 1px solid transparent;
+    border-radius: 5px;
+    transition: all 0.3s;
+}
+
+#logout-btn:hover {
+    color: #d9534f; /* Màu đỏ khi hover */
+}

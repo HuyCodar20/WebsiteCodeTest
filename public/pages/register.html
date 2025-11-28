@@ -3,61 +3,78 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>Đăng ký - WebApp Trắc Nghiệm</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đăng ký - DevArena</title>
 
-  <link rel="stylesheet" href="/stylesheets/auth.css">
-  <link rel="stylesheet" href="/stylesheets/style.css">
+  <link rel="stylesheet" href="/stylesheets/register.css">
+  
   <link rel="stylesheet" href="/stylesheets/footer.css">
   <link rel="stylesheet" href="/stylesheets/header.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-
 </head>
 
 <body>
+
   <div id="header-placeholder"></div>
 
-  <div class="form-container">
-    <h2>Đăng ký</h2>
-
-    <form id="register-form" enctype="multipart/form-data">
-
-      <div class="avatar-upload-container">
-        <img 
-          src="/images/user_icon.png" 
-          alt="Ảnh đại diện xem trước" 
-          class="avatar-preview"
-          id="avatar-preview"
-        >
-        <label for="avatar" class="avatar-upload-label">
-          Chọn ảnh đại diện
-        </label>
-        <input 
-          type="file" 
-          id="avatar" 
-          name="avatar" 
-          accept="image/png, image/jpeg" 
-          required 
-        >
+  <div class="main-content">
+    <div class="register-wrapper">
+      
+      <div class="register-form-section">
+        <div class="register-header">
+          <h2>Đăng ký tài khoản</h2>
         </div>
 
-      <div class="input-field">
-        <input type="text" id="username" name="username" placeholder="Tên đăng nhập" required>
-      </div>
-      <div class="input-field">
-        <input type="email" id="email" name="email" placeholder="Email" required>
-      </div>
-      <div class="input-field">
-        <input type="password" id="password" name="password" placeholder="Mật khẩu" required>
-      </div>
-      <div class="input-field">
-        <input type="password" id="confirm-password" placeholder="Xác nhận mật khẩu" required>
+        <form id="register-form" enctype="multipart/form-data">
+
+          <div class="avatar-upload-container">
+            <img 
+              src="/images/user_icon.png" 
+              alt="Ảnh đại diện xem trước" 
+              class="avatar-preview"
+              id="avatar-preview"
+            >
+            <label for="avatar" class="avatar-upload-label">
+              <i class="fas fa-camera"></i> Chọn ảnh đại diện
+            </label>
+            <input 
+              type="file" 
+              id="avatar" 
+              name="avatar" 
+              accept="image/png, image/jpeg" 
+              required 
+            >
+          </div>
+
+          <div class="input-group">
+            <input type="text" id="username" name="username" placeholder="Tên đăng nhập" required>
+          </div>
+
+          <div class="input-group">
+            <input type="email" id="email" name="email" placeholder="Địa chỉ Email" required>
+          </div>
+
+          <div class="input-group">
+            <input type="password" id="password" name="password" placeholder="Mật khẩu" required>
+          </div>
+
+          <div class="input-group">
+            <input type="password" id="confirm-password" placeholder="Xác nhận mật khẩu" required>
+          </div>
+
+          <button type="submit" id="register-btn" class="btn-register">Đăng ký ngay</button>
+
+          <p class="form-text">Đã có tài khoản? <a href="login.html">Đăng nhập</a></p>
+        </form>
       </div>
 
-      <button type="submit" id="register-btn" class="btn btn-success">Đăng ký</button>
+      <div class="register-image-section">
+        <div class="register-brand">
+        </div>
+      </div>
 
-      <p class="form-text">Đã có tài khoản? <a href="login.html">Đăng nhập ngay</a></p>
-    </form>
     </div>
+  </div>
 
   <div id="footer-placeholder"></div>
 
@@ -65,5 +82,4 @@
   <script src="/javascript/auth.js"></script>
 
 </body>
-
 </html>
