@@ -22,7 +22,7 @@ body {
 
 .main-content {
     flex-grow: 1;
-    background-color: #f8fbff; /* Màu nền tổng thể */
+    background-color: #f3fbff;
 }
 
 .container {
@@ -46,7 +46,7 @@ body {
     display: flex;
     align-items: center;
     padding: 60px 0;
-    margin-bottom: 60px;
+    margin-bottom: 40px;
     color: white;
 }
 
@@ -144,9 +144,9 @@ body {
     background-repeat: no-repeat;
     border: 2px solid #cfcfcf;
     border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    box-shadow: rgba(0, 0, 0, 0.4) 0px 2px 4px, rgba(0, 0, 0, 0.3) 0px 7px 13px -3px, rgba(0, 0, 0, 0.2) 0px -3px 0px inset;
     padding: 60px;
-    margin-bottom: 80px;
+    margin-bottom: 40px;
     position: relative;
     overflow: hidden;
 }
@@ -195,8 +195,8 @@ body {
     background: linear-gradient(135deg, #ffffff 40%, #e1e6e8 100%);
     padding: 40px;
     border-radius: 20px;
-    margin-bottom: 80px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+    margin-bottom: 60px;
+    box-shadow: rgba(0, 0, 0, 0.4) 0px 2px 4px, rgba(0, 0, 0, 0.3) 0px 7px 13px -3px, rgba(0, 0, 0, 0.2) 0px -3px 0px inset;
     border: 2px solid #cfcfcf;
 }
 
@@ -324,10 +324,10 @@ body {
     border: 2px solid #cfcfcf;
     border-radius: 24px;
     padding: 60px 50px; 
-    margin-bottom: 80px;
+    margin-bottom: 40px;
     position: relative;
     overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0, 58, 87, 0.1);
+    box-shadow: rgba(0, 0, 0, 0.4) 0px 2px 4px, rgba(0, 0, 0, 0.3) 0px 7px 13px -3px, rgba(0, 0, 0, 0.2) 0px -3px 0px inset;
     background-color: #ecf6fb; 
 }
 

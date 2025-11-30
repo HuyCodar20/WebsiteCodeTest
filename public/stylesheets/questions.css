@@ -1,0 +1,563 @@
+/* =========================================
+   1. VARIABLES & GLOBAL STYLES
+   ========================================= */
+:root {
+    --primary-color: #008cff;
+    --primary-hover: #0073d1;
+    --success-color: #28a745;
+    --warning-color: #ffc107;
+    --danger-color: #dc3545;
+    --text-dark: #333;
+    --text-light: #666;
+    --text-muted: #999;
+    --bg-light: #f8f9fa;
+    --border-color: #e0e0e0;
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 5px 15px rgba(0, 0, 0, 0.1);
+    --radius: 8px;
+}
+
+.create-question-container {
+    max-width: 1000px; /* Mở rộng một chút cho thoáng */
+    margin: 40px auto;
+    padding: 40px;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: var(--shadow-md);
+    min-height: 600px;
+    animation: fadeIn 0.5s ease-in-out;
+    border: 2px solid #cfcfcf;
+    box-shadow: rgba(0, 0, 0, 0.4) 0px 2px 4px, rgba(0, 0, 0, 0.3) 0px 7px 13px -3px, rgba(0, 0, 0, 0.2) 0px -3px 0px inset;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.page-title {
+    text-align: center;
+    color: rgb(0, 86, 147);
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.page-subtitle {
+    text-align: center;
+    color: var(--text-light);
+    margin-bottom: 50px;
+    font-size: 1.1rem;
+}
+
+/* Helper Classes */
+.hidden {
+    display: none !important;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 30px;
+    border-bottom: 2px solid rgb(207, 207, 207);
+    padding-bottom: 15px;
+}
+
+.section-header h2 {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    margin: 0;
+}
+
+/* =========================================
+   2. DASHBOARD SELECTION (CARD STYLE)
+   ========================================= */
+.dashboard-options {
+    display: flex;
+    gap: 30px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.dash-card {
+    background: #fff;
+    border: 1px solid rgb(0, 104, 127);
+    border-radius: 16px;
+    padding: 40px 30px;
+    width: 320px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    box-shadow: var(--shadow-sm);
+    position: relative;
+    overflow: hidden;
+}
+
+.dash-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary-color);
+    background-color: #f1f9ff;
+}
+
+.dash-card .icon-wrapper {
+    width: 80px;
+    height: 80px;
+    background-color: #eef7ff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    transition: background-color 0.3s;
+}
+
+.dash-card:hover .icon-wrapper {
+    background-color: var(--primary-color);
+}
+
+.dash-card i {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    transition: color 0.3s;
+}
+
+.dash-card:hover i {
+    color: #fff;
+}
+
+.dash-card h3 {
+    margin-bottom: 12px;
+    color: var(--text-dark);
+    font-size: 1.25rem;
+}
+
+.dash-card p {
+    color: var(--text-light);
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+/* =========================================
+   3. STEP 1: TOPIC SELECTION
+   ========================================= */
+.topics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 20px;
+}
+
+.topic-card-select {
+    background: #fff;
+    border: 2px solid rgb(224, 224, 224);
+    border-radius: 12px;
+    padding: 25px 15px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.topic-card-select:hover {
+    border-color: var(--primary-color);
+    background: #f0f8ff;
+    transform: scale(1.02);
+}
+
+.topic-card-select i {
+    font-size: 32px;
+    margin-bottom: 15px;
+    color: var(--text-light);
+    transition: color 0.2s;
+}
+
+.topic-card-select:hover i {
+    color: var(--primary-color);
+}
+
+.topic-card-select h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+/* =========================================
+   4. STEP 2: FORM STYLES
+   ========================================= */
+.form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid rgb(207, 207, 207);
+}
+
+.form-group {
+    margin-bottom: 25px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: var(--text-dark);
+    font-size: 0.95rem;
+}
+
+.required { color: var(--danger-color); }
+
+/* Inputs & Textareas */
+input[type="text"], 
+textarea, 
+select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ced4da;
+    border-radius: var(--radius);
+    font-size: 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    background-color: #fff;
+    font-family: inherit;
+}
+
+input[type="text"]:focus, 
+textarea:focus, 
+select:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 140, 255, 0.15);
+}
+
+textarea {
+    resize: vertical;
+    line-height: 1.5;
+}
+
+/* Character Counter */
+.char-counter {
+    text-align: right;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-top: 6px;
+    font-style: italic;
+}
+
+/* Radio Buttons Custom Style */
+.type-selector {
+    display: flex;
+    gap: 25px;
+    background: var(--bg-light);
+    padding: 15px;
+    border-radius: var(--radius);
+}
+
+.radio-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    font-weight: 500;
+    user-select: none;
+}
+
+.radio-label input[type="radio"] {
+    accent-color: var(--primary-color);
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+/* Image Upload Area */
+.image-upload-box {
+    border: 2px dashed var(--border-color);
+    padding: 20px;
+    border-radius: var(--radius);
+    text-align: center;
+    transition: border-color 0.3s;
+}
+
+.image-upload-box:hover {
+    border-color: var(--primary-color);
+}
+
+#image-preview-container {
+    margin-top: 15px;
+    position: relative;
+    display: inline-block;
+}
+
+#image-preview {
+    max-width: 100%;
+    height: 200px;
+    object-fit: contain;
+    border-radius: var(--radius);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+}
+
+#btn-remove-image {
+    position: absolute;
+    top: -12px;
+    right: -12px;
+    background: var(--danger-color);
+    color: white;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    transition: transform 0.2s;
+}
+
+#btn-remove-image:hover {
+    transform: scale(1.1);
+    background: #c82333;
+}
+
+/* Answer Rows - The Important Part */
+#answers-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.answer-row {
+    display: flex;
+    align-items: flex-start; /* Để input và radio căn chỉnh đẹp nếu text dài */
+    gap: 15px;
+    padding: 15px;
+    background: #fff;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+}
+
+.answer-row:hover {
+    border-color: #b0b0b0;
+}
+
+/* Khi dòng này được chọn là đáp án đúng */
+.answer-row.correct {
+    border-color: var(--success-color);
+    background-color: #f0fff4;
+    box-shadow: 0 0 0 1px var(--success-color);
+}
+
+.radio-wrap {
+    padding-top: 12px; /* Căn chỉnh với text input */
+    display: flex;
+    justify-content: center;
+}
+
+.answer-radio {
+    width: 20px;
+    height: 20px;
+    accent-color: var(--success-color);
+    cursor: pointer;
+}
+
+.input-wrap {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* =========================================
+   5. BUTTONS
+   ========================================= */
+.form-actions {
+    margin-top: 30px;
+    text-align: right;
+}
+
+button {
+    font-family: inherit;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 12px 30px;
+    border: none;
+    border-radius: 30px; /* Rounded pill */
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    transition: all 0.3s;
+    box-shadow: 0 4px 10px rgba(0, 140, 255, 0.3);
+    min-width: 150px;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 140, 255, 0.4);
+}
+
+.btn-secondary, 
+.btn-back-dashboard {
+    background: #fff;
+    color: var(--text-dark);
+    border: 1px solid var(--border-color);
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-secondary:hover, 
+.btn-back-dashboard:hover {
+    background: var(--bg-light);
+    border-color: #bbb;
+    color: #000;
+}
+
+/* =========================================
+   6. MANAGE SECTION (TABLE)
+   ========================================= */
+.manage-controls {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--bg-light);
+    padding: 15px;
+    border-radius: var(--radius);
+}
+
+.manage-controls select {
+    width: 200px;
+    padding: 8px 12px;
+}
+
+.table-responsive {
+    overflow-x: auto;
+    border-radius: var(--radius);
+    border: 1px solid var(--border-color);
+}
+
+.manage-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    min-width: 600px; /* Đảm bảo không bị vỡ trên mobile */
+}
+
+.manage-table th {
+    background-color: #f1f3f5;
+    color: var(--text-dark);
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    padding: 15px;
+    border-bottom: 2px solid rgb(207, 207, 207);
+    text-align: left;
+    white-space: nowrap;
+}
+
+.manage-table td {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    color: var(--text-dark);
+    vertical-align: middle;
+}
+
+.manage-table tr:last-child td {
+    border-bottom: none;
+}
+
+.manage-table tr:hover {
+    background-color: #fcfcfc;
+}
+
+/* Status Badges */
+.status-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    display: inline-block;
+    text-align: center;
+    min-width: 80px;
+}
+
+.status-approved { 
+    background-color: #d1e7dd; 
+    color: #0f5132; 
+}
+
+.status-pending { 
+    background-color: #fff3cd; 
+    color: #856404; 
+}
+
+.status-deleted { 
+    background-color: #f8d7da; 
+    color: #842029; 
+
+}
+
+/* Action Buttons in Table */
+.action-btn {
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-right: 6px;
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s, opacity 0.2s;
+}
+
+.action-btn:hover {
+    transform: translateY(-2px);
+    opacity: 0.9;
+}
+
+.btn-edit { background-color: var(--warning-color); color: #000; }
+.btn-delete { background-color: var(--danger-color); }
+.btn-disabled { 
+    background-color: #e9ecef; 
+    color: #adb5bd; 
+    cursor: not-allowed; 
+    pointer-events: none; /* Không cho click */
+}
+
+/* =========================================
+   7. RESPONSIVE DESIGN
+   ========================================= */
+@media (max-width: 768px) {
+    .create-question-container {
+        padding: 20px;
+        margin: 20px auto;
+    }
+
+    .page-title { font-size: 1.5rem; }
+
+    .dashboard-options { flex-direction: column; align-items: center; }
+    .dash-card { width: 100%; }
+
+    .form-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+    .form-header h2 { font-size: 1.2rem; }
+    
+    .manage-controls { flex-direction: column; gap: 10px; align-items: stretch; }
+    .manage-controls select { width: 100%; }
+    
+    .type-selector { flex-direction: column; gap: 10px; }
+}

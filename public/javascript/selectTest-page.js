@@ -220,7 +220,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const container = document.getElementById('question-list-container');
         container.innerHTML = '<div style="text-align:center; padding:20px;">Đang tải...</div>';
         try {
-            const url = `/api/questions?categoryId=${categoryId}&page=${browserPage}&limit=10&search=${encodeURIComponent(browserSearch)}&difficulty=${browserDifficulty}`;
+            const url = `/api/questions?categoryId=${categoryId}&page=${browserPage}&limit=10&search=${encodeURIComponent(browserSearch)}&difficulty=${browserDifficulty}&excludeDeleted=true`;
             const res = await fetch(url);
             const data = await res.json();
             renderQuestionList(data.questions, data.totalQuestions);

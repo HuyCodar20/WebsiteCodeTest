@@ -27,17 +27,17 @@ body {
     background: #fff;
     width: 100%;
     max-width: 1000px;
-    border: 2px solid #afafaf;
+    border: 1px solid #d0d0d0; /* Viền mỏng nhẹ hơn chút cho tinh tế */
     border-radius: 20px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
     overflow: hidden;
-    display: flex; /* Mặc định xếp ngang: Trái -> Phải */
+    display: flex;
     min-height: 600px;
 }
 
 /* ==================== FORM SECTION (LEFT) ==================== */
 .register-form-section {
-    flex: 1.3; 
+    flex: 1.3; /* Form chiếm nhiều chỗ hơn ảnh */
     background: #fff;
     padding: 40px;
     display: flex;
@@ -76,10 +76,12 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
+    /* Lớp phủ nhẹ nếu cần */
+    background: rgba(13, 110, 253, 0.1); 
     z-index: 1;
 }
 
-/* ==================== AVATAR UPLOAD STYLES ==================== */
+/* ==================== AVATAR UPLOAD (MAIN FORM) ==================== */
 .avatar-upload-container {
     display: flex;
     flex-direction: column;
@@ -94,33 +96,36 @@ body {
     object-fit: cover;
     border: 3px solid #e1e1e1;
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    margin-bottom: 10px;
+    margin-bottom: 15px;
     transition: all 0.3s ease;
+    cursor: pointer;
 }
 
-input[type="file"]#avatar {
-    display: none;
+.avatar-preview:hover {
+    transform: scale(1.05);
+    border-color: #0d6efd;
 }
 
-.avatar-upload-label {
-    padding: 6px 16px;
-    background-color: #f0f2f5;
+/* Nút mở modal chọn ảnh */
+.avatar-upload-btn {
+    padding: 8px 20px;
+    background-color: #fff;
     color: #333;
+    border: 1px solid #ccc;
     border-radius: 20px;
     cursor: pointer;
     font-size: 13px;
     font-weight: 600;
     transition: all 0.2s;
-    border: 1px solid #ddd;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
 }
 
-.avatar-upload-label:hover {
-    background-color: #e1e1e1;
+.avatar-upload-btn:hover {
+    background-color: #f8f9fa;
     border-color: #bbb;
-}
-
-.avatar-upload-label i {
-    margin-right: 5px;
+    color: #0d6efd;
 }
 
 /* ==================== INPUT FIELDS ==================== */
@@ -184,25 +189,154 @@ input[type="file"]#avatar {
     text-decoration: underline;
 }
 
-/* ==================== RESPONSIVE (MOBILE) ==================== */
+/* ==================== MODAL POPUP (AVATAR SELECTION) ==================== */
+.modal-overlay {
+    position: fixed;
+    top: 0; 
+    left: 0;
+    width: 100%; 
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6); /* Nền đen mờ */
+    z-index: 999999; /* Luôn nổi trên cùng */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    /* Mặc định ẩn */
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+/* Class này được JS thêm vào để hiện popup */
+.modal-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    background: #fff;
+    padding: 25px;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    position: relative;
+    transform: translateY(-20px);
+    transition: all 0.3s ease;
+}
+
+.modal-overlay.show .modal-content {
+    transform: translateY(0);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.modal-header h3 {
+    font-size: 18px;
+    color: #333;
+    font-weight: 700;
+}
+
+.close-modal {
+    font-size: 28px;
+    cursor: pointer;
+    color: #999;
+    line-height: 1;
+    transition: color 0.2s;
+}
+
+.close-modal:hover {
+    color: #333;
+}
+
+/* Grid chứa các avatar */
+.avatar-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4 cột */
+    gap: 15px;
+    justify-items: center;
+}
+
+/* Style cho từng hình tròn avatar */
+.avatar-option {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    cursor: pointer;
+    border: 3px solid transparent;
+    transition: all 0.2s ease;
+    background: #fff;
+}
+
+.avatar-option:hover {
+    transform: scale(1.1);
+    border-color: #0d6efd;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+/* Style riêng cho nút Upload (Hình tròn nét đứt) */
+.upload-option {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #f8f9fa;
+    color: #0d6efd;
+    border: 2px dashed #ccc;
+}
+
+.upload-option:hover {
+    background-color: #e9ecef;
+    border-color: #0d6efd;
+}
+
+.upload-option i { 
+    font-size: 24px; 
+    margin-bottom: 4px; 
+}
+
+.upload-option span { 
+    font-size: 10px; 
+    font-weight: 700; 
+    text-align: center;
+}
+
+/* ==================== RESPONSIVE ==================== */
 @media (max-width: 768px) {
     .register-wrapper {
-        flex-direction: column; /* Xếp dọc */
+        flex-direction: column;
         max-width: 450px;
         margin: 20px auto;
+        min-height: auto;
     }
 
-    .register-image-section {
-        display: none; /* Ẩn phần ảnh đi để tập trung vào form */
+    .register-image-section { 
+        display: none; /* Ẩn ảnh nền trên mobile */
     }
 
-    .register-form-section {
-        padding: 30px 20px;
-        order: 1; /* Đảm bảo form hiện lên (dù mặc định nó đã ở trên rồi) */
+    .register-form-section { 
+        padding: 30px 20px; 
+        flex: 1;
     }
-    
-    .avatar-preview {
-        width: 80px;
-        height: 80px;
+}
+
+@media (max-width: 500px) {
+    .avatar-grid {
+        grid-template-columns: repeat(3, 1fr); /* Mobile nhỏ: 3 cột avatar */
+        gap: 10px;
+    }
+
+    .avatar-option {
+        width: 70px;
+        height: 70px;
     }
 }

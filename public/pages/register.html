@@ -6,12 +6,104 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Đăng ký - DevArena</title>
 
-  <link rel="stylesheet" href="/stylesheets/register.css">
-  
+  <link rel="stylesheet" href="/stylesheets/register.css?v=77">
   <link rel="stylesheet" href="/stylesheets/footer.css">
   <link rel="stylesheet" href="/stylesheets/header.css">
+  
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
+
+
+<style>
+  /*----------------------- Popup Avarta -----------------------*/
+  .modal-overlay {
+      position: fixed;
+      top: 0; 
+      left: 0;
+      width: 100%; 
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 999999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+  }
+
+  .modal-overlay.show {
+      opacity: 1;
+      visibility: visible;
+  }
+
+  .modal-content {
+      background: #fff;
+      padding: 25px;
+      border-radius: 16px;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+      position: relative;
+      transform: translateY(-20px);
+      transition: all 0.3s ease;
+  }
+
+  .modal-overlay.show .modal-content {
+      transform: translateY(0);
+  }
+
+  .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #eee;
+  }
+
+  .modal-header h3 { font-size: 18px; font-weight: 700; color: #333; }
+
+  .close-modal { font-size: 28px; cursor: pointer; color: #999; }
+  .close-modal:hover { color: #333; }
+
+  .avatar-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 15px;
+      justify-items: center;
+  }
+
+  .avatar-option {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      cursor: pointer;
+      border: 3px solid transparent;
+      transition: all 0.2s ease;
+      background: #fff;
+  }
+
+  .avatar-option:hover {
+      transform: scale(1.1);
+      border-color: #0d6efd;
+  }
+
+  .upload-option {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background-color: #f8f9fa;
+      color: #0d6efd;
+      border: 2px dashed #ccc;
+  }
+  
+  .upload-option i { font-size: 24px; margin-bottom: 4px; }
+  .upload-option span { font-size: 10px; font-weight: 700; }
+
+</style>
 
 <body>
 
@@ -33,19 +125,21 @@
               alt="Ảnh đại diện xem trước" 
               class="avatar-preview"
               id="avatar-preview"
+              title="Nhấn để chọn ảnh"
             >
-            <label for="avatar" class="avatar-upload-label">
+            
+            <button type="button" id="open-avatar-modal-btn" class="avatar-upload-btn">
               <i class="fas fa-camera"></i> Chọn ảnh đại diện
-            </label>
+            </button>
+
             <input 
               type="file" 
               id="avatar" 
               name="avatar" 
               accept="image/png, image/jpeg" 
-              required 
+              style="display: none;"
             >
           </div>
-
           <div class="input-group">
             <input type="text" id="username" name="username" placeholder="Tên đăng nhập" required>
           </div>
@@ -73,6 +167,27 @@
         </div>
       </div>
 
+    </div>
+  </div>
+
+  <div id="avatar-modal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Chọn ảnh đại diện</h3>
+        <span class="close-modal">&times;</span>
+      </div>
+      
+      <div class="avatar-grid">
+        <div class="avatar-option upload-option" id="trigger-upload">
+          <i class="fas fa-cloud-upload-alt"></i>
+          <span>Tải từ máy</span>
+        </div>
+
+        <img src="/images/user_icon.png" class="avatar-option system-avatar" alt="Avatar 1">
+        <img src="/images/fl_user_icon.png" class="avatar-option system-avatar" alt="Avatar 2">
+        <img src="/images/rb_user_icon.png" class="avatar-option system-avatar" alt="Avatar 3">
+        
+      </div>
     </div>
   </div>
 

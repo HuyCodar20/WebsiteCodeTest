@@ -1,5 +1,5 @@
 /* ==========================================================================
-   SERVER CONFIGURATION & IMPORTS
+   1. SERVER CONFIGURATION & IMPORTS
    ========================================================================== */
 const express = require("express");
 const path = require("path");
@@ -13,25 +13,22 @@ const PORT = 3000;
 const MONGO_URI = "mongodb+srv://Admin01:Website123456@cluster0.ipbas5n.mongodb.net/DB_SWTesting?retryWrites=true&w=majority";
 
 /* ==========================================================================
-   DATABASE CONNECTION
+   2. DATABASE CONNECTION
    ========================================================================== */
 mongoose.connect(MONGO_URI)
   .then(() => console.log("✅ Kết nối MongoDB Atlas thành công!"))
   .catch(err => console.error("❌ Lỗi kết nối MongoDB:", err));
 
 /* ==========================================================================
-   MODELS & SCHEMAS (Định nghĩa dữ liệu)
+   3. MODELS & SCHEMAS (Định nghĩa dữ liệu)
    ========================================================================== */
 
-/**
- * 1. User Model
- * Quản lý thông tin người dùng
- */
+// --- Model: User (Người dùng) ---
 const userSchema = new mongoose.Schema({
   UserID: { type: Number, required: true, unique: true },
   Username: { type: String, required: true, unique: true },
   Email: { type: String, required: true, unique: true },
-  Password: { type: String, required: true }, // Lưu ý: Nên mã hóa password trong thực tế
+  Password: { type: String, required: true },
   AvatarURL: { type: String, default: '/images/default-avatar.png' },
   Role: { type: String, default: 'user' },
   CreatedAt: { type: Date, default: Date.now }
@@ -39,15 +36,12 @@ const userSchema = new mongoose.Schema({
 
 const User = mongoose.model('User', userSchema);
 
-/**
- * 2. Category Model
- * Quản lý các chủ đề (Topic)
- */
+// --- Model: Category (Chủ đề) ---
 const categorySchema = new mongoose.Schema({
   name: { type: String, required: true },
   description: String,
   icon: String,
-  type: String, // Ví dụ: 'framework', 'language', 'tool'
+  type: String,
   tags: [String],
   banner_image_url: String,
   long_description: String,
@@ -56,10 +50,7 @@ const categorySchema = new mongoose.Schema({
 
 const Category = mongoose.model('Category', categorySchema);
 
-/**
- * 3. Question Model
- * Quản lý ngân hàng câu hỏi và đáp án
- */
+// --- Model: Question (Ngân hàng câu hỏi) ---
 const questionSchema = new mongoose.Schema({
   QuestionText: { type: String, required: true },
   QuestionType: { 
@@ -76,10 +67,9 @@ const questionSchema = new mongoose.Schema({
     default: 'easy' 
   },
   CreatorUserID: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-  Status: { type: String, default: 'Approved' },
+  Status: { type: String, default: 'Approved' }, // Approved, Pending, Deleted
   CreatedAt: { type: Date, default: Date.now },
   ReportCount: { type: Number, default: 0 },
-  
   choices: [{
     choiceText: { type: String, required: true },
     isCorrect: { type: Boolean, required: true }
@@ -89,13 +79,12 @@ const questionSchema = new mongoose.Schema({
 const Question = mongoose.model('Question', questionSchema);
 
 /* ==========================================================================
-   UTILITIES (Hàm hỗ trợ)
+   4. UTILITIES (Hàm hỗ trợ & Cấu hình upload)
    ========================================================================== */
 
 // Cấu hình Multer để upload file
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    // Đảm bảo thư mục này tồn tại trong project
     cb(null, 'public/images/uploads/');
   },
   filename: function (req, file, cb) {
@@ -121,22 +110,20 @@ function escapeRegex(string) {
 }
 
 /* ==========================================================================
-   MIDDLEWARE
+   5. MIDDLEWARE
    ========================================================================== */
 app.use(express.json());
-// Cấu hình thư mục tĩnh (Public folder)
 app.use(express.static(path.join(__dirname, 'public')));
 
-
 /* ==========================================================================
-   API ROUTES
+   6. API ROUTES
    ========================================================================== */
 
-// --------------------------------------------------------------------------
-// AUTHENTICATION & USER (Đăng ký, Đăng nhập, Profile)
-// --------------------------------------------------------------------------
+/* --------------------------------------------------------------------------
+   GROUP 1: AUTHENTICATION & USER (Đăng ký, Đăng nhập, Profile)
+   -------------------------------------------------------------------------- */
 
-// Đăng ký tài khoản
+// [POST] Đăng ký tài khoản
 app.post('/api/register', upload.single('avatar'), async (req, res) => {
   const { username, email, password } = req.body;
   const avatarFile = req.file;
@@ -157,7 +144,7 @@ app.post('/api/register', upload.single('avatar'), async (req, res) => {
       return res.status(409).json({ message: 'Username hoặc Email đã tồn tại.' });
     }
 
-    // Tạo UserID tự tăng thủ công 
+    // Tạo UserID tự tăng
     let newUserID = 101;
     const lastUser = await User.findOne({}, {}, { sort: { 'UserID': -1 } });
     if (lastUser) {
@@ -177,7 +164,6 @@ app.post('/api/register', upload.single('avatar'), async (req, res) => {
     const savedUser = await newUser.save();
     console.log(`User mới: ${username}`);
     
-    // Loại bỏ password trước khi trả về client
     const userResponse = savedUser.toObject();
     delete userResponse.Password;
 
@@ -188,7 +174,7 @@ app.post('/api/register', upload.single('avatar'), async (req, res) => {
   }
 });
 
-// Đăng nhập
+// [POST] Đăng nhập
 app.post('/api/login', async (req, res) => {
   const { username, password } = req.body;
   if (!username || !password) {
@@ -215,7 +201,7 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
-// Lấy thông tin Profile
+// [GET] Lấy thông tin Profile
 app.get('/api/profile/:userId', async (req, res) => {
   try {
     const userId = parseInt(req.params.userId);
@@ -228,17 +214,14 @@ app.get('/api/profile/:userId', async (req, res) => {
   }
 });
 
-// Cập nhật Username
+// [PUT] Cập nhật Username
 app.put('/api/profile/update', async (req, res) => {
   const { userId, username } = req.body;
-
-  if (!userId || !username)
-    return res.status(400).json({ message: 'Thiếu User ID hoặc Username mới.' });
+  if (!userId || !username) return res.status(400).json({ message: 'Thiếu User ID hoặc Username mới.' });
 
   try {
     const existing = await User.findOne({ Username: username, UserID: { $ne: userId } });
-    if (existing)
-      return res.status(409).json({ message: 'Username này đã có người sử dụng.' });
+    if (existing) return res.status(409).json({ message: 'Username này đã có người sử dụng.' });
 
     const updated = await User.findOneAndUpdate(
       { UserID: userId },
@@ -246,9 +229,7 @@ app.put('/api/profile/update', async (req, res) => {
       { new: true, select: '-Password' }
     );
 
-    if (!updated)
-      return res.status(404).json({ message: 'Không tìm thấy người dùng.' });
-
+    if (!updated) return res.status(404).json({ message: 'Không tìm thấy người dùng.' });
     res.json({ message: 'Cập nhật tên người dùng thành công!', user: updated });
   } catch (err) {
     console.error(err);
@@ -256,7 +237,7 @@ app.put('/api/profile/update', async (req, res) => {
   }
 });
 
-// Đổi mật khẩu
+// [PUT] Đổi mật khẩu
 app.put('/api/password/change', async (req, res) => {
   const { userId, oldPassword, newPassword } = req.body;
 
@@ -281,18 +262,15 @@ app.put('/api/password/change', async (req, res) => {
   }
 });
 
-// Cập nhật Avatar
+// [PUT] Cập nhật Avatar
 app.put('/api/avatar/update', upload.single('avatar'), async (req, res) => {
   const userId = req.body.userId;
   const avatarFile = req.file;
 
-  if (!userId || !avatarFile)
-    return res.status(400).json({ message: 'Thiếu User ID hoặc file ảnh.' });
+  if (!userId || !avatarFile) return res.status(400).json({ message: 'Thiếu User ID hoặc file ảnh.' });
 
   try {
-    // Sửa lại đường dẫn cho khớp với logic Register: /images/uploads/...
     const newAvatar = `/images/uploads/${avatarFile.filename}`;
-
     const updated = await User.findOneAndUpdate(
       { UserID: userId },
       { AvatarURL: newAvatar },
@@ -300,7 +278,6 @@ app.put('/api/avatar/update', upload.single('avatar'), async (req, res) => {
     );
 
     if (!updated) return res.status(404).json({ message: 'Không tìm thấy người dùng.' });
-
     res.json({ message: 'Cập nhật ảnh đại diện thành công!', newAvatarUrl: updated.AvatarURL });
   } catch (err) {
     console.error(err);
@@ -308,12 +285,11 @@ app.put('/api/avatar/update', upload.single('avatar'), async (req, res) => {
   }
 });
 
+/* --------------------------------------------------------------------------
+   GROUP 2: CATEGORIES / TOPICS (Chủ đề bài học)
+   -------------------------------------------------------------------------- */
 
-// --------------------------------------------------------------------------
-// CATEGORIES / TOPICS (Chủ đề bài học)
-// --------------------------------------------------------------------------
-
-// Lấy danh sách Topics (có lọc và tìm kiếm)
+// [GET] Lấy danh sách Topics (có lọc và tìm kiếm)
 app.get('/api/topics', async (req, res) => {
   try {
     const { types, tags, search } = req.query;
@@ -345,7 +321,7 @@ app.get('/api/topics', async (req, res) => {
   }
 });
 
-// Lấy chi tiết MỘT Category
+// [GET] Lấy chi tiết MỘT Category
 app.get('/api/category/:id', async (req, res) => {
   try {
     const categoryId = req.params.id;
@@ -363,15 +339,14 @@ app.get('/api/category/:id', async (req, res) => {
   }
 });
 
+/* --------------------------------------------------------------------------
+   GROUP 3: QUESTIONS (Ngân hàng câu hỏi: CRUD)
+   -------------------------------------------------------------------------- */
 
-// --------------------------------------------------------------------------
-// QUESTIONS & TESTS (Ngân hàng câu hỏi & Thi)
-// --------------------------------------------------------------------------
-
-// Lấy danh sách câu hỏi (phân trang, tìm kiếm)
+// [GET] Lấy danh sách câu hỏi (phân trang, tìm kiếm)
 app.get('/api/questions', async (req, res) => {
   try {
-    const { categoryId, page = 1, limit = 10, search, difficulty } = req.query;
+    const { categoryId, page = 1, limit = 10, search, difficulty, excludeDeleted } = req.query;
 
     if (!categoryId || !mongoose.Types.ObjectId.isValid(categoryId)) {
       return res.status(400).json({ message: "categoryId không hợp lệ." });
@@ -382,11 +357,15 @@ app.get('/api/questions', async (req, res) => {
       dbFilter.Difficulty = difficulty;
     }
 
+    if (excludeDeleted === 'true') {
+        dbFilter.Status = { $ne: 'Deleted' };
+    }
+
     let resultQuestions = [];
     let totalQuestions = 0;
 
     if (search && search.trim() !== '') {
-      // Tìm kiếm thủ công (do cần xử lý tiếng Việt không dấu)
+      // Tìm kiếm thủ công (xử lý tiếng Việt)
       const allQuestions = await Question.find(dbFilter)
         .populate('CreatorUserID', 'Username')
         .select('-choices.isCorrect')
@@ -408,7 +387,7 @@ app.get('/api/questions', async (req, res) => {
       totalQuestions = await Question.countDocuments(dbFilter);
       resultQuestions = await Question.find(dbFilter)
         .populate('CreatorUserID', 'Username')
-        .select('-choices.isCorrect') // Ẩn đáp án đúng
+        .select('-choices.isCorrect')
         .skip((page - 1) * limit)
         .limit(parseInt(limit))
         .sort({ CreatedAt: -1 });
@@ -426,17 +405,11 @@ app.get('/api/questions', async (req, res) => {
   }
 });
 
-// Tạo câu hỏi mới (Có hỗ trợ Upload ảnh)
+// [POST] Tạo câu hỏi mới
 app.post('/api/questions', upload.single('image'), async (req, res) => {
   try {
     const { 
-      questionText, 
-      questionType, 
-      categoryId, 
-      difficulty, 
-      creatorId, 
-      explanation,
-      choices // JSON string
+      questionText, questionType, categoryId, difficulty, creatorId, explanation, choices 
     } = req.body;
 
     if (!questionText || !categoryId || !choices) {
@@ -445,7 +418,6 @@ app.post('/api/questions', upload.single('image'), async (req, res) => {
 
     let imageUrl = null;
     if (req.file) {
-      // Chuẩn hóa đường dẫn ảnh
       imageUrl = `/images/uploads/${req.file.filename}`;
     }
 
@@ -459,7 +431,6 @@ app.post('/api/questions', upload.single('image'), async (req, res) => {
     if (questionType === 'multiple_choice' && parsedChoices.length < 2) {
       return res.status(400).json({ message: "Cần ít nhất 2 đáp án." });
     }
-    
     if (!parsedChoices.some(c => c.isCorrect === true)) {
       return res.status(400).json({ message: "Phải có ít nhất một đáp án đúng." });
     }
@@ -478,27 +449,127 @@ app.post('/api/questions', upload.single('image'), async (req, res) => {
 
     await newQuestion.save();
 
-    res.status(201).json({ 
-      message: "Gửi câu hỏi thành công!",
-      question: newQuestion 
-    });
+    res.status(201).json({ message: "Gửi câu hỏi thành công!", question: newQuestion });
   } catch (error) {
     console.error("Lỗi tạo câu hỏi:", error);
     res.status(500).json({ message: "Lỗi server khi lưu câu hỏi." });
   }
 });
 
-// Đề tạo thi ngẫu nhiên (Start Test)
+// [PUT] Cập nhật câu hỏi
+app.put('/api/questions/:id', upload.single('image'), async (req, res) => {
+  try {
+    const questionId = req.params.id;
+    const { questionText, difficulty, explanation, choices, categoryId } = req.body;
+
+    const question = await Question.findById(questionId);
+    if (!question) return res.status(404).json({ message: "Không tìm thấy câu hỏi." });
+
+    if (questionText) question.QuestionText = questionText;
+    if (difficulty) question.Difficulty = difficulty;
+    if (explanation) question.Explanation = explanation;
+    if (categoryId) question.CategoryID = categoryId;
+
+    if (req.file) {
+      question.Image = `/images/uploads/${req.file.filename}`;
+    }
+
+    if (choices) {
+        try {
+            const parsedChoices = JSON.parse(choices);
+            if (parsedChoices.length < 2) return res.status(400).json({ message: "Cần ít nhất 2 đáp án." });
+            question.choices = parsedChoices;
+        } catch (e) {
+            return res.status(400).json({ message: "Dữ liệu đáp án lỗi." });
+        }
+    }
+
+    await question.save();
+    res.json({ message: "Cập nhật câu hỏi thành công!", question });
+  } catch (error) {
+    console.error("Lỗi update:", error);
+    res.status(500).json({ message: "Lỗi server." });
+  }
+});
+
+// [PATCH] Khôi phục câu hỏi
+app.patch('/api/questions/:id/restore', async (req, res) => {
+  try {
+    const questionId = req.params.id;
+    const updated = await Question.findByIdAndUpdate(
+        questionId, 
+        { Status: 'Approved' }, 
+        { new: true }
+    );
+    if (!updated) return res.status(404).json({ message: "Không tìm thấy câu hỏi." });
+    res.json({ message: "Đã khôi phục câu hỏi thành công." });
+  } catch (error) {
+    console.error("Lỗi khôi phục:", error);
+    res.status(500).json({ message: "Lỗi server." });
+  }
+});
+
+
+// API: Lấy chi tiết MỘT câu hỏi (Để điền vào form Sửa)
+app.get('/api/questions/:id', async (req, res) => {
+  try {
+    const questionId = req.params.id;
+    if (!mongoose.Types.ObjectId.isValid(questionId)) {
+        return res.status(400).json({ message: "ID không hợp lệ." });
+    }
+
+    const question = await Question.findById(questionId);
+    if (!question) {
+      return res.status(404).json({ message: "Không tìm thấy câu hỏi." });
+    }
+    res.json(question);
+  } catch (error) {
+    console.error("Lỗi lấy chi tiết câu hỏi:", error);
+    res.status(500).json({ message: "Lỗi server." });
+  }
+});
+
+// API: Xóa mềm (Soft Delete) - Chuyển Status thành 'Deleted'
+app.delete('/api/questions/:id', async (req, res) => {
+  try {
+    const questionId = req.params.id;
+    
+    // Cập nhật Status thành 'Deleted'
+    const updated = await Question.findByIdAndUpdate(
+        questionId, 
+        { Status: 'Deleted' }, 
+        { new: true }
+    );
+
+    if (!updated) return res.status(404).json({ message: "Không tìm thấy câu hỏi." });
+
+    res.json({ message: "Đã xóa câu hỏi (Soft Delete)." });
+  } catch (error) {
+    console.error("Lỗi xóa câu hỏi:", error);
+    res.status(500).json({ message: "Lỗi server." });
+  }
+});
+
+
+/* --------------------------------------------------------------------------
+   GROUP 4: TESTS (Tạo đề thi & Chấm điểm)
+   -------------------------------------------------------------------------- */
+
 app.get('/api/test/generate', async (req, res) => {
   try {
     const { categoryId, limit = 10, difficulty } = req.query;
 
     if (!categoryId || !mongoose.Types.ObjectId.isValid(categoryId)) {
-      return res.status(400).json({ message: "ID chủ đề không hợp lệ." });
+      return res.status(400).json({ message: "ID chủ đề lỗi." });
     }
 
     const pipeline = [
-      { $match: { CategoryID: new mongoose.Types.ObjectId(categoryId) } }
+      { 
+        $match: { 
+          CategoryID: new mongoose.Types.ObjectId(categoryId),
+          Status: { $ne: 'Deleted' } // Chỉ lấy câu chưa xóa
+        } 
+      }
     ];
 
     if (difficulty && difficulty !== 'all') {
@@ -514,7 +585,7 @@ app.get('/api/test/generate', async (req, res) => {
       return res.status(404).json({ message: "Không đủ câu hỏi để tạo đề thi." });
     }
 
-    // Ẩn đáp án đúng
+    // Ẩn đáp án đúng trước khi trả về Client
     const sanitizedQuestions = questions.map(q => {
       if (q.choices) {
         q.choices = q.choices.map(c => ({
@@ -536,7 +607,7 @@ app.get('/api/test/generate', async (req, res) => {
   }
 });
 
-// Nộp bài & Chấm điểm (Submit Test)
+// [POST] Nộp bài & Chấm điểm
 app.post('/api/test/submit-dynamic', async (req, res) => {
   try {
     const { userAnswers } = req.body; 
@@ -556,7 +627,6 @@ app.post('/api/test/submit-dynamic', async (req, res) => {
     userAnswers.forEach(ans => {
       const questionId = ans.questionId;
       const userChoiceId = ans.selectedChoiceId;
-
       const originalQ = originalQuestions.find(q => q._id.toString() === questionId);
 
       if (originalQ) {
@@ -594,7 +664,7 @@ app.post('/api/test/submit-dynamic', async (req, res) => {
   }
 });
 
-// Kiểm tra nhanh 1 câu (Practice Mode)
+// [POST] Kiểm tra nhanh 1 câu (Practice Mode)
 app.post('/api/check-single-answer', async (req, res) => {
   try {
     const { questionId, selectedChoiceId } = req.body;
@@ -622,7 +692,9 @@ app.post('/api/check-single-answer', async (req, res) => {
   }
 });
 
-// --------------------------------------------------------------------------
+/* ==========================================================================
+   7. MAIN ROUTES & START SERVER
+   ========================================================================== */
 
 // Route trang chủ
 app.get('/', (req, res) => {

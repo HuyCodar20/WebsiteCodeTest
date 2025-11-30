@@ -115,7 +115,7 @@ document.addEventListener("DOMContentLoaded", function() {
     };
 
     const initializeHeaderScripts = () => {
-        // Đã xóa categoryBtn vì không còn dropdown logic
+       
         const hamburgerBtn = document.getElementById('hamburger-btn');
         const navWrapper = document.getElementById('nav-wrapper');
         const settingsBtn = document.getElementById('settings-btn');
@@ -155,7 +155,6 @@ document.addEventListener("DOMContentLoaded", function() {
         }
 
         window.addEventListener('click', function(event) {
-            // Đã xóa logic đóng dropdown active
             if (navWrapper && navWrapper.classList.contains('active') && !navWrapper.contains(event.target) && hamburgerBtn && !hamburgerBtn.contains(event.target)) {
                 navWrapper.classList.remove('active');
             }
@@ -321,9 +320,9 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     loadComponent('/pages/footer.html', 'footer-placeholder');
-
     initializeSlideshow();
     initializeTabs();
+     
 });
 
 window.addEventListener("scroll", function() {
@@ -333,3 +332,6 @@ window.addEventListener("scroll", function() {
         else header.classList.remove("sticky");
     }
 });
+
+
+
