@@ -73,10 +73,35 @@ const questionSchema = new mongoose.Schema({
   choices: [{
     choiceText: { type: String, required: true },
     isCorrect: { type: Boolean, required: true }
-  }]
+  }],
+  ReportedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
 }, { collection: 'Questions' }); 
 
 const Question = mongoose.model('Question', questionSchema);
+
+// --- Model: TestResults (Kết quả bài thi đã làm) ---
+const TestResultsSchema = new mongoose.Schema({
+    UserID: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, 
+    Category: { 
+        id: { type: mongoose.Schema.Types.ObjectId, ref: 'Category' },
+        name: String
+    },
+    Mode: { type: String, enum: ['classic', 'paced'], default: 'classic' },
+    TotalQuestions: { type: Number, required: true },
+    CorrectCount: { type: Number, required: true },
+    Score: { type: Number, required: true }, // Điểm (0-10)
+    TimeTaken: { type: Number }, // Thời gian làm bài (giây)
+    CompletedAt: { type: Date, default: Date.now },
+    // Chi tiết đáp án
+    details: [{
+        questionId: mongoose.Schema.Types.ObjectId,
+        userChoiceId: String,
+        correctChoiceId: String,
+        isCorrect: Boolean,
+    }]
+}, { collection: 'TestResults' });
+
+const TestResult = mongoose.model('TestResult', TestResultsSchema);
 
 /* ==========================================================================
    4. UTILITIES (Hàm hỗ trợ & Cấu hình upload)
@@ -177,13 +202,26 @@ app.post('/api/register', upload.single('avatar'), async (req, res) => {
 // [POST] Đăng nhập
 app.post('/api/login', async (req, res) => {
   const { username, password } = req.body;
+
   if (!username || !password) {
-    return res.status(400).json({ message: 'Vui lòng nhập Username và Password.' });
+    return res.status(400).json({ message: 'Vui lòng nhập Username/Email và Password.' });
   }
+
   try {
-    const user = await User.findOne({ Username: username });
-    if (!user) return res.status(404).json({ message: 'Tài khoản không tồn tại!' });
-    if (user.Password !== password) return res.status(401).json({ message: 'Sai mật khẩu!' });
+    const user = await User.findOne({
+      $or: [
+        { Username: username },
+        { Email: username }
+      ]
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: 'Tài khoản không tồn tại!' });
+    }
+
+    if (user.Password !== password) {
+      return res.status(401).json({ message: 'Sai mật khẩu!' });
+    }
 
     res.json({
       message: 'Đăng nhập thành công!',
@@ -199,6 +237,7 @@ app.post('/api/login', async (req, res) => {
     console.error("Lỗi đăng nhập:", error);
     res.status(500).json({ message: 'Lỗi máy chủ nội bộ' });
   }
+
 });
 
 // [GET] Lấy thông tin Profile
@@ -265,19 +304,32 @@ app.put('/api/password/change', async (req, res) => {
 // [PUT] Cập nhật Avatar
 app.put('/api/avatar/update', upload.single('avatar'), async (req, res) => {
   const userId = req.body.userId;
-  const avatarFile = req.file;
+  const avatarFile = req.file;           // File upload (nếu có)
+  const avatarUrlStr = req.body.avatarUrl; // URL avatar hệ thống (nếu có)
 
-  if (!userId || !avatarFile) return res.status(400).json({ message: 'Thiếu User ID hoặc file ảnh.' });
+  // Kiểm tra: Phải có UserId VÀ (có File upload HOẶC có URL ảnh)
+  if (!userId || (!avatarFile && !avatarUrlStr)) {
+      return res.status(400).json({ message: 'Thiếu User ID hoặc dữ liệu ảnh.' });
+  }
 
   try {
-    const newAvatar = `/images/uploads/${avatarFile.filename}`;
+    // Ưu tiên lấy file upload, nếu không thì lấy đường dẫn string
+    let newAvatarPath = '';
+    
+    if (avatarFile) {
+        newAvatarPath = `/images/uploads/${avatarFile.filename}`;
+    } else {
+        newAvatarPath = avatarUrlStr;
+    }
+
     const updated = await User.findOneAndUpdate(
       { UserID: userId },
-      { AvatarURL: newAvatar },
+      { AvatarURL: newAvatarPath },
       { new: true, select: 'AvatarURL' }
     );
 
     if (!updated) return res.status(404).json({ message: 'Không tìm thấy người dùng.' });
+    
     res.json({ message: 'Cập nhật ảnh đại diện thành công!', newAvatarUrl: updated.AvatarURL });
   } catch (err) {
     console.error(err);
@@ -343,20 +395,28 @@ app.get('/api/category/:id', async (req, res) => {
    GROUP 3: QUESTIONS (Ngân hàng câu hỏi: CRUD)
    -------------------------------------------------------------------------- */
 
-// [GET] Lấy danh sách câu hỏi (phân trang, tìm kiếm)
+// [GET] Lấy danh sách câu hỏi (ĐÃ FIX: Cho phép không có categoryId)
 app.get('/api/questions', async (req, res) => {
   try {
-    const { categoryId, page = 1, limit = 10, search, difficulty, excludeDeleted } = req.query;
+    const { categoryId, page = 1, limit = 10, search, difficulty, excludeDeleted, hasReport } = req.query;
 
-    if (!categoryId || !mongoose.Types.ObjectId.isValid(categoryId)) {
-      return res.status(400).json({ message: "categoryId không hợp lệ." });
+    const dbFilter = {}; // Mặc định là lọc rỗng (lấy tất cả)
+
+    // FIX QUAN TRỌNG: Chỉ lọc theo Category nếu có truyền ID hợp lệ
+    if (categoryId && mongoose.Types.ObjectId.isValid(categoryId)) {
+      dbFilter.CategoryID = categoryId;
     }
 
-    const dbFilter = { CategoryID: categoryId };
+    // Lọc theo độ khó
     if (difficulty && difficulty !== 'all') {
       dbFilter.Difficulty = difficulty;
     }
 
+    if (hasReport === 'true') {
+        dbFilter.ReportCount = { $gt: 0 };
+    }
+
+    // Admin muốn xem cả câu đã xóa hay không?
     if (excludeDeleted === 'true') {
         dbFilter.Status = { $ne: 'Deleted' };
     }
@@ -365,9 +425,10 @@ app.get('/api/questions', async (req, res) => {
     let totalQuestions = 0;
 
     if (search && search.trim() !== '') {
-      // Tìm kiếm thủ công (xử lý tiếng Việt)
+      // --- LOGIC TÌM KIẾM (Search) ---
       const allQuestions = await Question.find(dbFilter)
         .populate('CreatorUserID', 'Username')
+        .populate('CategoryID', 'name') // Populate tên chủ đề
         .select('-choices.isCorrect')
         .sort({ CreatedAt: -1 });
 
@@ -383,12 +444,13 @@ app.get('/api/questions', async (req, res) => {
       const endIndex = startIndex + parseInt(limit);
       resultQuestions = filteredQuestions.slice(startIndex, endIndex);
     } else {
-      // Query trực tiếp DB
+      // --- LOGIC BÌNH THƯỜNG (Phân trang) ---
       totalQuestions = await Question.countDocuments(dbFilter);
       resultQuestions = await Question.find(dbFilter)
         .populate('CreatorUserID', 'Username')
+        .populate('CategoryID', 'name') // Populate tên chủ đề
         .select('-choices.isCorrect')
-        .skip((page - 1) * limit)
+        .skip((page - 1) * parseInt(limit))
         .limit(parseInt(limit))
         .sort({ CreatedAt: -1 });
     }
@@ -453,6 +515,27 @@ app.post('/api/questions', upload.single('image'), async (req, res) => {
   } catch (error) {
     console.error("Lỗi tạo câu hỏi:", error);
     res.status(500).json({ message: "Lỗi server khi lưu câu hỏi." });
+  }
+});
+
+app.put('/api/questions/:id/reset-report', async (req, res) => {
+  try {
+    const questionId = req.params.id;
+    const updated = await Question.findByIdAndUpdate(
+        questionId, 
+        { 
+            ReportCount: 0, 
+            ReportedBy: [] 
+        }, 
+        { new: true }
+    );
+
+    if (!updated) return res.status(404).json({ message: "Không tìm thấy câu hỏi." });
+
+    res.json({ message: "Đã reset báo cáo về 0.", question: updated });
+  } catch (error) {
+    console.error("Lỗi reset report:", error);
+    res.status(500).json({ message: "Lỗi server." });
   }
 });
 
@@ -530,11 +613,23 @@ app.get('/api/questions/:id', async (req, res) => {
 });
 
 // API: Xóa mềm (Soft Delete) - Chuyển Status thành 'Deleted'
+// [DELETE] Xóa câu hỏi (Hỗ trợ cả Soft Delete và Hard Delete)
 app.delete('/api/questions/:id', async (req, res) => {
   try {
     const questionId = req.params.id;
+    const { type } = req.query; // Lấy tham số type từ URL (VD: ?type=permanent)
     
-    // Cập nhật Status thành 'Deleted'
+    // TRƯỜNG HỢP 1: XÓA VĨNH VIỄN (Hard Delete) - Dành cho Admin
+    if (type === 'permanent') {
+        const deleted = await Question.findByIdAndDelete(questionId);
+
+        if (!deleted) {
+            return res.status(404).json({ message: "Không tìm thấy câu hỏi để xóa." });
+        }
+        return res.json({ message: "Đã xóa VĨNH VIỄN câu hỏi khỏi hệ thống." });
+    }
+
+    // TRƯỜNG HỢP 2: XÓA MỀM (Soft Delete) - Mặc định
     const updated = await Question.findByIdAndUpdate(
         questionId, 
         { Status: 'Deleted' }, 
@@ -543,9 +638,42 @@ app.delete('/api/questions/:id', async (req, res) => {
 
     if (!updated) return res.status(404).json({ message: "Không tìm thấy câu hỏi." });
 
-    res.json({ message: "Đã xóa câu hỏi (Soft Delete)." });
+    res.json({ message: "Đã xóa câu hỏi (Soft Delete - Đã ẩn)." });
+
   } catch (error) {
     console.error("Lỗi xóa câu hỏi:", error);
+    res.status(500).json({ message: "Lỗi server." });
+  }
+});
+
+app.post('/api/questions/report', async (req, res) => {
+  try {
+    const { questionId, userId } = req.body;
+
+    if (!questionId || !userId) {
+      return res.status(400).json({ message: "Thiếu thông tin." });
+    }
+
+    const question = await Question.findById(questionId);
+    if (!question) {
+      return res.status(404).json({ message: "Không tìm thấy câu hỏi." });
+    }
+
+    // Kiểm tra xem user này đã report chưa
+    if (question.ReportedBy.includes(userId)) {
+      return res.status(400).json({ message: "Bạn đã báo cáo câu hỏi này rồi!" });
+    }
+
+    // Nếu chưa, thêm UserID vào mảng và tăng ReportCount
+    question.ReportedBy.push(userId);
+    question.ReportCount = (question.ReportCount || 0) + 1;
+    
+    await question.save();
+
+    res.json({ message: "Cảm ơn bạn đã báo cáo. Admin sẽ xem xét!", newCount: question.ReportCount });
+
+  } catch (error) {
+    console.error("Lỗi report:", error);
     res.status(500).json({ message: "Lỗi server." });
   }
 });
@@ -560,14 +688,19 @@ app.get('/api/test/generate', async (req, res) => {
     const { categoryId, limit = 10, difficulty } = req.query;
 
     if (!categoryId || !mongoose.Types.ObjectId.isValid(categoryId)) {
-      return res.status(400).json({ message: "ID chủ đề lỗi." });
+      return res.status(400).json({ message: 'ID chủ đề lỗi.' });
     }
+
+    // [MỚI] Lấy tên Category cho tiêu đề bài thi
+    let categoryName = "Bài thi trắc nghiệm";
+    const category = await Category.findById(categoryId).select('name');
+    if(category) categoryName = category.name;
 
     const pipeline = [
       { 
         $match: { 
           CategoryID: new mongoose.Types.ObjectId(categoryId),
-          Status: { $ne: 'Deleted' } // Chỉ lấy câu chưa xóa
+          Status: { $ne: 'Deleted' } 
         } 
       }
     ];
@@ -576,16 +709,13 @@ app.get('/api/test/generate', async (req, res) => {
       pipeline.push({ $match: { Difficulty: difficulty } });
     }
 
-    // Lấy ngẫu nhiên câu hỏi
     pipeline.push({ $sample: { size: parseInt(limit) } });
-
     const questions = await Question.aggregate(pipeline);
 
     if (!questions || questions.length === 0) {
-      return res.status(404).json({ message: "Không đủ câu hỏi để tạo đề thi." });
+      return res.status(404).json({ message: 'Không đủ câu hỏi để tạo đề thi.' });
     }
 
-    // Ẩn đáp án đúng trước khi trả về Client
     const sanitizedQuestions = questions.map(q => {
       if (q.choices) {
         q.choices = q.choices.map(c => ({
@@ -597,71 +727,92 @@ app.get('/api/test/generate', async (req, res) => {
     });
 
     res.json({
-      title: "Bài thi trắc nghiệm",
+      title: categoryName, // [MỚI] Trả về tên Category
       questions: sanitizedQuestions,
       totalQuestions: sanitizedQuestions.length
     });
   } catch (error) {
-    console.error("Lỗi sinh đề thi:", error);
-    res.status(500).json({ message: "Lỗi server khi tạo đề thi." });
+    console.error('Lỗi sinh đề thi:', error);
+    res.status(500).json({ message: 'Lỗi server khi tạo đề thi.' });
   }
 });
 
 // [POST] Nộp bài & Chấm điểm
 app.post('/api/test/submit-dynamic', async (req, res) => {
-  try {
-    const { userAnswers } = req.body; 
-    // Format: [{ questionId: "...", selectedChoiceId: "..." }, ...]
+    try {
+       // [MỚI] Nhận thêm userId, categoryId, mode, timeTaken
+       const { userAnswers, userId, categoryId, mode, timeTaken } = req.body; 
 
-    if (!userAnswers || !Array.isArray(userAnswers)) {
-      return res.status(400).json({ message: "Dữ liệu bài làm không hợp lệ." });
+       if (!userAnswers || !Array.isArray(userAnswers) || !userId || !categoryId) {
+           return res.status(400).json({ message: 'Dữ liệu bài làm không hợp lệ hoặc thiếu thông tin user/category.' });
+       }
+       
+       if (!mongoose.Types.ObjectId.isValid(userId) || !mongoose.Types.ObjectId.isValid(categoryId)) {
+            return res.status(400).json({ message: 'ID người dùng hoặc Chủ đề không hợp lệ.' });
+       }
+
+       let correctCount = 0;
+       let details = [];
+       
+       const questionIds = userAnswers.map(ans => ans.questionId);
+       const originalQuestions = await Question.find({ _id: { $in: questionIds } });
+       const categoryInfo = await Category.findById(categoryId).select('name');
+
+       userAnswers.forEach(ans => {
+           const questionId = ans.questionId;
+           const userChoiceId = ans.selectedChoiceId;
+           const originalQ = originalQuestions.find(q => q._id.toString() === questionId);
+
+           if (originalQ) {
+               const correctChoice = originalQ.choices.find(c => c.isCorrect === true);
+               const correctChoiceId = correctChoice ? correctChoice._id.toString() : null;
+
+               let isCorrect = false;
+               if (userChoiceId && correctChoiceId && String(userChoiceId) === correctChoiceId) {
+                   isCorrect = true;
+                   correctCount++;
+               }
+
+               details.push({
+                   questionId: questionId,
+                   isCorrect: isCorrect,
+                   correctChoiceId: correctChoiceId,
+                   userChoiceId: userChoiceId
+               });
+           }
+       });
+
+       const totalQuestions = userAnswers.length;
+       const score = totalQuestions > 0 ? (correctCount / totalQuestions) * 10 : 0;
+
+       // LƯU KẾT QUẢ VÀO DB (TestResult)
+       const newReview = new TestResult({
+           UserID: userId,
+           Category: {
+               id: categoryId,
+               name: categoryInfo ? categoryInfo.name : 'Chủ đề không xác định'
+           },
+           Mode: mode || 'classic',
+           TotalQuestions: totalQuestions,
+           CorrectCount: correctCount,
+           Score: parseFloat(score.toFixed(1)),
+           TimeTaken: timeTaken, 
+           details: details
+       });
+       await newReview.save();
+       
+       res.json({
+           message: 'Chấm điểm và lưu review thành công!',
+           score: score.toFixed(1),
+           correctCount,
+           totalQuestions,
+           reviewId: newReview._id,
+           details: details
+       });
+    } catch (error) {
+      console.error('Lỗi chấm bài và lưu review:', error);
+      res.status(500).json({ message: 'Lỗi server khi chấm bài.' });
     }
-
-    let correctCount = 0;
-    let details = [];
-    
-    // Lấy thông tin các câu hỏi từ DB
-    const questionIds = userAnswers.map(ans => ans.questionId);
-    const originalQuestions = await Question.find({ _id: { $in: questionIds } });
-
-    userAnswers.forEach(ans => {
-      const questionId = ans.questionId;
-      const userChoiceId = ans.selectedChoiceId;
-      const originalQ = originalQuestions.find(q => q._id.toString() === questionId);
-
-      if (originalQ) {
-        const correctChoice = originalQ.choices.find(c => c.isCorrect === true);
-        const correctChoiceId = correctChoice ? correctChoice._id.toString() : null;
-
-        let isCorrect = false;
-        if (correctChoiceId && String(userChoiceId) === correctChoiceId) {
-          isCorrect = true;
-          correctCount++;
-        }
-
-        details.push({
-          questionId: questionId,
-          isCorrect: isCorrect,
-          correctChoiceId: correctChoiceId,
-          userChoiceId: userChoiceId
-        });
-      }
-    });
-
-    const totalQuestions = userAnswers.length;
-    const score = totalQuestions > 0 ? (correctCount / totalQuestions) * 10 : 0;
-
-    res.json({
-      message: "Chấm điểm thành công!",
-      score: score.toFixed(1),
-      correctCount,
-      totalQuestions,
-      details
-    });
-  } catch (error) {
-    console.error("Lỗi chấm bài:", error);
-    res.status(500).json({ message: "Lỗi server khi chấm bài." });
-  }
 });
 
 // [POST] Kiểm tra nhanh 1 câu (Practice Mode)
@@ -692,9 +843,171 @@ app.post('/api/check-single-answer', async (req, res) => {
   }
 });
 
+
+/* ==========================================================================
+   BỔ SUNG VÀO GROUP 2: CATEGORIES (CRUD CHO ADMIN - ĐÃ KIỂM TRA)
+   ========================================================================== */
+
+// [POST] Tạo Topic mới
+app.post('/api/topics', async (req, res) => {
+    try {
+        const { name, description, icon, type, tags, banner_image_url, long_description, theme_color } = req.body;
+
+        // Xử lý tags: Chuyển chuỗi "tag1, tag2" thành mảng ["tag1", "tag2"]
+        let tagsArray = [];
+        if (typeof tags === 'string') {
+            tagsArray = tags.split(',').map(t => t.trim()).filter(t => t !== "");
+        } else if (Array.isArray(tags)) {
+            tagsArray = tags;
+        }
+
+        const newTopic = new Category({
+            name, description, icon, type,
+            tags: tagsArray,
+            banner_image_url, long_description, theme_color
+        });
+
+        await newTopic.save();
+        res.status(201).json({ message: "Tạo chủ đề thành công!", topic: newTopic });
+    } catch (error) {
+        console.error("Lỗi tạo topic:", error);
+        res.status(500).json({ message: "Lỗi server: " + error.message });
+    }
+});
+
+// [PUT] Cập nhật Topic
+app.put('/api/topics/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { name, description, icon, type, tags, banner_image_url, long_description, theme_color } = req.body;
+
+        let tagsArray = [];
+        if (typeof tags === 'string') {
+            tagsArray = tags.split(',').map(t => t.trim()).filter(t => t !== "");
+        } else if (Array.isArray(tags)) {
+            tagsArray = tags;
+        }
+
+        const updatedTopic = await Category.findByIdAndUpdate(id, {
+            name, description, icon, type, 
+            tags: tagsArray, 
+            banner_image_url, long_description, theme_color
+        }, { new: true });
+
+        if (!updatedTopic) return res.status(404).json({ message: "Không tìm thấy chủ đề." });
+
+        res.json({ message: "Cập nhật thành công!", topic: updatedTopic });
+    } catch (error) {
+        console.error("Lỗi update topic:", error);
+        res.status(500).json({ message: "Lỗi server." });
+    }
+});
+
+// [DELETE] Xóa Topic (Lưu ý: Chỉ xóa được nếu không có câu hỏi)
+app.delete('/api/topics/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        
+        // Kiểm tra xem Topic này có đang chứa câu hỏi nào không
+        // Lưu ý: Cần đảm bảo CategoryID trong Question là ObjectId
+        const countQuestions = await Question.countDocuments({ CategoryID: id, Status: { $ne: 'Deleted' } });
+        
+        if (countQuestions > 0) {
+            return res.status(400).json({ message: `Không thể xóa! Chủ đề này đang chứa ${countQuestions} câu hỏi.` });
+        }
+
+        const deleted = await Category.findByIdAndDelete(id);
+        if (!deleted) return res.status(404).json({ message: "Chủ đề không tồn tại." });
+
+        res.json({ message: "Đã xóa chủ đề thành công." });
+    } catch (error) {
+        console.error("Lỗi xóa topic:", error);
+        res.status(500).json({ message: "Lỗi server." });
+    }
+});
+
+// [GET] Lấy danh sách lịch sử bài làm (Test Reviews) theo UserID (Dạng ObjectId)
+app.get('/api/profile/:userId/reviews', async (req, res) => {
+    try {
+        const userId = req.params.userId; 
+        
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
+            return res.status(400).json({ message: "ID người dùng không hợp lệ." });
+        }
+
+        const reviews = await TestResult.find({ UserID: userId })
+            .select('_id Category Mode TotalQuestions CorrectCount Score TimeTaken CompletedAt') 
+            .sort({ CompletedAt: -1 }) 
+            .limit(50); 
+
+        res.json({ reviews });
+    } catch (err) {
+        console.error("Lỗi lấy lịch sử bài làm:", err);
+        res.status(500).json({ message: 'Lỗi máy chủ nội bộ' });
+    }
+});
+
+/* --------------------------------------------------------------------------
+   GROUP 5: REVIEW (Chi tiết bài làm)
+   -------------------------------------------------------------------------- */
+// [GET] Lấy chi tiết một bài Review theo ID
+app.get('/api/reviews/:reviewId', async (req, res) => {
+    try {
+        const reviewId = req.params.reviewId;
+        if (!mongoose.Types.ObjectId.isValid(reviewId)) {
+            return res.status(400).json({ message: 'ID Review không hợp lệ.' });
+        }
+
+        const review = await TestResult.findById(reviewId).lean();
+        if (!review) {
+            return res.status(404).json({ message: 'Không tìm thấy bài làm chi tiết này.' });
+        }
+
+        const questionIds = review.details.map(d => d.questionId);
+        const questions = await Question.find({ _id: { $in: questionIds } }).lean();
+
+        const combinedDetails = review.details.map(detail => {
+            const question = questions.find(q => q._id.toString() === detail.questionId.toString());
+            
+            if (question) {
+                return {
+                    ...detail,
+                    QuestionText: question.QuestionText,
+                    Image: question.Image,
+                    Explanation: question.Explanation,
+                    Difficulty: question.Difficulty,
+                    QuestionType: question.QuestionType,
+                    AllChoices: question.choices 
+                };
+            }
+            return detail;
+        });
+
+        res.json({ ...review, details: combinedDetails });
+
+    } catch (error) {
+        console.error("Lỗi lấy chi tiết Review:", error);
+        res.status(500).json({ message: 'Lỗi server khi lấy chi tiết Review.' });
+    }
+});
+
 /* ==========================================================================
    7. MAIN ROUTES & START SERVER
    ========================================================================== */
+
+   // Route cho trang doTest
+app.get('/doTest', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'pages', 'doTest.html'));
+});
+
+// Route cho trang Chi tiết Review
+app.get('/test-review', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'pages', 'testResults.html'));
+});
+
+app.get('/profile', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'pages', 'profile.html')); 
+});
 
 // Route trang chủ
 app.get('/', (req, res) => {

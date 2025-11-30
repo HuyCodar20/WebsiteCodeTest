@@ -1,5 +1,12 @@
 document.addEventListener("DOMContentLoaded", function() {
 
+    // --- KIỂM TRA QUYỀN ADMIN ---
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+
+    if (currentUser && currentUser.role === 'admin') {
+        window.location.replace('/pages/admin.html'); 
+    }
+
     // --- CẤU HÌNH NHẠC & DATABASE ---
     const BACKGROUND_MUSIC_KEY = 'devarena_bg_music_enabled';
     const BACKGROUND_MUSIC_TIME_KEY = 'devarena_bg_music_current_time';
@@ -186,7 +193,7 @@ document.addEventListener("DOMContentLoaded", function() {
                         localStorage.removeItem(BACKGROUND_MUSIC_KEY);
                         localStorage.removeItem(BACKGROUND_MUSIC_TIME_KEY);
                         alert('Bạn đã đăng xuất.');
-                        window.location.href = '/';
+                        window.location.replace('/');
                     });
                 }
             } catch (e) {

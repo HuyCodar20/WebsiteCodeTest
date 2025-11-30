@@ -10,28 +10,44 @@
 <body>
 
     <div class="test-topbar">
-        <h2 id="test-title-display">Đang chuẩn bị đề thi...</h2>
+        <div class="topbar-left">
+            <h2 id="test-title-display">Đang chuẩn bị đề thi...</h2>
+        </div>
+        
+        <div class="topbar-tools">
+            <button class="tool-btn" title="Tăng cỡ chữ"><i class="fas fa-font"></i></button>
+            <button class="tool-btn" title="Chế độ tối"><i class="fas fa-moon"></i></button>
+            <button class="tool-btn btn-exit" title="Thoát"><i class="fas fa-sign-out-alt"></i></button>
+        </div>
     </div>
 
-    <div id="paced-progress-bar-container" style="display: none; width: 100%; height: 5px; background: #ddd;">
-        <div id="paced-progress-bar" style="width: 100%; height: 100%; background: #e74c3c; transition: width 1s linear;"></div>
+    <div id="paced-progress-bar-container" class="progress-container">
+        <div id="paced-progress-bar" class="progress-bar-fill"></div>
     </div>
 
     <div class="test-container">
+        
         <main class="question-area">
             <div class="question-header">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <h3 id="question-number-display">Câu hỏi 1</h3>
-                    <span id="question-timer-badge" style="display: none; background: #e74c3c; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.9rem;">
+                <h3 id="question-number-display">Câu hỏi 1</h3>
+                
+                <div class="header-actions">
+                    <button class="btn-icon-only" title="Báo lỗi câu hỏi">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </button>
+                    <span id="question-timer-badge" class="timer-badge">
                         <i class="fas fa-clock"></i> <span id="q-timer-val">60</span>s
                     </span>
                 </div>
             </div>
 
             <div class="question-body">
+                <div class="question-image-wrapper">
+                    <img id="question-image" src="" alt="Minh họa">
+                </div>
 
-                <div class="question-image-wrapper" style="text-align: center; margin-bottom: 15px;">
-                    <img id="question-image" src="" alt="Minh họa" style="display: none; max-width: 100%; max-height: 400px; border-radius: 8px; border: 1px solid #eee;">
+                <div id="question-code-block" class="code-snippet-container">
+                    <code>// Code snippet sẽ hiển thị ở đây...</code>
                 </div>
 
                 <p id="question-text">Đang tải dữ liệu...</p>
@@ -61,6 +77,16 @@
 
         <aside class="sidebar-area">
             
+            <div class="candidate-card">
+                <div class="candidate-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="candidate-info">
+                    <h4>Thí sinh DevArena</h4>
+                    <p>ID: #2025DA</p>
+                </div>
+            </div>
+
             <div class="timer-box" id="classic-timer-box">
                 <h4>Thời gian còn lại</h4>
                 <div class="countdown-display">
@@ -74,7 +100,30 @@
                 <h4>Danh sách câu hỏi</h4>
                 <div class="palette-grid" id="question-palette"></div>
             </div>
+
+            <div class="notepad-box">
+                <h4><i class="fas fa-pen-fancy"></i> Giấy nháp</h4>
+                <textarea class="notepad-area" placeholder="Ghi chú nhanh logic bài toán tại đây..."></textarea>
+            </div>
         </aside>
+    </div>
+
+    <div id="submit-confirm-modal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h3>Xác nhận nộp bài?</h3>
+            <p>Bạn vẫn còn thời gian làm bài. Bạn có chắc chắn muốn kết thúc và xem kết quả ngay không?</p>
+            <div class="modal-actions">
+                <button class="btn-modal-cancel" onclick="document.getElementById('submit-confirm-modal').style.display='none'">
+                    Kiểm tra lại
+                </button>
+                <button id="btn-confirm-submit-modal" class="btn-modal-confirm">
+                    Nộp ngay
+                </button>
+            </div>
+        </div>
     </div>
 
     <script src="/javascript/doTest.js"></script>

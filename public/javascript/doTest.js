@@ -12,18 +12,41 @@ document.addEventListener('DOMContentLoaded', () => {
     const difficulty = urlParams.get('difficulty') || 'all';
     
     // Tham số chế độ thi (Mode)
-    const mode = urlParams.get('mode') || 'classic'; // 'classic' (tính giờ tổng) hoặc 'paced' (tính giờ từng câu)
+    const mode = urlParams.get('mode') || 'classic'; // 'classic' hoặc 'paced'
     const totalTime = parseInt(urlParams.get('totalTime')) || 900; // Mặc định 15 phút
     const timePerQuestion = parseInt(urlParams.get('timePerQuestion')) || 60; // Mặc định 60s/câu
 
     // 1.2 State Global (Biến lưu trạng thái)
-    let questionsData = [];      // Chứa danh sách câu hỏi từ API
-    let userAnswers = [];        // Lưu đáp án user: [{ questionId, selectedChoiceId, isFlagged }]
-    let currentQuestionIndex = 0;// Chỉ số câu hỏi hiện tại
-    let timerInterval = null;    // Biến giữ Interval của đồng hồ tổng
-    let questionTimerInterval = null; // Biến giữ Interval của đồng hồ từng câu (Paced)
+    let questionsData = [];      // Chứa danh sách câu hỏi
+    let userAnswers = [];        // Lưu đáp án user
+    let currentQuestionIndex = 0;// Chỉ số câu hiện tại
+    let timerInterval = null;    // Timer tổng
+    let questionTimerInterval = null; // Timer từng câu (Paced)
+    
+    // --- [NEW FEATURE from doTest2]: State thời gian & User ---
+    let startTime = Date.now();  // Thời điểm bắt đầu
+    let userId = null;
+    let userName = "Thí sinh tự do"; // Tên mặc định
 
-    // 1.3 DOM Elements (Các phần tử giao diện)
+    // 1.3 Lấy thông tin User từ LocalStorage (Logic của doTest2)
+    const userDataString = localStorage.getItem('currentUser');
+    if (userDataString) {
+        try {
+            const userBasic = JSON.parse(userDataString);
+            userId = userBasic._id;
+            userName = userBasic.username || userBasic.email || "DevArena User";
+            
+            // Fix ID 20 ký tự (Logic từ doTest2)
+            if (userId && userId.length === 20) {
+                 userId = userId + "0000"; 
+            }
+        } catch (e) {
+            console.error("Lỗi parse currentUser:", e);
+        }
+    }
+
+    // 1.4 DOM Elements (Các phần tử giao diện)
+    // --- CŨ ---
     const testTitle = document.getElementById('test-title-display');
     const questionText = document.getElementById('question-text');
     const optionsContainer = document.getElementById('options-container');
@@ -31,13 +54,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const paletteContainer = document.getElementById('question-palette');
     const mainArea = document.querySelector('.question-area');
     
-    // Các nút điều hướng
+    // Buttons nav
     const btnPrev = document.getElementById('btn-prev');
     const btnNext = document.getElementById('btn-next');
     const btnSubmit = document.getElementById('btn-submit');
     const btnReview = document.getElementById('btn-review');
 
-    // UI đặc thù cho từng mode
+    // UI Mode elements
     const classicTimerBox = document.getElementById('classic-timer-box');
     const classicLegend = document.getElementById('classic-legend');
     const pacedProgressBar = document.getElementById('paced-progress-bar-container');
@@ -45,13 +68,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const questionTimerBadge = document.getElementById('question-timer-badge');
     const qTimerVal = document.getElementById('q-timer-val');
 
+    // --- [NEW UI ELEMENTS] ---
+    const codeBlock = document.getElementById('question-code-block'); // Khu vực code
+    const modalSubmit = document.getElementById('submit-confirm-modal'); // Modal nộp bài
+    const btnModalConfirm = document.getElementById('btn-confirm-submit-modal'); // Nút OK trong modal
+    const candidateNameEl = document.querySelector('.candidate-info h4'); // Tên thí sinh
+    const candidateIdEl = document.querySelector('.candidate-info p'); // ID thí sinh
+    const toolBtns = document.querySelectorAll('.tool-btn'); // Các nút toolbar
+
     /* =========================================
        PHẦN 2: CÁC HÀM HELPER (HỖ TRỢ)
        ========================================= */
 
-    /**
-     * Chuyển đổi ký tự đặc biệt để chống lỗi hiển thị HTML (XSS prevention basic)
-     */
     function escapeHtml(text) {
         if (!text) return "";
         return text
@@ -62,14 +90,9 @@ document.addEventListener('DOMContentLoaded', () => {
             .replace(/'/g, "&#039;");
     }
 
-    /**
-     * Xử lý đường dẫn ảnh để hiển thị đúng (loại bỏ public/ thừa)
-     */
     function processImageUrl(rawUrl) {
         if (!rawUrl) return "";
-        let imageUrl = rawUrl.replace(/\\/g, '/'); // Đổi backslash thành slash
-        
-        // Logic cắt chuỗi: nếu bắt đầu bằng public/ thì cắt bỏ
+        let imageUrl = rawUrl.replace(/\\/g, '/');
         if (imageUrl.startsWith('public/')) {
             imageUrl = '/' + imageUrl.substring(7); 
         } else if (imageUrl.startsWith('public')) {
@@ -84,45 +107,34 @@ document.addEventListener('DOMContentLoaded', () => {
        PHẦN 3: LOGIC KHỞI TẠO BÀI THI
        ========================================= */
 
-    /**
-     * Hàm Main: Chạy khi trang load xong
-     */
     async function initTest() {
         if (!categoryId) {
             alert("Thiếu thông tin bài thi (CategoryId)!");
-            window.location.href = "/";
+            window.location.replace("/");
             return;
         }
 
-        // Cài đặt giao diện dựa trên Mode
-        setupUIMode();
+        // Cập nhật thông tin thí sinh lên giao diện (New Logic)
+        if (candidateNameEl) candidateNameEl.textContent = userName;
+        if (candidateIdEl && userId) candidateIdEl.textContent = `ID: #${userId.substring(0, 6)}...`;
 
-        // Gọi API lấy đề thi
+        setupUIMode();
         await generateTest();
     }
 
-    /**
-     * Ẩn/Hiện các thành phần UI dựa trên mode Classic hay Paced
-     */
     function setupUIMode() {
         if (mode === 'paced') {
             testTitle.textContent = "Thử thách tốc độ";
-            
-            // Ẩn UI Classic
             if(classicTimerBox) classicTimerBox.style.display = 'none';
             if(classicLegend) classicLegend.style.display = 'none';
-            if(btnPrev) btnPrev.style.display = 'none'; // Paced không được quay lại
-            if(btnReview) btnReview.style.display = 'none'; // Paced không có review
+            if(btnPrev) btnPrev.style.display = 'none'; 
+            if(btnReview) btnReview.style.display = 'none'; 
             
-            // Hiện UI Paced
             if(pacedProgressBar) pacedProgressBar.style.display = 'block';
             if(questionTimerBadge) questionTimerBadge.style.display = 'inline-block';
-            
-            // Đổi text nút Next
             if(btnNext) btnNext.textContent = "Câu tiếp >>";
         } else {
             testTitle.textContent = "Bài thi tiêu chuẩn";
-            // Hiện UI Classic
             if(classicTimerBox) classicTimerBox.style.display = 'block';
             if(classicLegend) classicLegend.style.display = 'flex';
         }
@@ -132,9 +144,6 @@ document.addEventListener('DOMContentLoaded', () => {
        PHẦN 4: LOGIC LẤY DATA VÀ RENDER
        ========================================= */
 
-    /**
-     * Gọi API tạo đề thi ngẫu nhiên
-     */
     async function generateTest() {
         try {
             const url = `/api/test/generate?categoryId=${categoryId}&limit=${limit}&difficulty=${difficulty}`;
@@ -144,39 +153,39 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await res.json();
             questionsData = data.questions;
 
+            // Nếu server trả về Title, cập nhật luôn
+            if (data.title) testTitle.textContent = data.title;
+
             if (!questionsData || questionsData.length === 0) {
                 alert("Không đủ câu hỏi trong kho dữ liệu!");
-                window.location.href = "/";
+                window.location.replace("/");
                 return;
             }
 
-            // Khởi tạo mảng câu trả lời của User
             userAnswers = questionsData.map(q => ({
                 questionId: q._id,
                 selectedChoiceId: null, 
                 isFlagged: false 
             }));
 
-            // Render Palette (Sidebar) và Câu hỏi đầu tiên
             renderPalette();
             loadQuestion(0);
 
-            // Bắt đầu tính giờ
+            // [New Logic] Reset thời gian bắt đầu chính xác sau khi tải xong
+            startTime = Date.now();
+
             if (mode === 'classic') {
                 startClassicTimer(totalTime);
             } else {
-                startPacedQuestionTimer(); // Timer cho câu 1
+                startPacedQuestionTimer();
             }
 
         } catch (err) {
             console.error(err);
-            questionText.textContent = "Lỗi tải đề thi. Vui lòng kiểm tra kết nối mạng.";
+            if(questionText) questionText.textContent = "Lỗi tải đề thi. Vui lòng kiểm tra kết nối mạng.";
         }
     }
 
-    /**
-     * Hiển thị câu hỏi ra màn hình
-     */
     function loadQuestion(index) {
         if (index < 0 || index >= questionsData.length) return;
         currentQuestionIndex = index;
@@ -184,14 +193,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const q = questionsData[index];
         questionNumDisplay.textContent = `Câu ${index + 1} / ${questionsData.length}`;
         
-        // 1. Hiển thị nội dung câu hỏi (Text)
+        // 1. Text
         questionText.innerHTML = escapeHtml(q.QuestionText);
 
-        // 2. Hiển thị Ảnh (nếu có)
+        // 2. Image
         const imgEl = document.getElementById('question-image');
         if (imgEl) {
             if (q.Image) {
-                const imageUrl = processImageUrl(q.Image); // Dùng hàm helper xử lý path
+                const imageUrl = processImageUrl(q.Image);
                 imgEl.src = imageUrl;
                 imgEl.style.display = 'block';
             } else {
@@ -200,13 +209,23 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // 3. Render các lựa chọn (Options)
+        // 3. [NEW] Code Block (Nếu có trường Code snippet trong DB - mô phỏng)
+        // Giả sử API trả về q.CodeSnippet. Nếu không có thì ẩn.
+        if (codeBlock) {
+            if (q.CodeSnippet) {
+                codeBlock.style.display = 'block';
+                codeBlock.querySelector('code').textContent = q.CodeSnippet;
+            } else {
+                codeBlock.style.display = 'none';
+            }
+        }
+
+        // 4. Options
         optionsContainer.innerHTML = '';
         q.choices.forEach(choice => {
             const item = document.createElement('div');
             item.className = 'option-item';
             
-            // Kiểm tra xem user đã chọn đáp án này chưa
             const currentAns = userAnswers[index].selectedChoiceId;
             if (currentAns === choice._id) item.classList.add('selected');
 
@@ -215,12 +234,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 <span>${escapeHtml(choice.choiceText)}</span>
             `;
 
-            // Sự kiện click chọn đáp án
             item.addEventListener('click', () => {
-                // Lưu vào state
                 userAnswers[index].selectedChoiceId = choice._id;
                 
-                // Update UI (Xóa chọn cũ, thêm chọn mới)
                 const all = optionsContainer.querySelectorAll('.option-item');
                 all.forEach(el => {
                     el.classList.remove('selected');
@@ -229,29 +245,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 item.classList.add('selected');
                 item.querySelector('input').checked = true;
 
-                // Cập nhật màu sidebar ngay lập tức
                 updatePalette();
             });
 
             optionsContainer.appendChild(item);
         });
 
-        // 4. Cập nhật trạng thái nút bấm (Chỉ cho Classic Mode)
+        // 5. Buttons state
         if (mode === 'classic') {
             if(btnPrev) btnPrev.disabled = index === 0;
             if(btnNext) btnNext.disabled = index === questionsData.length - 1;
             updatePalette();
         }
 
-        // Cập nhật nút Flag (Đánh dấu)
         updateReviewButtonState(index);
     }
 
     /* =========================================
-       PHẦN 5: LOGIC TIMERS (ĐỒNG HỒ)
+       PHẦN 5: LOGIC TIMERS
        ========================================= */
     
-    // Timer Tổng (Dùng cho Classic Mode)
     function startClassicTimer(seconds) {
         let timeLeft = seconds;
         const minEl = document.getElementById('timer-minutes');
@@ -276,20 +289,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 1000);
     }
 
-    // Timer Từng câu (Dùng cho Paced Mode)
     function startPacedQuestionTimer() {
         let timeLeft = timePerQuestion;
         
-        // Reset hiển thị số giây
         if(qTimerVal) qTimerVal.textContent = timeLeft;
-        
-        // Reset thanh progress bar
         if(pacedBarFill) {
             pacedBarFill.style.transition = 'none';
             pacedBarFill.style.width = '100%';
         }
 
-        // Tạo animation trượt giảm dần
         setTimeout(() => {
             if(pacedBarFill) {
                 pacedBarFill.style.transition = `width ${timePerQuestion}s linear`;
@@ -297,7 +305,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }, 50);
 
-        // Clear timer cũ nếu tồn tại
         if (questionTimerInterval) clearInterval(questionTimerInterval);
 
         questionTimerInterval = setInterval(() => {
@@ -306,19 +313,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (timeLeft <= 0) {
                 clearInterval(questionTimerInterval);
-                // Hết giờ câu này -> Tự động chuyển câu
                 handlePacedNext();
             }
         }, 1000);
     }
 
-    // Xử lý chuyển câu tự động trong Paced Mode
     function handlePacedNext() {
         if (currentQuestionIndex < questionsData.length - 1) {
             loadQuestion(currentQuestionIndex + 1);
-            startPacedQuestionTimer(); // Reset timer cho câu mới
+            startPacedQuestionTimer();
         } else {
-            // Hết câu hỏi -> Nộp bài
             clearInterval(questionTimerInterval);
             alert("Đã hoàn thành tất cả câu hỏi!");
             submitTest();
@@ -326,7 +330,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /* =========================================
-       PHẦN 6: PALETTE (DANH SÁCH CÂU HỎI SIDEBAR)
+       PHẦN 6: PALETTE
        ========================================= */
     
     function renderPalette() {
@@ -341,7 +345,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (mode === 'classic') {
                 item.addEventListener('click', () => loadQuestion(idx));
             } else {
-                // Paced mode: Không cho click nhảy câu
                 item.style.cursor = 'default';
                 item.style.pointerEvents = 'none';
                 item.style.opacity = '0.5';
@@ -352,41 +355,46 @@ document.addEventListener('DOMContentLoaded', () => {
         updatePalette();
     }
 
-    // Cập nhật màu sắc của các ô số trong sidebar
     function updatePalette() {
         const items = paletteContainer.querySelectorAll('.palette-item');
         items.forEach((item, idx) => {
-            item.className = 'palette-item'; // Reset class
-            
-            // 1. Current (Câu đang làm)
+            item.className = 'palette-item';
             if (idx === currentQuestionIndex) item.classList.add('current');
-            
-            // 2. Review (Được đánh dấu Flag - Ưu tiên hiện màu vàng)
             if (userAnswers[idx].isFlagged) {
                 item.classList.add('review');
-            } 
-            // 3. Answered (Đã chọn đáp án - Hiện màu xanh)
-            else if (userAnswers[idx].selectedChoiceId) {
+            } else if (userAnswers[idx].selectedChoiceId) {
                 item.classList.add('answered');
             }
         });
     }
 
     /* =========================================
-       PHẦN 7: NỘP BÀI & HIỂN THỊ KẾT QUẢ
+       PHẦN 7: NỘP BÀI & XỬ LÝ KẾT QUẢ
        ========================================= */
 
     async function submitTest() {
-        // Dừng tất cả đồng hồ
         if(timerInterval) clearInterval(timerInterval);
         if(questionTimerInterval) clearInterval(questionTimerInterval);
+        
+        // Ẩn modal nếu đang mở
+        if (modalSubmit) modalSubmit.style.display = 'none';
+
+        // 1. [Updated from doTest2] Tính thời gian làm bài
+        const endTime = Date.now();
+        const timeSpent = Math.floor((endTime - startTime) / 1000);
 
         // Hiển thị loading
         mainArea.innerHTML = '<div class="loading-spinner"></div><h3 style="text-align:center;">Đang chấm điểm...</h3>';
         
         try {
-            // Payload gửi lên server
-            const payload = { userAnswers: userAnswers };
+            // 2. [Updated from doTest2] Payload đầy đủ hơn
+            const payload = { 
+                userAnswers: userAnswers,
+                userId: userId,           
+                categoryId: categoryId,   
+                mode: mode,               
+                timeTaken: timeSpent      
+            };
 
             const res = await fetch('/api/test/submit-dynamic', {
                 method: 'POST',
@@ -397,24 +405,29 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!res.ok) throw new Error("Lỗi nộp bài");
             
             const result = await res.json();
-            showResult(result);
+            // Truyền thêm timeSpent vào hàm hiển thị
+            showResult(result, timeSpent);
 
         } catch (err) {
             console.error(err);
-            alert("Có lỗi xảy ra khi nộp bài!");
+            alert("Có lỗi xảy ra khi nộp bài: " + err.message);
         }
     }
 
     /**
-     * Render trang kết quả (Thay thế toàn bộ nội dung cũ)
+     * Hiển thị kết quả (Kết hợp giao diện chi tiết cũ + stats mới từ doTest2)
      */
-    function showResult(result) {
+    function showResult(result, timeSpent) {
         const testContainer = document.querySelector('.test-container');
         
-        // Màu sắc điểm số: >=8 Xanh, >=5 Vàng, <5 Đỏ
+        // Màu sắc điểm số
         let scoreColor = result.score >= 8 ? '#10b981' : (result.score >= 5 ? '#f59e0b' : '#ef4444');
         
-        // Reset style container để hiển thị full
+        // Tính toán phút giây hiển thị (Logic từ doTest2)
+        const minutes = Math.floor(timeSpent / 60);
+        const seconds = timeSpent % 60;
+
+        // Reset style container
         testContainer.style.height = 'auto';
         testContainer.style.overflow = 'visible';
         testContainer.style.display = 'block';
@@ -436,7 +449,12 @@ document.addEventListener('DOMContentLoaded', () => {
                             <span><i class="fas fa-times-circle" style="color:#ef4444"></i> Sai:</span>
                             <strong>${result.totalQuestions - result.correctCount}</strong>
                         </div>
+                        <div class="stat-row">
+                            <span><i class="fas fa-clock" style="color:#3498db"></i> Thời gian:</span>
+                            <strong>${minutes}p ${seconds}s</strong>
+                        </div>
                         <hr>
+                        ${userId ? `<a href="/profile" class="btn-home-mini" style="background-color: #3498db;"><i class="fas fa-user"></i> Lịch sử bài làm</a>` : ''}
                         <a href="/" class="btn-home-mini"><i class="fas fa-home"></i> Về trang chủ</a>
                         <button onclick="location.reload()" class="btn-retry-mini"><i class="fas fa-redo"></i> Làm lại</button>
                     </div>
@@ -445,22 +463,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 <main class="result-detail-list">
                     <h3 class="result-heading">Chi tiết đáp án</h3>
                     ${questionsData.map((q, idx) => {
-                        // Lấy chi tiết kết quả cho câu này
                         const detail = result.details.find(d => d.questionId === q._id);
                         const userChoiceId = userAnswers[idx].selectedChoiceId;
                         const correctChoiceId = detail ? detail.correctChoiceId : null;
                         const isCorrect = detail ? detail.isCorrect : false;
                         
-                        // Icon trạng thái
                         const statusIcon = isCorrect 
                             ? '<i class="fas fa-check" style="color:#10b981"></i>' 
                             : '<i class="fas fa-times" style="color:#ef4444"></i>';
 
-                        // Xử lý hiển thị ảnh trong phần Review
                         let imageHtml = '';
                         if (q.Image) {
                             const imageUrl = processImageUrl(q.Image);
-                            // QUAN TRỌNG: max-width 100% để không bị bé, object-fit để giữ tỷ lệ
                             imageHtml = `
                                 <div class="review-image-wrapper" style="text-align: center; margin: 15px 0;">
                                     <img src="${imageUrl}" alt="Hình minh họa" 
@@ -480,23 +494,24 @@ document.addEventListener('DOMContentLoaded', () => {
                                 ${escapeHtml(q.QuestionText)}
                             </div>
                             
-                            ${imageHtml} <div class="options-review-new">
+                            ${imageHtml} 
+                            
+                            <div class="options-review-new">
                                 ${q.choices.map(c => {
                                     let cls = 'opt-review-simple';
                                     let icon = '';
 
-                                    // Logic tô màu đáp án
                                     if (c._id === correctChoiceId) {
-                                        cls += ' is-correct-answer'; // Luôn tô xanh đáp án đúng
+                                        cls += ' is-correct-answer'; 
                                         icon = '<i class="fas fa-check"></i>';
                                     }
                                     
                                     if (c._id === userChoiceId) {
                                         if (c._id !== correctChoiceId) {
-                                            cls += ' is-wrong-choice'; // Tô đỏ nếu user chọn sai
+                                            cls += ' is-wrong-choice'; 
                                             icon = '<i class="fas fa-times"></i>';
                                         } else {
-                                            cls += ' is-user-selected'; // Tô đậm nếu user chọn đúng
+                                            cls += ' is-user-selected'; 
                                         }
                                     }
 
@@ -516,14 +531,10 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         `;
 
-        // Inject HTML vào trang
         testContainer.innerHTML = html;
         window.scrollTo(0, 0);
     }
 
-    /**
-     * Cập nhật giao diện nút Review (Đánh dấu)
-     */
     function updateReviewButtonState(index) {
         if (!btnReview) return;
         const isFlagged = userAnswers[index].isFlagged;
@@ -541,7 +552,7 @@ document.addEventListener('DOMContentLoaded', () => {
        PHẦN 8: EVENT LISTENERS (SỰ KIỆN)
        ========================================= */
 
-    // Sự kiện nút Review
+    // 1. Navigation & Flag (Giữ nguyên)
     if (btnReview) {
         btnReview.addEventListener('click', () => {
             userAnswers[currentQuestionIndex].isFlagged = !userAnswers[currentQuestionIndex].isFlagged;
@@ -550,25 +561,65 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Sự kiện nút Prev (Lùi)
     if(btnPrev) btnPrev.addEventListener('click', () => loadQuestion(currentQuestionIndex - 1));
     
-    // Sự kiện nút Next (Tiến)
     if(btnNext) btnNext.addEventListener('click', () => {
         if (mode === 'paced') {
-            // Paced: Next = Skip thời gian -> Qua câu mới ngay
             clearInterval(questionTimerInterval);
             handlePacedNext();
         } else {
-            // Classic: Chỉ chuyển trang
             loadQuestion(currentQuestionIndex + 1);
         }
     });
 
-    // Sự kiện nút Submit (Nộp bài)
-    if(btnSubmit) btnSubmit.addEventListener('click', () => {
-        if(confirm("Bạn có chắc chắn muốn nộp bài ngay không?")) submitTest();
-    });
+    // 2. Submit Logic [CHANGED: Use Modal instead of confirm()]
+    if(btnSubmit) {
+        btnSubmit.addEventListener('click', (e) => {
+            e.preventDefault();
+            // Nếu có modal thì hiện modal, không thì dùng confirm cũ
+            if (modalSubmit) {
+                modalSubmit.style.display = 'flex';
+            } else {
+                if(confirm("Bạn có chắc chắn muốn nộp bài ngay không?")) submitTest();
+            }
+        });
+    }
+
+    // [New] Sự kiện cho nút Confirm trong Modal
+    if (btnModalConfirm) {
+        btnModalConfirm.addEventListener('click', () => {
+            submitTest();
+        });
+    }
+
+    // 3. Toolbar Events [New]
+    if (toolBtns && toolBtns.length > 0) {
+        // Nút 0: Font Size (Demo)
+        toolBtns[0].addEventListener('click', () => {
+            const currentSize = parseFloat(window.getComputedStyle(document.body).fontSize);
+            if (currentSize < 20) {
+                document.body.style.fontSize = (currentSize + 1) + 'px';
+            } else {
+                document.body.style.fontSize = '16px'; // Reset logic đơn giản
+            }
+        });
+
+        // Nút 1: Dark Mode (Demo - Toggle class)
+        toolBtns[1].addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            // Cần CSS .dark-mode để hoạt động (đã có trong file CSS nếu bạn thêm vào)
+            // Ví dụ: body.dark-mode { background: #1e293b; color: white; }
+        });
+
+        // Nút 2: Exit
+        if(toolBtns[2]) {
+            toolBtns[2].addEventListener('click', () => {
+                if(confirm("Thoát bài thi? Kết quả sẽ không được lưu.")) {
+                    window.location.href = "/";
+                }
+            });
+        }
+    }
 
     // KHỞI CHẠY ỨNG DỤNG
     initTest();

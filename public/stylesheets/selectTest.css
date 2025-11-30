@@ -74,7 +74,6 @@ body {
     border-radius: 20px;
     text-align: center;
     
-    /* Box shadow và Border theo màu xanh #114e8b bạn yêu cầu */
     box-shadow: rgba(17, 78, 139, 0.4) 0px 6px, 
                 rgba(17, 78, 139, 0.15) 0px 12px;
     border: 1px solid #114e8b;
@@ -239,16 +238,25 @@ body {
     background: white;
     padding: 20px 25px;
     border-radius: 16px;
-    border: 1px solid #f1f5f9;
+    border: 1px solid #c1c1c1;
     display: flex;
     align-items: center;
     gap: 25px;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+    --active-color: #3182ce;
 }
 
 .test-item-horizontal:hover {
     border-color: #6366f1;
+    background-image: linear-gradient(
+        to right,                  
+        transparent 0%,           
+        transparent 70px,    
+        color-mix(in srgb, var(--active-color), transparent 90%) 70%, 
+        color-mix(in srgb, var(--active-color), transparent 70%) 100% 
+    );
+    
     transform: translateY(-8px);
     box-shadow: rgba(37, 37, 37, 0.5) -5px 5px,
     rgba(37, 37, 37, 0.5) -10px 10px;
@@ -334,9 +342,9 @@ body {
     z-index: 1000;
     justify-content: center;
     align-items: center;
-    padding: 20px; /* Padding để modal không dính sát mép màn hình mobile */
+    padding: 20px; 
     backdrop-filter: blur(5px);
-    box-sizing: border-box; /* Quan trọng để tính toán padding đúng */
+    box-sizing: border-box; 
 }
 
 .modal-overlay.show {
@@ -348,13 +356,11 @@ body {
     background: white;
     width: 100%;
     max-width: 500px;
-    /* --- FIX TRÀN MÀN HÌNH TẠI ĐÂY --- */
-    max-height: 85vh; /* Giới hạn chiều cao chỉ chiếm 85% màn hình */
-    display: flex;    /* Bật Flexbox để chia layout dọc */
-    flex-direction: column; /* Xếp Header - Body - Footer theo chiều dọc */
-    /* -------------------------------- */
+    max-height: 85vh;
+    display: flex;  
+    flex-direction: column; 
     border-radius: 20px;
-    overflow: hidden; /* Ẩn phần thừa */
+    overflow: hidden; 
     position: relative;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
     animation: slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1);
@@ -362,10 +368,10 @@ body {
 
 .modal-header {
     background: #ffffff;
-    padding: 20px 25px; /* Giảm padding một chút cho gọn */
+    padding: 20px 25px; 
     text-align: left;
-    border-bottom: 1px solid #f1f5f9; /* Thêm viền mờ ngăn cách */
-    flex-shrink: 0; /* Không cho header bị co lại */
+    border-bottom: 1px solid #f1f5f9; 
+    flex-shrink: 0; 
 }
 
 .modal-header h2 {
@@ -394,13 +400,10 @@ body {
 
 .modal-body {
     padding: 20px 25px;
-    /* --- FIX SCROLL TẠI ĐÂY --- */
-    overflow-y: auto; /* Chỉ hiện thanh cuộn ở body nếu nội dung dài */
-    flex: 1; /* Tự động chiếm hết khoảng trống còn lại */
-    /* -------------------------- */
+    overflow-y: auto;
+    flex: 1; 
 }
 
-/* Tùy chỉnh thanh cuộn cho đẹp hơn (Optional - Webkit browsers) */
 .modal-body::-webkit-scrollbar {
     width: 6px;
 }
@@ -415,7 +418,6 @@ body {
     background: #94a3b8;
 }
 
-/* Các class con bên trong Body giữ nguyên */
 .section-title {
     margin: 0 0 15px 0;
     font-size: 0.9rem;
@@ -543,22 +545,16 @@ select:disabled {
 /* =========================================
    ✅ PRACTICE MODAL STYLES (KẾT HỢP & TỐI ƯU)
    ========================================= */
-
-/* Định nghĩa biến màu chủ đạo nếu chưa có */
-/* Lưu ý: Bạn cần đảm bảo --primary-color đã được định nghĩa ở đâu đó trong CSS gốc của bạn.
-   Nếu không, các dòng sử dụng nó sẽ không hoạt động.
-   Tạm thời sử dụng một giá trị mặc định cho ví dụ này: */
 :root {
-    --primary-color: #0284c7; /* Màu chủ đạo mặc định (xanh dương) */
+    --primary-color: #0284c7;
 }
-
 
 /* 1. Modal Box & Cấu trúc chính */
 .practice-modal-box {
     /* Cải tiến từ 'Sửa lỗi' */
     background-color: #ffffff;
-    max-width: 600px; /* Chọn max-width hẹp hơn một chút */
-    width: 90%; /* Để không bị quá to trên mobile */
+    max-width: 600px;
+    width: 90%;
     border-radius: 16px;
     overflow: hidden;
     box-shadow: 0 10px 25px rgba(0,0,0,0.2);
@@ -571,7 +567,7 @@ select:disabled {
 .modal-body {
     padding: 25px;
     overflow-y: auto;
-    flex-grow: 1; /* Cho phép phần thân chiếm không gian còn lại */
+    flex-grow: 1;
 }
 
 
@@ -581,8 +577,8 @@ select:disabled {
     justify-content: space-between;
     align-items: center;
     padding: 15px 25px; /* Giảm padding trên dưới một chút */
-    background: linear-gradient(to right, #f8fafc, #fff);
-    border-bottom: 1px solid #e2e8f0;
+    background: linear-gradient(to right, #f8fafc, #78c5dc);
+    border-bottom: 1px solid #61a0b3;
 }
 
 .practice-header h2 {
@@ -606,7 +602,7 @@ select:disabled {
     text-align: center;
     border-radius: 50%;
     transition: all 0.2s;
-    padding: 0; /* Loại bỏ padding 0 5px cũ */
+    padding: 0; 
 }
 .close-practice-btn:hover {
     color: #ef4444;
@@ -616,11 +612,11 @@ select:disabled {
 
 /* 3. Question Text */
 .practice-q-text {
-    font-size: 1.15rem; /* Giữ kích thước lớn hơn từ 'NEW' */
+    font-size: 1.15rem;
     font-weight: 600;
     color: #1e293b;
     margin-bottom: 25px;
-    line-height: 1.6; /* Chọn line-height tốt hơn từ 'Sửa lỗi' */
+    line-height: 1.6;
 }
 
 
@@ -634,7 +630,7 @@ select:disabled {
 /* Từng dòng đáp án */
 .practice-option-row {
     padding: 14px 18px;
-    border: 2px solid #e2e8f0;
+    border: 2px solid #e5f0ff;
     border-radius: 10px;
     cursor: pointer;
     display: flex;
@@ -688,13 +684,11 @@ select:disabled {
     border-radius: 8px;
     border: none;
     transition: background 0.2s;
-    /* Có thể thêm các style khác nếu cần kế thừa từ btn-confirm-start */
 }
 .practice-check-btn:hover {
-    background-color: #4f46e5; /* Thay đổi màu hover */
+    background-color: #4f46e5; 
 }
 
-/* Style khi bị disabled (Quan trọng!) */
 .practice-check-btn:disabled {
     background: #94a3b8 !important;
     color: #e2e8f0 !important;
@@ -704,6 +698,36 @@ select:disabled {
     opacity: 0.8;
 }
 
+.btn-icon-report {
+    background: none;
+    border: none;
+    color: #6c757d; 
+    font-size: 0.9rem; 
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 0px 5px; 
+    display: flex; 
+    align-items: center;
+    text-decoration: underline;
+    margin-top: 10px;
+}
+
+.btn-icon-report i {
+    font-size: 0.8rem; 
+    margin-right: 5px; 
+}
+
+.btn-icon-report:hover {
+    background-color: transparent; 
+    color: #dc3545; 
+    text-decoration: none; 
+}
+
+.btn-icon-report.reported {
+    color: #dc3545;
+    cursor: not-allowed;
+    opacity: 0.8;
+}
 
 /* 6. Result Box (Kết quả) */
 .practice-result-box {

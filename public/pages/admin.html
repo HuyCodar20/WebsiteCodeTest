@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | DevArena</title>
+    <link rel="stylesheet" href="/stylesheets/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <div class="admin-container">
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fa-solid fa-shield-halved"></i>
+                <span>Admin Portal</span>
+            </div>
+            
+            <i class="fa-solid fa-bars menu-toggle" id="menu-toggle-btn"></i>
+            
+            <nav class="menu">
+                
+            <a href="javascript:void(0)" class="menu-item active" id="tab-topics" onclick="switchTab('topics')">
+                <i class="fa-solid fa-layer-group"></i> Quản lý Chủ đề
+            </a>
+            
+            <a href="javascript:void(0)" class="menu-item" id="tab-questions" onclick="switchTab('questions')">
+                <i class="fa-solid fa-circle-question"></i> Quản lý Câu hỏi
+            </a>
+
+            </nav>
+
+            <div class="sidebar-footer">
+                <button id="btn-logout" class="btn-logout">
+                    <i class="fa-solid fa-right-from-bracket"></i> Đăng xuất
+                </button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-bar">
+                <h2 id="page-title">Quản lý Chủ đề</h2>
+                <div class="admin-info">
+                    <span>Xin chào, <strong>Admin</strong></span>
+                    <img src="/images/default-avatar.png" alt="Avatar" class="avatar-small">
+                </div>
+            </header>
+
+            <section id="section-topics" class="content-section">
+                <div class="toolbar">
+                    <button class="btn-primary" onclick="openTopicModal('add')">
+                        <i class="fa-solid fa-plus"></i> Thêm Chủ đề mới
+                    </button>
+                    <div class="search-box">
+                        <input type="text" placeholder="Tìm kiếm chủ đề..." disabled title="Tính năng đang phát triển">
+                        <i class="fa-solid fa-search"></i>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 80px; text-align: center;">Icon</th>
+                                <th style="width: 25%;">Tên Chủ đề</th>
+                                <th>Thông tin chi tiết</th>
+                                <th style="width: 120px; text-align: center;">Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody id="topic-table-body">
+                            <tr>
+                                <td colspan="4" style="text-align: center;">Đang tải dữ liệu...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+
+            <section id="section-questions" class="content-section hidden">
+                <div class="toolbar">
+                    <div class="filter-group" style="display: flex; gap: 10px;">
+                        <select id="filter-topic" class="form-control" style="min-width: 200px;">
+                            <option value="">-- Tất cả chủ đề --</option>
+                        </select>
+            
+                        <select id="filter-difficulty" class="form-control">
+                            <option value="">-- Tất cả độ khó --</option>
+                            <option value="easy">Dễ</option>
+                            <option value="medium">Trung bình</option>
+                            <option value="hard">Khó</option>
+                        </select>
+                    </div>
+
+                    <div style="display: flex; align-items: center; background: #fff; padding: 0 10px; border: 1px solid #ddd; border-radius: 4px; height: 38px;">
+                        <input type="checkbox" id="filter-reported" style="cursor: pointer; margin-right: 8px;">
+                        <label for="filter-reported" style="cursor: pointer; user-select: none; font-size: 0.9rem; color: #d9534f; font-weight: bold;">
+                            <i class="fa-solid fa-flag"></i> Có báo cáo
+                        </label>
+                    </div>
+            
+                    <div class="search-box">
+                        <input type="text" id="search-questions" placeholder="Nhập từ khóa & Enter...">
+                        <i class="fa-solid fa-search"></i>
+                    </div>
+                </div>
+            
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 40%;">Nội dung câu hỏi</th>
+                                <th>Chủ đề</th>
+                                <th>Người tạo</th>
+                                <th style="text-align: center;">Báo cáo</th>
+                                <th>Độ khó</th>
+                                <th style="width: 120px; text-align: center;">Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody id="question-table-body">
+                            </tbody>
+                    </table>
+                    
+                    <div id="pagination-controls" style="padding: 15px; display: flex; justify-content: center; align-items: center; gap: 15px; border-top: 1px solid #eee;">
+                        <button id="btn-prev" class="btn-secondary" disabled><i class="fa-solid fa-chevron-left"></i> Trước</button>
+                        <span id="page-info" style="font-weight: bold; color: #555;">Trang 1</span>
+                        <button id="btn-next" class="btn-secondary" disabled>Sau <i class="fa-solid fa-chevron-right"></i></button>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <div id="modal-topic" class="modal hidden">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3 id="topic-modal-title">Thêm Chủ đề mới</h3>
+                <span class="close-btn" onclick="closeModal('modal-topic')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="topic-form">
+                    <input type="hidden" id="topic-id"> 
+                    
+                    <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div class="col-left">
+                            <div class="form-group">
+                                <label>Tên chủ đề <span style="color:red">*</span></label>
+                                <input type="text" id="topic-name" placeholder="VD: Frontend Developer" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Loại (Type)</label>
+                                <select id="topic-type">
+                                    <option value="language">Ngôn ngữ (Language)</option>
+                                    <option value="framework">Framework</option>
+                                    <option value="tool">Công cụ (Tool)</option>
+                                    <option value="database">Cơ sở dữ liệu</option>
+                                    <option value="career">Lộ trình (Career)</option>
+                                    <option value="concept">Khái niệm (Concept)</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Mô tả ngắn</label>
+                                <textarea id="topic-desc" rows="3" placeholder="Mô tả hiển thị trên card..."></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Màu chủ đạo (Theme Color)</label>
+                                <div style="display: flex; gap: 10px; align-items: center;">
+                                    <input type="color" id="topic-color" value="#007bff" style="height: 40px; width: 60px; cursor: pointer;">
+                                    <span style="font-size: 0.8rem; color: #666;">Chọn màu nền icon</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-right">
+                            <div class="form-group">
+                                <label>Icon Class (FontAwesome)</label>
+                                <input type="text" id="topic-icon" placeholder="VD: fa-solid fa-code">
+                                <small style="color: #888;">Tra cứu tại <a href="https://fontawesome.com/icons" target="_blank">fontawesome.com</a></small>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Tags (ngăn cách bằng dấu phẩy)</label>
+                                <input type="text" id="topic-tags" placeholder="VD: web, frontend, js">
+                            </div>
+
+                            <div class="form-group">
+                                <label>URL Banner Ảnh</label>
+                                <input type="text" id="topic-banner" placeholder="/images/banners/frontend.jpg">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Mô tả chi tiết (Long Description)</label>
+                                <textarea id="topic-long-desc" rows="3" placeholder="Mô tả đầy đủ ở trang chi tiết..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer" style="margin-top: 20px; text-align: right; border-top: 1px solid #eee; padding-top: 15px;">
+                        <button type="button" class="btn-secondary" onclick="closeModal('modal-topic')">Hủy</button>
+                        <button type="submit" class="btn-primary">Lưu thông tin</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-question" class="modal hidden">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3>Chi tiết câu hỏi</h3>
+                <span class="close-btn" onclick="closeModal('modal-question')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="question-detail-view">
+                    <div style="margin-bottom: 15px;">
+                        <label style="font-weight: bold; color: #666; font-size: 0.9rem;">CÂU HỎI:</label>
+                        <p style="font-size: 1.1rem; margin-top: 5px; color: #2c3e50;">
+                            <strong id="view-q-text">...</strong>
+                        </p>
+                    </div>
+
+                    <div id="view-q-image-container" style="text-align: center; margin-bottom: 20px; display: none; background: #f8f9fa; padding: 10px; border-radius: 5px;">
+                        <img id="view-q-image" src="" alt="Question Image" style="max-width: 100%; max-height: 250px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                    </div>
+
+                    <div class="choices-list">
+                        <label style="font-weight: bold; color: #666; font-size: 0.9rem;">CÁC LỰA CHỌN:</label>
+                        <ul id="view-q-choices" style="padding-left: 0; margin-top: 10px; list-style: none;">
+                            </ul>
+                    </div>
+
+                    <div style="margin-top: 20px; background: #e3f2fd; padding: 15px; border-left: 5px solid #2196f3; border-radius: 4px;">
+                        <strong><i class="fa-solid fa-lightbulb" style="color: #fbc02d;"></i> Giải thích đáp án:</strong>
+                        <div id="view-q-explain" style="margin-top: 5px; color: #444;">Không có giải thích.</div>
+                    </div>
+                </div>
+                
+                <div class="modal-footer" style="margin-top: 20px; text-align: right; border-top: 1px solid #eee; padding-top: 15px;">
+                    <button class="btn-secondary" onclick="closeModal('modal-question')">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/javascript/admin.js"></script>
+</body>
+</html>

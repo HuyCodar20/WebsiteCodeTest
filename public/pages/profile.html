@@ -12,156 +12,114 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 
-<style>
-  /*----------------------- Popup Avarta -----------------------*/
-  .modal-overlay {
-      position: fixed;
-      top: 0; 
-      left: 0;
-      width: 100%; 
-      height: 100%;
-      background: rgba(0, 0, 0, 0.6);
-      z-index: 999999;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.3s ease;
-  }
-
-  .modal-overlay.show {
-      opacity: 1;
-      visibility: visible;
-  }
-
-  .modal-content {
-      background: #fff;
-      padding: 25px;
-      border-radius: 16px;
-      width: 90%;
-      max-width: 500px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-      position: relative;
-      transform: translateY(-20px);
-      transition: all 0.3s ease;
-  }
-
-  .modal-overlay.show .modal-content {
-      transform: translateY(0);
-  }
-
-  .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid #eee;
-  }
-
-  .modal-header h3 { font-size: 18px; font-weight: 700; color: #333; }
-
-  .close-modal { font-size: 28px; cursor: pointer; color: #999; }
-  .close-modal:hover { color: #333; }
-
-  .avatar-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 15px;
-      justify-items: center;
-  }
-
-  .avatar-option {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      object-fit: cover;
-      cursor: pointer;
-      border: 3px solid transparent;
-      transition: all 0.2s ease;
-      background: #fff;
-  }
-
-  .avatar-option:hover {
-      transform: scale(1.1);
-      border-color: #0d6efd;
-  }
-
-  .upload-option {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      background-color: #f8f9fa;
-      color: #0d6efd;
-      border: 2px dashed #ccc;
-  }
-  
-  .upload-option i { font-size: 24px; margin-bottom: 4px; }
-  .upload-option span { font-size: 10px; font-weight: 700; }
-
-</style>
-
-
 <body>
-
     <div id="header-placeholder"></div>
 
     <div class="profile-container">
-        <div class="profile-header">
-            <div class="profile-avatar-wrapper">
-                <img id="profile-avatar" src="/images/user_icon.png" alt="Avatar" class="profile-avatar">
-                
-                <div id="trigger-avatar-modal" class="change-avatar-overlay">
-                    <i class="fas fa-camera"></i><br>Đổi ảnh
+        
+        <section id="dashboard-selection">
+            <h1 class="page-title">Trang cá nhân</h1>
+            <p class="page-subtitle">Quản lý thông tin và xem lại lịch sử học tập của bạn</p>
+            
+            <div class="dashboard-options">
+                <div class="dash-card" id="btn-goto-profile">
+                    <div class="icon-wrapper"><i class="fas fa-user-circle"></i></div>
+                    <h3>Hồ sơ của bạn</h3>
+                    <p>Xem và chỉnh sửa thông tin cá nhân, cập nhật avatar và mật khẩu.</p>
+                </div>
+
+                <div class="dash-card" id="btn-goto-history">
+                    <div class="icon-wrapper"><i class="fas fa-history"></i></div>
+                    <h3>Lịch sử bài làm</h3>
+                    <p>Xem lại các bài trắc nghiệm đã làm và kết quả đánh giá chi tiết.</p>
+                </div>
+            </div>
+        </section>
+
+        <div id="profile-flow" class="hidden">
+            <div class="section-header">
+                <button class="btn-back-dashboard" onclick="showDashboard()">
+                    <i class="fas fa-arrow-left"></i> <span>Quay lại</span>
+                </button>
+                <h2>Hồ sơ cá nhân</h2>
+                <div class="header-spacer"></div> </div>
+
+            <div class="profile-card-wrapper">
+                <div class="profile-avatar-wrapper">
+                    <img id="profile-avatar" src="/images/user_icon.png" alt="Avatar" class="profile-avatar">
+                    <div id="trigger-avatar-modal" class="change-avatar-overlay">
+                        <i class="fas fa-camera"></i>
+                        <span>Đổi ảnh</span>
+                    </div>
+                    
+                    <input type="file" id="avatar-file-input" class="hidden-input" name="avatar" accept="image/*">
                 </div>
                 
-                <input type="file" id="avatar-file-input" class="hidden-input" name="avatar" accept="image/*">
+                <div style="text-align: center;">
+                    <h2 style="margin: 0;">
+                        <span id="profile-username-display">Đang tải...</span>
+                        <input type="text" id="profile-username-input" class="hidden-input" placeholder="Nhập tên mới">
+                    </h2>
+                </div>
+
+                <div class="profile-info-details">
+                    <p><i class="fas fa-id-card"></i> <strong>UserID:</strong> <span id="profile-userid">...</span></p>
+                    <p><i class="fas fa-envelope"></i> <strong>Email:</strong> <span id="profile-email">...</span></p>
+                    <p><i class="fas fa-user-tag"></i> <strong>Vai trò:</strong> <span id="profile-role">...</span></p>
+                    <p><i class="fas fa-calendar-alt"></i> <strong>Ngày tham gia:</strong> <span id="profile-createdat">...</span></p>
+                </div>
+
+                <div class="edit-controls">
+                    <button id="edit-profile-btn" class="btn btn-primary">
+                        <i class="fas fa-pen"></i> Chỉnh sửa
+                    </button>
+                    <button id="change-password-trigger" class="btn btn-warning">
+                        <i class="fas fa-key"></i> Đổi mật khẩu
+                    </button>
+
+                    <button id="save-profile-btn" class="btn btn-success hidden-input">
+                        <i class="fas fa-save"></i> Lưu
+                    </button>
+                    <button id="cancel-edit-btn" class="btn btn-secondary hidden-input">
+                        <i class="fas fa-times"></i> Hủy
+                    </button>
+
+                    <button id="logout-profile-btn" class="btn btn-danger">
+                        <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="history-flow" class="hidden">
+            <div class="section-header">
+                <button class="btn-back-dashboard" onclick="showDashboard()">
+                    <i class="fas fa-arrow-left"></i> <span>Quay lại</span>
+                </button>
+                <h2>Lịch sử bài làm</h2>
+                <div class="header-spacer"></div>
             </div>
 
-            <h2>
-                <span id="profile-username-display">Loading...</span>
-                <input type="text" id="profile-username-input" class="hidden-input" placeholder="Nhập tên mới">
-            </h2>
-        </div>
-        
-        <div class="profile-info-details">
-            <p><i class="fas fa-id-card"></i> <strong>UserID:</strong> <span id="profile-userid">...</span></p>
-            <p><i class="fas fa-envelope"></i> <strong>Email:</strong> <span id="profile-email">...</span></p>
-            <p><i class="fas fa-user-tag"></i> <strong>Vai trò:</strong> <span id="profile-role">...</span></p>
-            <p><i class="fas fa-calendar-alt"></i> <strong>Ngày tham gia:</strong> <span id="profile-createdat">...</span></p>
-        </div>
-
-        <div class="edit-controls">
-            <button id="edit-profile-btn" class="btn btn-primary">
-                <i class="fas fa-pen"></i> Chỉnh sửa
-            </button>
-            <button id="change-password-trigger" class="btn btn-warning">
-                <i class="fas fa-key"></i> Đổi mật khẩu
-            </button>
-
-            <button id="save-profile-btn" class="btn btn-success hidden-input">
-                <i class="fas fa-save"></i> Lưu
-            </button>
-            <button id="cancel-edit-btn" class="btn btn-secondary hidden-input">
-                <i class="fas fa-times"></i> Hủy
-            </button>
-
-            <button id="logout-profile-btn" class="btn btn-danger">
-                <i class="fas fa-sign-out-alt"></i> Đăng xuất
-            </button>
+            <div class="review-history-card">
+                <div id="review-history-list" class="review-list">
+                    <p style="text-align: center; padding: 20px; color: #7f8c8d;">
+                        Đang tải lịch sử...
+                    </p>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div id="password-modal" class="modal">
+    <div id="password-modal" class="modal-overlay">
         <div class="modal-content">
-            <span class="close-btn">&times;</span>
-            <h3>Đổi Mật Khẩu</h3>
+            <div class="modal-header">
+                <h3>Đổi mật khẩu</h3>
+                <span class="close-btn" style="font-size: 24px; cursor: pointer;">&times;</span>
+            </div>
             <form id="change-password-form">
-                <input type="password" id="old-password" placeholder="Mật khẩu hiện tại" required>
-                <input type="password" id="new-password" placeholder="Mật khẩu mới" required>
-                <input type="password" id="confirm-new-password" placeholder="Xác nhận mật khẩu mới" required>
+                <input type="password" id="old-password" placeholder="Mật khẩu hiện tại" required style="width:100%; padding:10px; margin-bottom:10px;">
+                <input type="password" id="new-password" placeholder="Mật khẩu mới" required style="width:100%; padding:10px; margin-bottom:10px;">
+                <input type="password" id="confirm-new-password" placeholder="Xác nhận mật khẩu mới" required style="width:100%; padding:10px; margin-bottom:10px;">
                 <button type="submit" class="btn btn-success" style="width:100%">Xác nhận đổi</button>
             </form>
         </div>
@@ -173,17 +131,15 @@
                 <h3>Chọn ảnh đại diện</h3>
                 <span class="close-avatar-modal">&times;</span>
             </div>
-          
             <div class="avatar-grid">
                 <div class="avatar-option upload-option" id="btn-upload-from-device">
                     <i class="fas fa-cloud-upload-alt"></i>
                     <span>Tải từ máy</span>
                 </div>
-
-                <img src="/images/user_icon.png" class="avatar-option system-avatar" alt="Avatar 1">
-                <img src="/images/fl_user_icon.png" class="avatar-option system-avatar" alt="Avatar 2">
-                <img src="/images/rb_user_icon.png" class="avatar-option system-avatar" alt="Avatar 3">
-                </div>
+                <img src="/images/user_icon.png" class="avatar-option system-avatar" alt="System 1">
+                <img src="/images/fl_user_icon.png" class="avatar-option system-avatar" alt="System 2">
+                <img src="/images/rb_user_icon.png" class="avatar-option system-avatar" alt="System 3">
+            </div>
         </div>
     </div>
 
@@ -191,5 +147,39 @@
     
     <script src="/javascript/main.js"></script>
     <script src="/javascript/profile.js"></script>
+
+    <script>
+        // Logic chuyển tab đơn giản nằm tại đây để đảm bảo chạy ngay
+        const dashboardSection = document.getElementById('dashboard-selection');
+        const profileFlow = document.getElementById('profile-flow');
+        const historyFlow = document.getElementById('history-flow');
+        
+        function showDashboard() {
+            dashboardSection.classList.remove('hidden');
+            profileFlow.classList.add('hidden');
+            historyFlow.classList.add('hidden');
+        }
+
+        function showProfile() {
+            dashboardSection.classList.add('hidden');
+            profileFlow.classList.remove('hidden');
+            historyFlow.classList.add('hidden');
+        }
+
+        function showHistory() {
+            dashboardSection.classList.add('hidden');
+            profileFlow.classList.add('hidden');
+            historyFlow.classList.remove('hidden');
+            
+            // Gọi lại hàm load dữ liệu (từ profile.js) để cập nhật mới nhất
+            if(typeof loadUserReviews === 'function') loadUserReviews();
+        }
+
+        document.getElementById('btn-goto-profile').addEventListener('click', showProfile);
+        document.getElementById('btn-goto-history').addEventListener('click', showHistory);
+        
+        // Mặc định
+        showDashboard();
+    </script>
 </body>
 </html>

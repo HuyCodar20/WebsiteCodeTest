@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết kết quả | DevArena</title>
+    <link rel="stylesheet" href="/stylesheets/testResults.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+<body>
+
+    <div id="loading-overlay">
+        <div class="spinner"></div>
+        <p>Đang tải kết quả...</p>
+    </div>
+
+    <div class="container" id="main-content" style="display: none;">
+        
+        <header class="review-header">
+            <button onclick="window.location.href='/'" class="btn-home">
+                <i class="fas fa-home"></i> Trang chủ
+            </button>
+            <h1 id="review-title">Chi tiết bài làm</h1>
+            <button onclick="window.location.href='/profile'" class="btn-profile">
+                <i class="fas fa-user"></i> Hồ sơ
+            </button>
+        </header>
+
+        <section class="summary-card">
+            <div class="score-box">
+                <div class="score-circle">
+                    <span id="score-display">0.0</span>
+                </div>
+                <p class="score-label">Điểm số</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <i class="fas fa-book-open icon-topic"></i>
+                    <div class="stat-info">
+                        <span class="label">Chủ đề</span>
+                        <span class="value" id="topic-name">...</span>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <i class="fas fa-check-circle icon-correct"></i>
+                    <div class="stat-info">
+                        <span class="label">Số câu đúng</span>
+                        <span class="value" id="correct-count">0/0</span>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <i class="fas fa-stopwatch icon-time"></i>
+                    <div class="stat-info">
+                        <span class="label">Thời gian</span>
+                        <span class="value" id="time-taken">00:00</span>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <i class="fas fa-calendar-alt icon-date"></i>
+                    <div class="stat-info">
+                        <span class="label">Ngày làm</span>
+                        <span class="value" id="completed-at">--/--/----</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="details-list" id="questions-container">
+            </section>
+
+    </div>
+
+    <script src="/javascript/testResults.js"></script>
+</body>
+</html>

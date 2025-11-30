@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const userJson = localStorage.getItem('currentUser');
     if (!userJson) {
         alert("Bạn cần đăng nhập để thực hiện chức năng này!");
-        window.location.href = '/pages/login.html';
+        window.location.replace('/pages/login.html');
         return;
     }
     const currentUser = JSON.parse(userJson);

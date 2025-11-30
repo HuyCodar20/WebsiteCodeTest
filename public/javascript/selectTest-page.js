@@ -40,13 +40,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const practiceOptions = document.getElementById('practice-options');
     const practiceResult = document.getElementById('practice-result');
     const btnCheckPractice = document.getElementById('btn-check-practice');
+
+    const btnReport = document.getElementById('btn-report-question');
     
     let currentPracticeQID = null;
     let currentSelectedChoice = null;
 
     if (!categoryId) {
         alert("Thiếu ID chủ đề!");
-        window.location.href = "/";
+        window.location.replace("/");
         return;
     }
 
@@ -128,7 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
             btnStartConfirm.disabled = true;
 
             try {
-                const checkUrl = `/api/questions?categoryId=${categoryId}&limit=1&difficulty=${difficulty}`;
+                const checkUrl = `/api/questions?categoryId=${categoryId}&limit=1&difficulty=${difficulty}&excludeDeleted=true`;
                 const res = await fetch(checkUrl);
                 const data = await res.json();
 
@@ -158,7 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     params.append('totalTime', inputTotalTime.value);
                 }
 
-                window.location.href = `/pages/doTest.html?${params.toString()}`;
+                window.location.replace(`/pages/doTest.html?${params.toString()}`);
 
             } catch (err) {
                 console.error(err);
@@ -177,7 +179,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!userLogged) {
                 e.preventDefault(); 
                 alert("Bạn cần đăng nhập để thực hiện bài thi!");
-                window.location.href = "/pages/login.html"; 
+                window.location.replace("/pages/login.html"); 
                 return;
             }
 
@@ -237,17 +239,19 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         const color = currentCategoryData?.theme_color || '#3182ce';
+        const categoryIcon = currentCategoryData?.icon || 'fas fa-question-circle';
 
         questions.forEach(q => {
             const item = document.createElement('div');
-            item.className = 'test-item-horizontal';
+            item.className = 'test-item-horizontal' ;
+            item.style.setProperty('--active-color', color);
+            
             let diffText = q.Difficulty === 'easy' ? 'Dễ' : (q.Difficulty === 'medium' ? 'Trung bình' : 'Khó');
             let diffClass = q.Difficulty;
             
-            // [MỚI] Sử dụng escapeHtml cho tiêu đề câu hỏi
             item.innerHTML = `
                 <div class="test-icon-wrapper" style="color:${color}">
-                    <i class="fas fa-question-circle"></i>
+                    <i class="${categoryIcon}"></i>
                 </div>
                 <div class="test-content-wrapper">
                     <h3 class="test-item-title">${escapeHtml(q.QuestionText)}</h3>
@@ -303,7 +307,11 @@ document.addEventListener('DOMContentLoaded', () => {
     function openPracticeModal(q) {
         currentPracticeQID = q._id;
         currentSelectedChoice = null;
-        
+        if (btnReport) {
+            btnReport.classList.remove('reported'); 
+            btnReport.title = "Báo cáo câu hỏi lỗi";
+        }
+
         // 1. Reset UI về trạng thái ban đầu
         practiceResult.style.display = 'none';
         // Xóa các class màu sắc kết quả cũ
@@ -442,6 +450,57 @@ document.addEventListener('DOMContentLoaded', () => {
             modalPractice.classList.remove('show');
         });
     }
+
+    // --- LOGIC BUTTON REPORT ---
+    if (btnReport) {
+        btnReport.addEventListener('click', async () => {
+            // 1. Kiểm tra đăng nhập
+            const storedUser = localStorage.getItem('currentUser');
+            if (!storedUser) {
+                alert("Bạn cần đăng nhập để báo cáo!");
+                return;
+            }
+            const currentUser = JSON.parse(storedUser);
+            const userId = currentUser._id || currentUser.id; // Tùy vào cách bạn lưu object user
+
+            // 2. Kiểm tra xem đã bấm chưa (Client side check visual)
+            if (btnReport.classList.contains('reported')) {
+                return; // Đã report rồi thì không làm gì
+            }
+
+            if (!confirm("Bạn có chắc muốn báo cáo câu hỏi này có vấn đề không?")) return;
+
+            // 3. Gọi API
+            try {
+                const res = await fetch('/api/questions/report', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        questionId: currentPracticeQID,
+                        userId: userId
+                    })
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    alert("✅ " + data.message);
+                    // Đổi màu nút sang đỏ để biết đã report
+                    btnReport.classList.add('reported');
+                } else {
+                    alert("⚠️ " + data.message); // Ví dụ: "Bạn đã báo cáo rồi"
+                    if (data.message.includes("đã báo cáo")) {
+                         btnReport.classList.add('reported');
+                    }
+                }
+
+            } catch (err) {
+                console.error(err);
+                alert("Lỗi kết nối server.");
+            }
+        });
+    }
+
     // Đóng khi click ra ngoài (Bổ sung vào event listener window click cũ)
     window.addEventListener('click', (e) => {
         if (e.target === modalConfig) modalConfig.classList.remove('show');

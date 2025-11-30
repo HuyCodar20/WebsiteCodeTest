@@ -1,22 +1,20 @@
-/* ==========================================================================
-   PROFILE.JS - QUẢN LÝ TRANG CÁ NHÂN & POPUP AVATAR
-   ========================================================================== */
-
-let currentUserId = null; 
+// Biến toàn cục lưu trữ ID
+let profileUserId = null;  // Dùng cho API Profile
+let reviewUserId = null;   // Dùng cho API Reviews
 let originalUsername = ""; 
 
 // ===============================================
-// 1. CÁC HÀM API (Giao tiếp với Server)
+// 1. CÁC HÀM API CỐT LÕI
 // ===============================================
 
 // Cập nhật Tên hiển thị
 async function updateUsername(newUsername) {
-    if (!currentUserId) return alert('Lỗi: Không tìm thấy User ID.');
+    if (!profileUserId) return alert('Lỗi: Không tìm thấy User ID.');
     try {
         const response = await fetch('/api/profile/update', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userId: currentUserId, username: newUsername })
+            body: JSON.stringify({ userId: profileUserId, username: newUsername })
         });
         const data = await response.json();
         if (response.ok) {
@@ -35,12 +33,12 @@ async function updateUsername(newUsername) {
 
 // Đổi mật khẩu
 async function changePassword(oldPassword, newPassword) {
-    if (!currentUserId) return alert('Lỗi: Không tìm thấy User ID.');
+    if (!profileUserId) return alert('Lỗi: Không tìm thấy User ID.');
     try {
         const response = await fetch('/api/password/change', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userId: currentUserId, oldPassword, newPassword })
+            body: JSON.stringify({ userId: profileUserId, oldPassword, newPassword })
         });
         const data = await response.json();
         if (response.ok) {
@@ -57,31 +55,41 @@ async function changePassword(oldPassword, newPassword) {
     }
 }
 
-// Upload Avatar (Dùng chung cho cả chọn từ máy và chọn có sẵn)
-async function updateAvatar(file) {
-    if (!currentUserId) return alert('Lỗi: Không tìm thấy User ID.');
+// [QUAN TRỌNG] Hàm Update Avatar mới - Xử lý cả File và String URL
+async function updateAvatar(source) {
+    if (!profileUserId) return alert('Lỗi: Không tìm thấy User ID.');
     
-    // 1. Hiển thị ảnh tạm thời (Preview) ngay lập tức cho mượt
-    const tempUrl = URL.createObjectURL(file);
-    document.getElementById('profile-avatar').src = tempUrl;
-
-    // 2. Chuẩn bị dữ liệu gửi đi
     const formData = new FormData();
-    formData.append('userId', currentUserId);
-    formData.append('avatar', file);
+    formData.append('userId', profileUserId);
+
+    const imgElement = document.getElementById('profile-avatar');
+    
+    // Kiểm tra nguồn ảnh là File (Upload) hay String (Hệ thống)
+    if (source instanceof File) {
+        formData.append('avatar', source); // Key 'avatar' cho multer xử lý
+        imgElement.src = URL.createObjectURL(source); // Preview ngay
+    } else if (typeof source === 'string') {
+        formData.append('avatarUrl', source); // Key 'avatarUrl' cho server xử lý text
+        imgElement.src = source; // Preview ngay
+    } else {
+        return alert("Dữ liệu ảnh không hợp lệ.");
+    }
 
     try {
-        const response = await fetch('/api/avatar/update', { method: 'PUT', body: formData });
+        // Gửi request PUT (không set Content-Type thủ công khi dùng FormData)
+        const response = await fetch('/api/avatar/update', { 
+            method: 'PUT', 
+            body: formData 
+        });
         const data = await response.json();
         
         if (response.ok) {
             alert(data.message);
+            // Cập nhật hiển thị mới nhất từ server để đảm bảo link đúng
+            const newAvatarUrl = data.newAvatarUrl;
+            imgElement.src = newAvatarUrl; 
             
-            // Thêm timestamp vào URL để trình duyệt không dùng cache cũ
-            const newAvatarUrl = data.newAvatarUrl + '?' + new Date().getTime(); 
-            document.getElementById('profile-avatar').src = newAvatarUrl; 
-            
-            // Cập nhật localStorage để Header cũng đổi theo
+            // Cập nhật localStorage
             let user = JSON.parse(localStorage.getItem('currentUser'));
             if (user) {
                 user.avatarUrl = newAvatarUrl;
@@ -89,8 +97,7 @@ async function updateAvatar(file) {
             }
         } else {
             alert('Cập nhật Avatar thất bại: ' + data.message);
-            // Nếu lỗi thì nên reload lại để trả về ảnh cũ (hoặc xử lý thêm)
-            window.location.reload();
+            window.location.reload(); // Reset lại ảnh cũ nếu lỗi
         }
     } catch (error) {
         console.error('Lỗi updateAvatar:', error);
@@ -98,64 +105,124 @@ async function updateAvatar(file) {
     }
 }
 
-
 // ===============================================
-// 2. UI LOGIC (Xử lý giao diện)
+// 2. LOGIC LỊCH SỬ BÀI LÀM
 // ===============================================
 
-// Chuyển đổi chế độ Xem <-> Sửa
-function setEditMode(isEditing) {
-    const usernameDisplay = document.getElementById('profile-username-display');
-    const usernameInput = document.getElementById('profile-username-input');
-    
-    const editBtn = document.getElementById('edit-profile-btn');
-    const changePassBtn = document.getElementById('change-password-trigger'); // Nút đổi pass
-    
-    const saveBtn = document.getElementById('save-profile-btn');
-    const cancelBtn = document.getElementById('cancel-edit-btn');
-    
-    // Cái lớp phủ đen trên avatar (để bấm vào đổi ảnh)
-    // Lưu ý: Trong HTML mới, ID của nó là 'trigger-avatar-modal' hoặc class 'change-avatar-overlay'
-    const changeAvatarOverlay = document.querySelector('.change-avatar-overlay');
+async function loadUserReviews() {
+    const container = document.getElementById('review-history-list');
+    if (!container) return;
 
-    if (isEditing) {
-        // --- CHẾ ĐỘ SỬA ---
-        usernameDisplay.classList.add('hidden-input');
-        usernameInput.classList.remove('hidden-input');
+    if (!reviewUserId) {
+        container.innerHTML = '<p style="text-align: center;">Không tìm thấy ID bài làm.</p>';
+        return;
+    }
+
+    container.innerHTML = '<p style="text-align: center; padding: 10px;"><i class="fas fa-spinner fa-spin"></i> Đang tải lịch sử...</p>';
+
+    try {
+        const res = await fetch(`/api/profile/${reviewUserId}/reviews`);
+        if (!res.ok) throw new Error('Lỗi tải dữ liệu lịch sử');
         
-        editBtn.classList.add('hidden-input');
-        changePassBtn.classList.add('hidden-input'); // Ẩn nút đổi pass cho đỡ rối
-        
-        saveBtn.classList.remove('hidden-input');
-        cancelBtn.classList.remove('hidden-input');
-        
-        if(changeAvatarOverlay) {
-            changeAvatarOverlay.classList.add('active'); 
-        }
-        
-        originalUsername = usernameInput.value; // Lưu giá trị cũ
-    } else {
-        // --- CHẾ ĐỘ XEM ---
-        usernameDisplay.classList.remove('hidden-input');
-        usernameInput.classList.add('hidden-input');
-        
-        editBtn.classList.remove('hidden-input');
-        changePassBtn.classList.remove('hidden-input');
-        
-        saveBtn.classList.add('hidden-input');
-        cancelBtn.classList.add('hidden-input');
-        
-        if(changeAvatarOverlay) {
-            changeAvatarOverlay.classList.remove('active');
+        const data = await res.json();
+        const reviews = data.reviews || [];
+
+        if (reviews.length === 0) {
+            container.innerHTML = '<p style="text-align: center;">Bạn chưa làm bài thi nào gần đây.</p>';
+            return;
         }
 
-        usernameInput.value = originalUsername; // Reset về cũ
-        usernameDisplay.textContent = originalUsername;
+        container.innerHTML = reviews.map(review => {
+            const date = new Date(review.CompletedAt).toLocaleDateString('vi-VN', { 
+                year: 'numeric', month: '2-digit', day: '2-digit', 
+                hour: '2-digit', minute: '2-digit' 
+            });
+            const timeStr = review.TimeTaken ? `${Math.floor(review.TimeTaken / 60)}p ${review.TimeTaken % 60}s` : 'N/A';
+            const modeName = review.Mode === 'paced' ? 'Tốc độ' : 'Tiêu chuẩn';
+
+            let scoreClass = 'score-low'; 
+            if (review.Score >= 8.0) scoreClass = 'score-high';
+            else if (review.Score >= 5.0) scoreClass = 'score-medium';
+
+            return `
+                <div class="review-item" style="border-bottom:1px solid #eee; padding: 10px 0;">
+                    <div class="review-header" style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                        <span class="review-title" style="font-weight:600;">
+                            ${review.Category.name || 'Chủ đề'} <small style="color:#666">(${modeName})</small>
+                        </span>
+                        <span class="review-date" style="font-size:0.9em; color:#888;">${date}</span>
+                    </div>
+                    <div class="review-body" style="display:flex; justify-content:space-between; align-items:center;">
+                        <span class="review-score ${scoreClass}" style="font-weight:bold;">
+                            Điểm: ${review.Score}
+                        </span>
+                        <span class="review-details" style="font-size:0.9em;">
+                            Đúng: ${review.CorrectCount}/${review.TotalQuestions} | Thời gian: ${timeStr}
+                        </span>
+                        <a href="/test-review?id=${review._id}" class="btn-sm btn-view-review" style="text-decoration:none; color:blue;">Xem chi tiết</a>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+    } catch (err) {
+        console.error("Lỗi tải review:", err);
+        container.innerHTML = '<p style="text-align: center; color: red;">Không thể tải lịch sử bài làm.</p>';
     }
 }
 
 // ===============================================
-// 3. MAIN EVENT LISTENER (Chạy khi trang tải xong)
+// 3. UI LOGIC (Xử lý giao diện)
+// ===============================================
+
+function setEditMode(isEditing) {
+    const usernameDisplay = document.getElementById('profile-username-display');
+    const usernameInput = document.getElementById('profile-username-input');
+    const editBtn = document.getElementById('edit-profile-btn');
+    const changePassBtn = document.getElementById('change-password-trigger');
+    const saveBtn = document.getElementById('save-profile-btn');
+    const cancelBtn = document.getElementById('cancel-edit-btn');
+    const changeAvatarOverlay = document.getElementById('trigger-avatar-modal');
+
+    if (isEditing) {
+        if(usernameDisplay) usernameDisplay.classList.add('hidden-input');
+        if(usernameInput) usernameInput.classList.remove('hidden-input');
+        
+        if(editBtn) editBtn.classList.add('hidden-input');
+        if(changePassBtn) changePassBtn.classList.add('hidden-input');
+        
+        if(saveBtn) saveBtn.classList.remove('hidden-input');
+        if(cancelBtn) cancelBtn.classList.remove('hidden-input');
+        
+        // Hiện nút camera khi edit
+        if(changeAvatarOverlay) changeAvatarOverlay.classList.add('active');
+        
+        if(usernameInput) originalUsername = usernameInput.value;
+        if(changeAvatarOverlay) changeAvatarOverlay.classList.add('editable');
+
+    } else {
+
+        if(usernameDisplay) usernameDisplay.classList.remove('hidden-input');
+        if(usernameInput) usernameInput.classList.add('hidden-input');
+        
+        if(editBtn) editBtn.classList.remove('hidden-input');
+        if(changePassBtn) changePassBtn.classList.remove('hidden-input');
+        
+        if(saveBtn) saveBtn.classList.add('hidden-input');
+        if(cancelBtn) cancelBtn.classList.add('hidden-input');
+
+        // Ẩn nút camera khi xong
+        if(changeAvatarOverlay) changeAvatarOverlay.classList.remove('active');
+
+        if(usernameInput) usernameInput.value = originalUsername;
+        if(usernameDisplay) usernameDisplay.textContent = originalUsername;
+
+        if(changeAvatarOverlay) changeAvatarOverlay.classList.remove('editable');
+    }
+}
+
+// ===============================================
+// 4. MAIN - CHẠY KHI TRANG TẢI XONG
 // ===============================================
 document.addEventListener('DOMContentLoaded', async function() {
     
@@ -163,48 +230,66 @@ document.addEventListener('DOMContentLoaded', async function() {
     const userDataString = localStorage.getItem('currentUser');
     if (!userDataString) {
         alert('Vui lòng đăng nhập để xem Profile.');
-        window.location.href = '/pages/login.html'; 
+        window.location.replace('/pages/login.html'); 
         return;
     }
 
-    const userBasic = JSON.parse(userDataString);
-    currentUserId = userBasic.userId || userBasic.UserID; 
-
-    // --- B. LOAD DỮ LIỆU TỪ SERVER ---
+    // --- B. KHỞI TẠO ID ---
     try {
-        const response = await fetch(`/api/profile/${currentUserId}`);
+        const userBasic = JSON.parse(userDataString);
+        profileUserId = userBasic.userId || userBasic.UserID;
+        reviewUserId = userBasic._id || profileUserId; 
+
+        if (typeof reviewUserId === 'string' && reviewUserId.length === 20) {
+            reviewUserId = reviewUserId + "0000";
+        }
+    } catch (e) {
+        console.error("Lỗi parse localStorage:", e);
+    }
+
+    // --- C. LOAD DỮ LIỆU ---
+    try {
+        const response = await fetch(`/api/profile/${profileUserId}`);
         const data = await response.json();
         
         if (response.ok && data.user) {
             const userFull = data.user;
             
-            // 1. Avatar
+            // Avatar
             const avatarImg = document.getElementById('profile-avatar');
-            avatarImg.src = userFull.AvatarURL || '/images/user_icon.png';
+            if(avatarImg) avatarImg.src = userFull.AvatarURL || '/images/user_icon.png';
             
-            // 2. Thông tin Text
-            const displayUsername = userFull.Username || userBasic.username;
-            document.getElementById('profile-username-display').textContent = displayUsername;
-            document.getElementById('profile-username-input').value = displayUsername;
+            // Info
+            const displayUsername = userFull.Username || JSON.parse(userDataString).username;
+            const elUserDisplay = document.getElementById('profile-username-display');
+            const elUserInput = document.getElementById('profile-username-input');
+            
+            if(elUserDisplay) elUserDisplay.textContent = displayUsername;
+            if(elUserInput) elUserInput.value = displayUsername;
             originalUsername = displayUsername;
             
-            document.getElementById('profile-userid').textContent = userFull.UserID;
-            document.getElementById('profile-email').textContent = userFull.Email; 
-            document.getElementById('profile-role').textContent = userFull.Role;
+            if(document.getElementById('profile-userid')) 
+                document.getElementById('profile-userid').textContent = userFull.UserID;
+            if(document.getElementById('profile-email')) 
+                document.getElementById('profile-email').textContent = userFull.Email; 
+            if(document.getElementById('profile-role')) 
+                document.getElementById('profile-role').textContent = userFull.Role;
             
-            // 3. Format Ngày tham gia
-            if (userFull.CreatedAt) {
-                const date = new Date(userFull.CreatedAt);
-                document.getElementById('profile-createdat').textContent = date.toLocaleDateString('vi-VN');
-            } else {
-                document.getElementById('profile-createdat').textContent = 'N/A';
+            const elDate = document.getElementById('profile-createdat');
+            if (elDate && userFull.CreatedAt) {
+                elDate.textContent = new Date(userFull.CreatedAt).toLocaleDateString('vi-VN');
             }
         }
     } catch (error) {
         console.error('Lỗi tải profile:', error);
     }
 
-    // --- C. XỬ LÝ CÁC NÚT BẤM (Sửa, Lưu, Hủy, Đăng xuất) ---
+    // Load lịch sử nếu đang ở tab history
+    if (!document.getElementById('history-flow').classList.contains('hidden')) {
+        await loadUserReviews();
+    }
+
+    // --- D. XỬ LÝ NÚT BẤM (Edit/Save/Logout) ---
     const editBtn = document.getElementById('edit-profile-btn');
     const cancelBtn = document.getElementById('cancel-edit-btn');
     const saveBtn = document.getElementById('save-profile-btn');
@@ -215,24 +300,21 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     if (saveBtn) {
         saveBtn.addEventListener('click', async () => {
-            const newUsername = document.getElementById('profile-username-input').value.trim();
+            const inputEl = document.getElementById('profile-username-input');
+            const newUsername = inputEl ? inputEl.value.trim() : '';
             
-            // Chỉ gọi API nếu tên thay đổi và không rỗng
             if (newUsername !== originalUsername && newUsername !== '') {
                 const success = await updateUsername(newUsername);
                 if (success) {
                     originalUsername = newUsername; 
                     document.getElementById('profile-username-display').textContent = newUsername;
                     
-                    // Cập nhật localStorage
                     let user = JSON.parse(localStorage.getItem('currentUser'));
                     if (user) {
                         user.username = newUsername;
                         localStorage.setItem('currentUser', JSON.stringify(user));
                     }
-                } else {
-                    return; // Lỗi thì giữ nguyên chế độ sửa
-                }
+                } else return; 
             }
             setEditMode(false);
         });
@@ -242,103 +324,75 @@ document.addEventListener('DOMContentLoaded', async function() {
         logoutBtn.addEventListener('click', () => {
             if(confirm('Bạn có chắc chắn muốn đăng xuất?')) {
                 localStorage.removeItem('currentUser'); 
-                window.location.href = '/pages/login.html'; 
+                window.location.replace('/pages/login.html'); 
             }
         });
     }
 
-    // ============================================================
-    // D. LOGIC MODAL AVATAR (CODE MỚI - GIỐNG REGISTER)
-    // ============================================================
-    
-    // Các phần tử liên quan đến Modal Avatar
-    // Lưu ý: ID 'trigger-avatar-modal' là cái overlay hình tròn trên ảnh đại diện
-    const avatarTrigger = document.getElementById('trigger-avatar-modal') || document.querySelector('.change-avatar-overlay');
+    // --- E. LOGIC MODAL AVATAR (QUAN TRỌNG: ĐÃ SỬA) ---
+    const avatarTrigger = document.getElementById('trigger-avatar-modal');
     const avatarModal = document.getElementById('avatar-modal');
-    const closeAvatarModalBtn = document.querySelector('.close-avatar-modal'); // Nút X
-    
-    // Nút "Tải từ máy" trong Modal
+    const closeAvatarModalBtn = document.querySelector('.close-avatar-modal');
     const btnUploadDevice = document.getElementById('btn-upload-from-device');
-    // Input file ẩn (đã có sẵn trong HTML cũ)
     const avatarInput = document.getElementById('avatar-file-input');
-    // Các ảnh avatar có sẵn
     const systemAvatars = document.querySelectorAll('.system-avatar');
 
-    // Hàm bật/tắt Modal
+    // Hàm toggle hiển thị modal
     const toggleAvatarModal = (show) => {
         if (!avatarModal) return;
-        if (show) avatarModal.classList.add('show');
-        else avatarModal.classList.remove('show');
+        if (show) {
+            avatarModal.style.display = 'flex'; // Ép buộc hiển thị
+            setTimeout(() => avatarModal.classList.add('show'), 10);
+        } else {
+            avatarModal.classList.remove('show');
+            setTimeout(() => { avatarModal.style.display = 'none'; }, 300); // Đợi hiệu ứng mờ
+        }
     };
 
-    // 1. Sự kiện mở Modal (Khi bấm vào overlay ảnh đại diện)
     if (avatarTrigger) {
-        avatarTrigger.addEventListener('click', () => {
-            // Chỉ mở được khi đang ở chế độ Sửa (Edit Mode) 
-            // Kiểm tra xem overlay có class 'active' hay không (do setEditMode thêm vào)
-            if (avatarTrigger.classList.contains('active')) {
-                toggleAvatarModal(true);
-            } else {
-                // Nếu muốn cho phép đổi ảnh ngay cả khi không bấm "Chỉnh sửa", bỏ dòng if check ở trên đi
-                // alert('Vui lòng bấm nút "Chỉnh sửa" để đổi ảnh đại diện.'); 
-                toggleAvatarModal(true); // Cho phép mở luôn cho tiện
-            }
+        avatarTrigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleAvatarModal(true);
         });
     }
 
-    // 2. Sự kiện đóng Modal
     if (closeAvatarModalBtn) {
         closeAvatarModalBtn.addEventListener('click', () => toggleAvatarModal(false));
     }
-    // Bấm ra ngoài vùng trắng thì đóng
+
     window.addEventListener('click', (e) => {
         if (e.target === avatarModal) toggleAvatarModal(false);
     });
 
-    // 3. Xử lý nút "Tải từ máy"
+    // --- Logic Upload từ máy (FIXED) ---
     if (btnUploadDevice && avatarInput) {
-        btnUploadDevice.addEventListener('click', () => {
-            avatarInput.click(); // Kích hoạt input file ẩn
+        btnUploadDevice.addEventListener('click', (e) => {
+            e.stopPropagation(); // Ngăn đóng modal
+            avatarInput.click(); // Kích hoạt input ẩn
         });
     }
 
-    // Khi người dùng chọn file từ máy xong
     if (avatarInput) {
+        avatarInput.addEventListener('click', (e) => e.stopPropagation());
         avatarInput.addEventListener('change', function() {
             if (this.files && this.files[0]) {
-                toggleAvatarModal(false); // Đóng modal
-                updateAvatar(this.files[0]); // Gọi hàm upload
+                toggleAvatarModal(false);
+                updateAvatar(this.files[0]); // Gọi hàm với tham số là FILE
             }
         });
     }
 
-    // 4. Xử lý chọn Avatar có sẵn (System Avatar)
+    // --- Logic Chọn Avatar hệ thống (FIXED) ---
     systemAvatars.forEach(img => {
-        img.addEventListener('click', async () => {
-            toggleAvatarModal(false); // Đóng modal ngay cho mượt
-            
-            const imageUrl = img.src;
-            try {
-                // Tải ảnh về dưới dạng Blob để giả lập thành File object
-                const response = await fetch(imageUrl);
-                const blob = await response.blob();
-                
-                // Tạo file giả
-                const file = new File([blob], "system_avatar.png", { type: blob.type });
-                
-                // Gọi hàm upload như bình thường
-                updateAvatar(file);
-                
-            } catch (error) {
-                console.error("Lỗi chọn avatar hệ thống:", error);
-                alert("Không thể chọn ảnh này. Vui lòng thử lại.");
-            }
+        img.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleAvatarModal(false);
+            const imageUrl = img.getAttribute('src'); // Lấy đường dẫn ảnh
+            updateAvatar(imageUrl); // Gọi hàm với tham số là STRING
         });
     });
 
-    // ============================================================
-    // E. LOGIC MODAL ĐỔI MẬT KHẨU (CODE CŨ GIỮ NGUYÊN)
-    // ============================================================
+    // --- F. LOGIC MODAL ĐỔI MẬT KHẨU ---
     const passModal = document.getElementById('password-modal');
     const openPassModalBtn = document.getElementById('change-password-trigger');
     const closePassModalBtn = document.querySelector('#password-modal .close-btn');
@@ -346,7 +400,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     if (openPassModalBtn) {
         openPassModalBtn.addEventListener('click', () => {
-            if(passModal) passModal.style.display = 'block';
+            if(passModal) passModal.style.display = 'flex'; 
         });
     }
     
@@ -357,11 +411,8 @@ document.addEventListener('DOMContentLoaded', async function() {
         });
     }
     
-    // Click outside cho password modal (Xử lý riêng vì modal này dùng display:block thay vì class show)
     window.addEventListener('click', (event) => {
-        if (event.target == passModal) {
-            passModal.style.display = "none";
-        }
+        if (event.target == passModal) passModal.style.display = "none";
     });
 
     if (passForm) {

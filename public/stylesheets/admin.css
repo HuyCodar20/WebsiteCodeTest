@@ -1,0 +1,498 @@
+/* ============================================================
+   1. RESET & VARIABLES (CẤU HÌNH CHUNG)
+   ============================================================ */
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
+:root {
+    /* --- BẢNG MÀU CHÍNH --- */
+    --sidebar-bg: #2c3e50;       /* Màu nền Sidebar (Xanh đen đậm) */
+    --sidebar-text: #ecf0f1;     /* Màu chữ Sidebar (Trắng xám) */
+    
+    --primary-color: #3498db;    /* Xanh dương (Chính) */
+    --primary-dark: #2980b9;     /* Xanh dương đậm (Hover) */
+    
+    --danger-color: #e74c3c;     /* Đỏ (Xóa/Cảnh báo) */
+    --danger-dark: #c0392b;      
+    
+    --success-color: #27ae60;    /* Xanh lá (Thành công) */
+    --warning-color: #f39c12;    /* Cam (Sửa/Lưu ý) */
+    
+    /* --- MÀU GIAO DIỆN --- */
+    --bg-color: #f4f6f9;         /* Nền web (Xám rất nhạt) */
+    --text-color: #333;          /* Màu chữ chính */
+    --border-color: #e0e0e0;     /* Màu đường viền */
+    --hover-bg: rgba(52, 152, 219, 0.05); /* Màu nền khi di chuột vào bảng */
+}
+
+body { background-color: var(--bg-color); color: var(--text-color); font-size: 15px; line-height: 1.5; }
+
+.admin-container { 
+    display: flex; 
+    height: 100vh; 
+    overflow: hidden; /* Ẩn cuộn ngoài container chính */
+}
+
+/* ============================================================
+   2. SIDEBAR (THANH ĐIỀU HƯỚNG BÊN TRÁI)
+   ============================================================ */
+.sidebar {
+    width: 260px;
+    background-color: var(--sidebar-bg);
+    color: var(--sidebar-text);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    transition: width 0.3s ease;
+    z-index: 20;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+}
+
+.logo {
+    height: 70px; /* Chiều cao cố định */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    font-weight: 700;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    letter-spacing: 0.5px;
+    background-color: rgba(0,0,0,0.1); /* Làm tối nền logo chút */
+}
+.logo i { margin-right: 12px; color: var(--primary-color); }
+
+.menu { 
+    flex: 1; 
+    padding: 15px 0; 
+    overflow-y: auto; 
+}
+
+/* Style cho từng mục menu */
+.menu-item {
+    display: flex; 
+    align-items: center;
+    padding: 15px 25px;
+    color: #bdc3c7; /* Màu chữ khi chưa chọn */
+    text-decoration: none;
+    transition: all 0.25s ease;
+    border-left: 5px solid transparent;
+    font-weight: 500;
+}
+
+.menu-item:hover, .menu-item.active {
+    background-color: rgba(255,255,255,0.08);
+    color: #fff;
+    border-left-color: var(--primary-color); /* Viền trái màu xanh khi active */
+}
+
+.menu-item i { 
+    width: 35px; 
+    text-align: center; 
+    margin-right: 5px; 
+    font-size: 1.2rem; 
+}
+
+/* Footer của Sidebar (Nút Đăng xuất) */
+.sidebar-footer { 
+    padding: 20px; 
+    border-top: 1px solid rgba(255,255,255,0.1); 
+    background-color: rgba(0,0,0,0.1);
+}
+
+.btn-logout {
+    width: 100%;
+    padding: 12px;
+    background: transparent;
+    border: 1px solid var(--danger-color);
+    color: var(--danger-color);
+    cursor: pointer;
+    border-radius: 6px;
+    transition: 0.3s;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+.btn-logout:hover { 
+    background: var(--danger-color); 
+    color: white; 
+    box-shadow: 0 4px 10px rgba(231, 76, 60, 0.3);
+}
+
+/* Mặc định ẩn nút Hamburger trên Desktop */
+.menu-toggle { display: none !important; } 
+
+/* ============================================================
+   3. MAIN CONTENT & TOP BAR (NỘI DUNG CHÍNH)
+   ============================================================ */
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto; /* Cho phép cuộn nội dung chính */
+}
+
+/* Thanh Header trắng ở trên cùng */
+.top-bar {
+    height: 70px;
+    background: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 30px;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.03);
+    z-index: 10;
+    position: sticky;
+    top: 0;
+}
+
+.top-bar h2 { font-size: 1.5rem; color: #2c3e50; font-weight: 700; }
+
+.admin-info { display: flex; align-items: center; gap: 15px; }
+.admin-info span { font-size: 0.95rem; color: #555; }
+.avatar-small { 
+    width: 42px; height: 42px; 
+    border-radius: 50%; 
+    object-fit: cover; 
+    border: 2px solid #e0e0e0;
+    padding: 2px;
+}
+
+/* ============================================================
+   4. SECTIONS & TOOLBAR (KHU VỰC NỘI DUNG & BỘ LỌC)
+   ============================================================ */
+.content-section { 
+    padding: 30px; 
+    animation: fadeIn 0.4s ease; /* Hiệu ứng hiện dần */
+    flex: 1;
+}
+
+/* Thanh công cụ (Nút thêm, tìm kiếm, lọc) */
+.toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.filter-group { display: flex; gap: 15px; }
+
+/* Style chung cho Select và Input */
+.toolbar select, .toolbar input[type="text"] {
+    height: 44px; /* Cao hơn để dễ bấm */
+    padding: 0 15px;
+    border: 1px solid #dcdcdc;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    background-color: white;
+    color: #444;
+}
+
+.toolbar select:focus, .toolbar input[type="text"]:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.1); /* Hiệu ứng glow xanh */
+}
+
+/* Ô tìm kiếm có icon */
+.search-box { position: relative; }
+.search-box input {
+    padding-left: 42px !important;
+    width: 320px;
+}
+.search-box i {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #95a5a6;
+    font-size: 1.1rem;
+}
+
+/* Checkbox Lọc báo cáo (Style riêng) */
+.checkbox-wrapper {
+    display: flex; align-items: center; 
+    background: white; 
+    padding: 0 15px; 
+    border: 1px solid #dcdcdc; 
+    border-radius: 8px; 
+    height: 44px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.checkbox-wrapper:hover { border-color: var(--danger-color); background: #fff5f5; }
+
+/* ============================================================
+   5. TABLES (BẢNG DỮ LIỆU)
+   ============================================================ */
+.table-container {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.05); 
+    overflow: hidden;
+    border: 1px solid #edf2f7;
+}
+
+table { width: 100%; border-collapse: separate; border-spacing: 0; }
+
+th, td { 
+    padding: 18px 25px; 
+    text-align: left; 
+    border-bottom: 1px solid #f1f1f1; 
+    vertical-align: middle;
+}
+
+th { 
+    background-color: #dedede; 
+    font-weight: 700; 
+    color: #003886; 
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.8px;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+tr:last-child td { border-bottom: none; }
+tr:hover { background-color: var(--hover-bg); }
+
+/* Cắt chữ nếu quá dài */
+.text-truncate {
+    max-width: 320px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #333;
+}
+
+/* Icon chủ đề trong bảng */
+td i.fa-2x {
+    font-size: 1.6rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    color: inherit;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+/* ============================================================
+   6. BUTTONS & BADGES (NÚT VÀ NHÃN)
+   ============================================================ */
+/* Nút bấm thường */
+.btn-primary, .btn-secondary, .btn-danger {
+    border: none;
+    padding: 10px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-primary { 
+    background: var(--primary-color); 
+    color: white; 
+    box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
+}
+.btn-primary:hover { background: var(--primary-dark); transform: translateY(-2px); }
+
+.btn-secondary { background: #ecf0f1; color: #333; }
+.btn-secondary:hover { background: #bdc3c7; }
+
+.btn-danger { background: var(--danger-color); color: white; }
+.btn-danger:hover { background: var(--danger-dark); }
+
+/* --- ICON ACTION BUTTONS (SỬA, XÓA, XEM) --- */
+.btn-icon {
+    width: 42px;   /* Kích thước lớn, dễ bấm */
+    height: 42px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    margin-right: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    font-size: 1.1rem;
+}
+
+/* Phân loại màu sắc icon */
+.btn-icon.edit { background: #fff8e1; color: var(--warning-color); }
+.btn-icon.edit:hover { background: #ffe082; transform: scale(1.1); }
+
+.btn-icon.view { background: #e3f2fd; color: var(--primary-color); }
+.btn-icon.view:hover { background: #bbdefb; transform: scale(1.1); }
+
+.btn-icon.delete { background: #ffebee; color: var(--danger-color); }
+.btn-icon.delete:hover { background: #ffcdd2; transform: scale(1.1); }
+
+/* Badge (Nhãn trạng thái) */
+.badge { 
+    padding: 6px 12px; 
+    border-radius: 30px; 
+    font-size: 0.75rem; 
+    font-weight: 700;
+    display: inline-block;
+}
+
+/* ============================================================
+   7. MODAL (CỬA SỔ BẬT LÊN)
+   ============================================================ */
+.modal {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(30, 41, 59, 0.7); /* Nền tối mờ hiện đại */
+    display: flex; justify-content: center; align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+}
+.modal.hidden { display: none; }
+
+.modal-content {
+    background: white;
+    border-radius: 16px;
+    width: 500px;
+    max-width: 90%;
+    animation: slideDown 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    display: flex; flex-direction: column;
+    max-height: 90vh;
+}
+.modal-content.large { width: 850px; }
+
+.modal-header { 
+    padding: 20px 30px; 
+    border-bottom: 1px solid #eee; 
+    display: flex; justify-content: space-between; align-items: center; 
+}
+.modal-header h3 { font-size: 1.3rem; color: #2c3e50; font-weight: 700; }
+.close-btn { font-size: 2rem; cursor: pointer; color: #cbd5e1; transition: 0.2s; line-height: 1; }
+.close-btn:hover { color: var(--danger-color); }
+
+.modal-body { padding: 30px; overflow-y: auto; }
+
+/* Style Form trong Modal */
+.form-group { margin-bottom: 20px; }
+.form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #475569; font-size: 0.95rem; }
+.form-group input, .form-group textarea, .form-group select { 
+    width: 100%; 
+    padding: 12px 15px; 
+    border: 1px solid #cbd5e1; 
+    border-radius: 8px; 
+    font-size: 1rem;
+    transition: border-color 0.2s;
+    background: #f8fafc;
+}
+.form-group input:focus { background: white; border-color: var(--primary-color); outline: none; }
+
+/* ============================================================
+   8. RESPONSIVE / MOBILE (ĐIỆN THOẠI)
+   ============================================================ */
+@media (max-width: 768px) {
+    .admin-container { flex-direction: column; height: auto; overflow: visible; }
+
+    /* --- SIDEBAR TRỞ THÀNH HEADER --- */
+    .sidebar {
+        width: 100%; 
+        height: 60px;
+        flex-direction: row; 
+        justify-content: flex-start; /* Logo căn trái */
+        align-items: center;
+        padding: 0 15px;
+        position: fixed; 
+        top: 0;
+        z-index: 100;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .logo { 
+        height: 100%; 
+        border: none; 
+        font-size: 1.2rem; 
+        padding-left: 0; 
+        background: transparent;
+        justify-content: flex-start;
+        flex-grow: 1;
+    }
+    
+    /* --- NÚT HAMBURGER (HIỆN RA) --- */
+    .menu-toggle {
+        display: block !important;
+        color: white;
+        font-size: 1.6rem;
+        cursor: pointer;
+        padding: 10px;
+    }
+
+    /* --- MENU MOBILE (TÁCH BIỆT VỚI FOOTER) --- */
+    .menu { 
+        position: fixed;
+        top: 60px;              /* Ngay dưới Header */
+        bottom: 70px;           /* Chừa chỗ cho Footer */
+        left: 0;
+        width: 260px;
+        background-color: var(--sidebar-bg);
+        transform: translateX(-100%);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 99;
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+        border-right: 1px solid rgba(255,255,255,0.05);
+        box-shadow: 5px 0 15px rgba(0,0,0,0.1);
+    }
+
+    /* --- FOOTER MOBILE (NÚT ĐĂNG XUẤT) --- */
+    .sidebar-footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 260px;
+        height: 70px;
+        background-color: #243442; /* Màu đậm hơn chút để phân biệt */
+        transform: translateX(-100%);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 100;
+        display: flex;
+        align-items: center;
+        border-top: 1px solid rgba(255,255,255,0.1);
+        box-shadow: 5px 0 15px rgba(0,0,0,0.1);
+    }
+
+    /* KHI MỞ MENU: Trượt cả 2 phần ra */
+    .sidebar.open .menu { transform: translateX(0); }
+    .sidebar.open .sidebar-footer { transform: translateX(0); }
+
+    /* --- NỘI DUNG CHÍNH TRÊN MOBILE --- */
+    .main-content { padding-top: 60px; }
+    .top-bar { display: none; } /* Ẩn topbar Desktop */
+    
+    .content-section { padding: 15px; }
+
+    /* Toolbar xếp dọc */
+    .toolbar { flex-direction: column; align-items: stretch; gap: 10px; }
+    .filter-group { flex-direction: column; }
+    .search-box input { width: 100%; }
+
+    /* Bảng cuộn ngang */
+    .table-container { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    table { min-width: 700px; }
+    
+    /* Modal Full màn hình */
+    .modal-content { width: 95%; margin: 10px; max-height: 85vh; }
+    .form-grid { grid-template-columns: 1fr !important; }
+}
+
+/* Hiệu ứng Animation */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes slideDown { from { transform: translateY(-30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.hidden { display: none !important; }
