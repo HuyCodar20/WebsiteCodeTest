@@ -187,7 +187,6 @@ app.post('/api/register', upload.single('avatar'), async (req, res) => {
         });
 
         const savedUser = await newUser.save();
-        console.log(`User mới: ${username}`);
 
         const userResponse = savedUser.toObject();
         delete userResponse.Password;

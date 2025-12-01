@@ -105,6 +105,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const candidateIdEl = document.querySelector('.candidate-info p'); // ID thí sinh
     const toolBtns = document.querySelectorAll('.tool-btn'); // Các nút toolbar
 
+    const btnReport = document.getElementById('btn-icon-only');
+
     if (!clickListenerAdded) {
         document.body.addEventListener('click', initializeAudio, { once: true });
         clickListenerAdded = true;
@@ -290,6 +292,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if(btnPrev) btnPrev.disabled = index === 0;
             if(btnNext) btnNext.disabled = index === questionsData.length - 1;
             updatePalette();
+        }
+
+        if (btnReport) {
+            btnReport.classList.remove('reported'); 
+            btnReport.disabled = false; 
+            btnReport.title = "Báo cáo câu hỏi lỗi"; 
         }
 
         updateReviewButtonState(index);
@@ -651,21 +659,62 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Nút 1: Dark Mode (Demo - Toggle class)
-        toolBtns[1].addEventListener('click', () => {
-            document.body.classList.toggle('dark-mode');
-            // Cần CSS .dark-mode để hoạt động (đã có trong file CSS nếu bạn thêm vào)
-            // Ví dụ: body.dark-mode { background: #1e293b; color: white; }
-        });
-
         // Nút 2: Exit
-        if(toolBtns[2]) {
-            toolBtns[2].addEventListener('click', () => {
+        if(toolBtns[1]) {
+            toolBtns[1].addEventListener('click', () => {
                 if(confirm("Thoát bài thi? Kết quả sẽ không được lưu.")) {
                     window.location.href = "/";
                 }
             });
         }
+    }
+
+    // --- LOGIC BUTTON REPORT ---
+    if (btnReport) {
+        btnReport.addEventListener('click', async () => {
+            // 1. Kiểm tra đăng nhập
+            const storedUser = localStorage.getItem('currentUser');
+            if (!storedUser) {
+                alert("Bạn cần đăng nhập để báo cáo!");
+                return;
+            }
+
+            if (btnReport.classList.contains('reported')) {
+                return; 
+            }
+
+            if (!confirm("Bạn có chắc muốn báo cáo câu hỏi này có vấn đề không?")) return;
+
+            // 3. Gọi API
+            try {
+                const currentQId = questionsData[currentQuestionIndex]._id;
+
+                const res = await fetch('/api/questions/report', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        questionId: currentQId, 
+                        userId: userId
+                    })
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    alert("✅ " + data.message);
+                    btnReport.classList.add('reported');
+                } else {
+                    alert("⚠️ " + data.message);
+                    if (data.message && data.message.includes("đã báo cáo")) {
+                         btnReport.classList.add('reported');
+                    }
+                }
+
+            } catch (err) {
+                console.error(err);
+                alert("Lỗi kết nối server.");
+            }
+        });
     }
 
     // KHỞI CHẠY ỨNG DỤNG
