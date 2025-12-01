@@ -46,10 +46,48 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentPracticeQID = null;
     let currentSelectedChoice = null;
 
+    //Âm thanh
+    let synth = null;
+    let clickListenerAdded = false;
+
+    // Định nghĩa các tần số đơn giản
+    const SOUND_FREQS = {
+        CORRECT: { freq: "C6", duration: "8n" }, // Cao, ngắn, phản hồi tích cực
+        WRONG: { freq: "C3", duration: "4n" },   // Thấp, dài hơn, phản hồi tiêu cực
+    };
+
+    function initializeAudio() {
+        if (!synth) {
+            Tone.start();
+            synth = new Tone.Synth({
+                oscillator: {
+                    type: "sine"
+                }
+            }).toDestination();
+            console.log("Tone.js AudioContext đã khởi tạo.");
+        }
+    }
+
+    function playFeedbackSound(isCorrect) {
+        const isSfxOn = localStorage.getItem('devarena_sfx_enabled') === 'true';
+        if (!isSfxOn) return;
+        
+        initializeAudio();
+        const sound = isCorrect ? SOUND_FREQS.CORRECT : SOUND_FREQS.WRONG;
+        if (synth) {
+            synth.triggerAttackRelease(sound.freq, sound.duration);
+        }
+    }
+
     if (!categoryId) {
         alert("Thiếu ID chủ đề!");
         window.location.replace("/");
         return;
+    }
+
+    if (!clickListenerAdded) {
+        document.body.addEventListener('click', initializeAudio, { once: true });
+        clickListenerAdded = true;
     }
 
     // --- HÀM HỖ TRỢ: FIX LỖI HIỂN THỊ THẺ HTML ---
@@ -397,6 +435,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     })
                 });
                 const data = await res.json();
+
+                playFeedbackSound(data.isCorrect); 
 
                 // Hiển thị kết quả
                 practiceResult.style.display = 'block';

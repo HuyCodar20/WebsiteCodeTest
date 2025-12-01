@@ -1,4 +1,33 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // --- KHỞI TẠO TONE.JS VÀ ÂM THANH ---
+    let synth = null;
+    let clickListenerAdded = false;
+
+    const SOUND_FREQ_NAV = { freq: "C4", duration: "32n" }; // Trầm hơn, nhẹ nhàng hơn
+
+    function initializeAudio() {
+        if (!synth) {
+            Tone.start();
+            
+            synth = new Tone.Synth({
+                oscillator: {
+                    type: "sine" // Sóng Sine cho âm thanh mượt mà, dịu tai
+                }
+            }).toDestination();
+            console.log("Tone.js AudioContext đã khởi tạo.");
+        }
+    }
+
+    function playNavigationSound() {
+        const isSfxOn = localStorage.getItem('devarena_sfx_enabled') === 'true';
+        if (!isSfxOn) return;
+        
+        initializeAudio();
+        if (synth) {
+            synth.triggerAttackRelease(SOUND_FREQ_NAV.freq, SOUND_FREQ_NAV.duration);
+        }
+    }
+
     /* =========================================
        PHẦN 1: CẤU HÌNH & KHỞI TẠO STATE
        ========================================= */
@@ -75,6 +104,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const candidateNameEl = document.querySelector('.candidate-info h4'); // Tên thí sinh
     const candidateIdEl = document.querySelector('.candidate-info p'); // ID thí sinh
     const toolBtns = document.querySelectorAll('.tool-btn'); // Các nút toolbar
+
+    if (!clickListenerAdded) {
+        document.body.addEventListener('click', initializeAudio, { once: true });
+        clickListenerAdded = true;
+    }
 
     /* =========================================
        PHẦN 2: CÁC HÀM HELPER (HỖ TRỢ)
@@ -322,6 +356,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (currentQuestionIndex < questionsData.length - 1) {
             loadQuestion(currentQuestionIndex + 1);
             startPacedQuestionTimer();
+            playNavigationSound();
+
         } else {
             clearInterval(questionTimerInterval);
             alert("Đã hoàn thành tất cả câu hỏi!");
@@ -343,7 +379,12 @@ document.addEventListener('DOMContentLoaded', () => {
             item.textContent = idx + 1;
             
             if (mode === 'classic') {
-                item.addEventListener('click', () => loadQuestion(idx));
+                item.addEventListener('click', () => {
+                    if (idx !== currentQuestionIndex) {
+                        loadQuestion(idx);
+                        playNavigationSound(); 
+                    }
+                });
             } else {
                 item.style.cursor = 'default';
                 item.style.pointerEvents = 'none';
@@ -561,7 +602,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    if(btnPrev) btnPrev.addEventListener('click', () => loadQuestion(currentQuestionIndex - 1));
+    if(btnPrev) btnPrev.addEventListener('click', () => {
+        if (currentQuestionIndex > 0) {
+            loadQuestion(currentQuestionIndex - 1);
+            playNavigationSound(); 
+        }
+    });
     
     if(btnNext) btnNext.addEventListener('click', () => {
         if (mode === 'paced') {
@@ -569,6 +615,7 @@ document.addEventListener('DOMContentLoaded', () => {
             handlePacedNext();
         } else {
             loadQuestion(currentQuestionIndex + 1);
+            playNavigationSound();
         }
     });
 

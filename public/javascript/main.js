@@ -206,10 +206,17 @@ document.addEventListener("DOMContentLoaded", function() {
     const initializeUserSettings = () => {
         const ids = [ "bg-music", "sound-effects", "question-timer", "num-questions", "total-time" ];
 
+        const SFX_KEY = 'devarena_sfx_enabled';
         const handleSettingChange = function () {
             const allSettings = getCurrentSettingsFromUI();
             saveUserSettings(CURRENT_USER_ID, allSettings);
             if (this.id === "bg-music") toggleBackgroundMusic(this.checked);
+
+            // Xử lý riêng cho Sound Effects (Lưu vào LocalStorage để các trang khác đọc)
+            if (this.id === "sound-effects") {
+                localStorage.setItem(SFX_KEY, this.checked ? "true" : "false");
+            }
+
         };
 
         ids.forEach(id => {
@@ -222,16 +229,16 @@ document.addEventListener("DOMContentLoaded", function() {
             if(bgMusicEl) bgMusicEl.checked = isMusicEnabled;
             
             const soundEffectsEl = document.getElementById('sound-effects');
-            if(soundEffectsEl) soundEffectsEl.checked = settings.SoundEffects;
+            const storedSfxState = localStorage.getItem(SFX_KEY);
+            if(soundEffectsEl) {
+                if (storedSfxState === null) {
+                    soundEffectsEl.checked = false;
+                    localStorage.setItem(SFX_KEY, "false");
+                } else {
+                    soundEffectsEl.checked = storedSfxState === "true";
+                }
+            }
             
-            const questionTimerEl = document.getElementById('question-timer');
-            if(questionTimerEl) questionTimerEl.checked = settings.TimerPerQuestion;
-            
-            const numQuestionsEl = document.getElementById('num-questions');
-            if(numQuestionsEl) numQuestionsEl.value = settings.DefaultNumQuestions;
-            
-            const totalTimeEl = document.getElementById('total-time');
-            if(totalTimeEl) totalTimeEl.value = settings.TestTimer;
         };
 
         const loadUserSettings = async () => {
